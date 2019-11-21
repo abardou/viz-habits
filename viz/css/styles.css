@@ -1,0 +1,10 @@
+rect {
+	fill: white;
+	stroke: black;
+	stroke-width: 1px;
+}
+
+path {
+	fill: none;
+	stroke: black;
+}
