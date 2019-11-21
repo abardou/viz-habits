@@ -1,5 +1,10 @@
 # VizThat
 
+## Requirements
+### Python
+* `pymongo`
+* `pythondns`
+
 ## Data format
 Our data will be stored with JSON, and each block can have at least one of the following attributes:
 
