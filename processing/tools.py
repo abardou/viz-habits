@@ -36,7 +36,8 @@ def translate_appname(appname):
         'Horloge': 'Clock',
         'Téléphone': 'Phone',
         'Calculatrice': 'Calculator',
-        'Google Actualités': 'Google News'
+        'Google Actualités': 'Google News',
+        'Screen off (locked)': 'Screen off'
     }
 
     if appname in translations:
