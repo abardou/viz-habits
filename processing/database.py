@@ -14,3 +14,12 @@ def get_database():
 def get_activity_collection():
     db = get_database()
     return db.Activity
+
+def get_gtelt_filter(gteFilter, ltFilter):
+    f = {}
+    if gteFilter is not None:
+        f['$gte'] = gteFilter
+    if ltFilter is not None:
+        f['$lt'] = ltFilter
+
+    return f if f != {} else None
