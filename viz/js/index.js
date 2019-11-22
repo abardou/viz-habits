@@ -3,14 +3,17 @@ import getNeighbors from './utils/getNeighbors.js';
 import baseNodes from './data/nodes.js';
 import baseLinks from './data/links.js';
 
-const nodes = [...baseNodes];
-const links = [...baseLinks];
+let nodes = [...baseNodes];
+let links = [...baseLinks];
 
 const width = window.innerWidth;
 const height = window.innerHeight;
 
-const svg = d3.select('svg');
-svg.attr('width', width).attr('height', height);
+const svg = d3
+  .select('div#main')
+  .append('svg')
+  .attr('width', width)
+  .attr('height', height);
 
 let linkElements, nodeElements, textElements;
 
@@ -54,10 +57,6 @@ const dragDrop = d3
     node.fy = null;
   });
 
-/**---------------------------
- --- UPDATE & INTERACTION ---
- ---------------------------**/
-
 // select node is called on every click
 // we either update the data according to the selection
 // or reset the data if the same node is clicked twice
@@ -72,12 +71,12 @@ function selectNode(selectedNode) {
     updateSimulation();
   }
 
-  const neighbors = getNeighbors(selectedNode, baseLinks);
+  // const neighbors = getNeighbors(selectedNode, baseLinks);
 
-  // we modify the styles to highlight selected nodes
-  nodeElements.attr('fill', node => getNodeColor(node, neighbors));
-  textElements.attr('fill', node => getTextColor(node, neighbors));
-  linkElements.attr('stroke', link => getLinkColor(selectedNode, link));
+  // // we modify the styles to highlight selected nodes
+  // nodeElements.attr('fill', node => getNodeColor(node, neighbors));
+  // textElements.attr('fill', node => getTextColor(node, neighbors));
+  // linkElements.attr('stroke', link => getLinkColor(selectedNode, link));
 }
 
 // this helper simple adds all nodes and links
@@ -115,18 +114,39 @@ function updateData(selectedNode) {
   );
 }
 
+let defs = svg.append('defs');
+defs
+  .append('marker')
+  .attrs({
+    id: 'arrow',
+    viewBox: '0 -5 10 10',
+    refX: 15,
+    refY: -1.5,
+    markerWidth: 15,
+    markerHeight: 15,
+    orient: 'auto'
+  })
+  .append('path')
+  .attrs({
+    d: 'M0,-5L10,0L0,5',
+    fill: '#f00'
+  });
+
 function updateGraph() {
   // links
   linkElements = linkGroup
-    .selectAll('line')
+    .selectAll('path')
     .data(links, link => link.target.id + link.source.id);
   linkElements.exit().remove();
 
   const linkEnter = linkElements
     .enter()
-    .append('line')
-    .attr('stroke-width', 1)
-    .attr('stroke', 'rgba(50, 50, 50, 0.2)');
+    .append('path')
+    .attrs({
+      'stroke-width': 1,
+      stroke: 'rgba(50, 50, 50, 1)',
+      'marker-end': 'url(#arrow)'
+    });
 
   linkElements = linkEnter.merge(linkElements);
 
@@ -138,10 +158,7 @@ function updateGraph() {
     .enter()
     .append('circle')
     .attr('r', 10)
-    .attr('fill', node => (node.level === 1 ? 'red' : 'gray'))
     .call(dragDrop)
-    // we link the selectNode method here
-    // to update the graph on every click
     .on('click', selectNode);
 
   nodeElements = nodeEnter.merge(nodeElements);
@@ -154,9 +171,11 @@ function updateGraph() {
     .enter()
     .append('text')
     .text(node => node.label)
-    .attr('font-size', 15)
-    .attr('dx', 15)
-    .attr('dy', 4);
+    .attrs({
+      'font-size': 15,
+      dx: 15,
+      dy: 4
+    });
 
   textElements = textEnter.merge(textElements);
 }
@@ -167,17 +186,19 @@ function updateSimulation() {
   simulation.nodes(nodes).on('tick', () => {
     nodeElements.attr('cx', node => node.x).attr('cy', node => node.y);
     textElements.attr('x', node => node.x).attr('y', node => node.y);
-    linkElements
-      .attr('x1', link => link.source.x)
-      .attr('y1', link => link.source.y)
-      .attr('x2', link => link.target.x)
-      .attr('y2', link => link.target.y);
+    linkElements.attr('d', linkArc);
   });
 
   simulation.force('link').links(links);
   simulation.restart();
 }
 
-// last but not least, we call updateSimulation
-// to trigger the initial render
+function linkArc(d) {
+  var dx = d.target.x - d.source.x,
+    dy = d.target.y - d.source.y,
+    dr = Math.sqrt(dx * dx + dy * dy);
+
+  return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
+}
+
 updateSimulation();
