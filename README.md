@@ -6,21 +6,14 @@
 * `pythondns`
 
 ## Data format
-Our data will be stored with JSON, and each block can have at least one of the following attributes:
+Our data will be stored in a MongoDB database (see [this file](credentials) for credentials). We detail here, for each collection, the fields of a document.
 
-* `Data_Id` : a unique id in order to quickly get a data block
-* `User_Name` : the name of the user
-* `Smartphone_Brand` : the brand of the smartphone
-* `Smartphone_Model` : the model of the smartphone (must be used with `Smartphone_Brand`)
-* `Date_Start` : start date of the measure
-* `Date_End` : end date of the measure (must be used with `Date_Start`)
-* `App_Usage_Duration` : duration for a specific app (must be used with `Date_Start` and `Application_Name`)
-* `Phone_Usage_Duration` : usage duration of the phone for a specific interval (must be used with `Date_Start`)
-* `Application_Name` : name of the application
-* `Application_Checks` : number of checks for an application in a specific interval (must be used with `Date_Start`, `Date_End`)
-* `Phone_Checks` : number of phone checks in a specific interval (must be used with `Date_Start`, `Date_End`)
-* `Battery` : percentage of battery
-* `Tags` : textual description items
+### Activity
+The Activity collection will store the list of apps used by the user, at a specific date, for a specific duration. Data is represented with the following fields:
+* `user_id` : id of the user
+* `app_name` : the app name
+* `date` : the date and time at starting of the app
+* `duration` : the duration of app usage
 
 ## Visualizations
 ### App Graph
