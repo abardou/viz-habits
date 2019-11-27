@@ -16,7 +16,7 @@
 
 <script>
 export default {
-	name: 'Timeline',
+	name: 'FrequencyRange',
 	data: () => ({
 		freqRange: [0.2, 0.65],
 	}),
