@@ -25,6 +25,34 @@ def extract_app_usage_data(userId, filepath):
     # Create a df with new data and return it
     return pd.DataFrame(new_data)
 
+def build_positions_for_activity(activity, location):
+    lat = [float('nan')]*activity.shape[0]
+    long = [float('nan')]*activity.shape[0]
+
+    for i in range(activity.shape[0]):
+        tmin = activity['Time'][i]
+        tmax = tmin + activity['Duration'][i]
+        loc_points = location[location['Time'].between(tmin, tmax, inclusive=True)]
+
+        if not loc_points.empty:
+            means = location[['Lat', 'Long']].mean()
+            lat[i] = means['Lat']
+            long[i] = means['Long']
+
+    return lat, long
+
+def build_aggregate_for_user(userId, activity_source, location_source, aggregate_target):
+    activity_data = extract_app_usage_data(userId, activity_source)
+
+    tmax, tmin = (activity_data['Time'].max(), activity_data['Time'].min())
+    location_data = pd.read_csv(location_source)
+    location_data = location_data[location_data['Time'].between(tmin, tmax, inclusive=True)]
+
+    lat, long = build_positions_for_activity(activity_data, location_data)
+    activity_data['Lat'] = lat
+    activity_data['Long'] = long
+
+    activity_data.to_csv(aggregate_target)
+
 if __name__ == "__main__":
-    extract_app_usage_data(3, "data/user3/AUM_V4_Activity_2019-11-26_09-26-10.csv")
-    
+    build_aggregate_for_user(2, "data/user2/AUM_V4_Activity_2019-11-21_15-18-06.csv", "data/user2/position.csv", "data/user2/u2_aggregate.csv")
