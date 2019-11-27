@@ -1,17 +1,24 @@
 <template>
 	<div class="home">
-		<img alt="Vue logo" src="../assets/logo.png">
+		<v-container grid-list-xs>
+			<v-card>
+				<Timeline />
+				<FrequencyRange />
+			</v-card>
+		</v-container>
 	</div>
 </template>
 
 <script>
 // @ is an alias to /src
-// import HelloWorld from '@/components/HelloWorld.vue';
+import Timeline from '@/components/Timeline.vue';
+import FrequencyRange from '@/components/FrequencyRange.vue';
 
 export default {
 	name: 'Home',
 	components: {
-		
+		Timeline,
+		FrequencyRange
 	}
 };
 </script>
