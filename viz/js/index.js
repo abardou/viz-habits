@@ -201,4 +201,4 @@ function linkArc(d) {
   return `M${d.source.x},${d.source.y}A${dr},${dr} 0 0,1 ${d.target.x},${d.target.y}`;
 }
 
-updateSimulation();
+// updateSimulation();
