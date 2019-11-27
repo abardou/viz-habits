@@ -44,15 +44,30 @@ def build_positions_for_activity(activity, location):
 def build_aggregate_for_user(userId, activity_source, location_source, aggregate_target):
     activity_data = extract_app_usage_data(userId, activity_source)
 
-    tmax, tmin = (activity_data['Time'].max(), activity_data['Time'].min())
-    location_data = pd.read_csv(location_source)
-    location_data = location_data[location_data['Time'].between(tmin, tmax, inclusive=True)]
+    if location_source is not None:
+        tmax, tmin = (activity_data['Time'].max(), activity_data['Time'].min())
+        location_data = pd.read_csv(location_source)
+        location_data = location_data[location_data['Time'].between(tmin, tmax, inclusive=True)]
 
-    lat, long = build_positions_for_activity(activity_data, location_data)
+        lat, long = build_positions_for_activity(activity_data, location_data)
+    else:
+        lat = [float('nan')]*activity_data.shape[0]
+        long = [float('nan')]*activity_data.shape[0]
+
     activity_data['Lat'] = lat
     activity_data['Long'] = long
 
     activity_data.to_csv(aggregate_target)
 
+def aggregate_aggregates(aggregates, aggregate_target):
+    dataframes = [pd.read_csv(a) for a in aggregates]
+    data = dataframes[0].append(dataframes[1:], ignore_index=True).drop(columns="Unnamed: 0")
+    data.to_json(aggregate_target, orient='records')
+
 if __name__ == "__main__":
-    build_aggregate_for_user(2, "data/user2/AUM_V4_Activity_2019-11-21_15-18-06.csv", "data/user2/position.csv", "data/user2/u2_aggregate.csv")
+    # build_aggregate_for_user(3, "data/user3/AUM_V4_Activity_2019-11-26_09-26-10.csv", None, "data/user3/u3_aggregate.csv")
+    aggregate_aggregates([
+        "data/user1/u1_aggregate.csv",
+        "data/user2/u2_aggregate.csv",
+        "data/user3/u3_aggregate.csv"
+    ], "data/dataset.json")

@@ -2,8 +2,8 @@ import json
 import pandas as pd
 
 if __name__ == "__main__":
-    path = "data/user3/positions.json"
-    target = "data/user3/positions.csv"
+    path = "data/user1/position.json"
+    target = "data/user1/position.csv"
     with open(path) as json_file:
         js = json.load(json_file)
         
