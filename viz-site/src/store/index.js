@@ -5,8 +5,20 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
 	state: {
+		daysSelection: null,
+		hoursSelection: null,
+		minutesSelection: null
 	},
 	mutations: {
+		setDaysSelection(state, value) {
+			state.daysSelection = value;
+		},
+		setHoursSelection(state, value) {
+			state.hoursSelection = value;
+		},
+		setMinutesSelection(state, value) {
+			state.minutesSelection = value;
+		},
 	},
 	actions: {
 	},
