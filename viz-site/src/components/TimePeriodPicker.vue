@@ -14,15 +14,15 @@
 			unselcol="#ddd"
 			:data="daysTooltips"
 		/>
-		<!-- <Ring
+		<Ring
 			v-if="initialized"
 			id="ring_2"
 			:svg="svg"
 			:tooltip="tooltip"
-			cx="480"
-			cy="250"
-			outrad="106"
-			inrad="86"
+			:cx="480"
+			:cy="250"
+			:outrad="106"
+			:inrad="86"
 			selcol="#46edc8"
 			unselcol="#ddd"
 			:data="hoursTooltips"
@@ -32,14 +32,14 @@
 			id="ring_3"
 			:svg="svg"
 			:tooltip="tooltip"
-			cx="480"
-			cy="250"
-			outrad="80"
-			inrad="60"
+			:cx="480"
+			:cy="250"
+			:outrad="80"
+			:inrad="60"
 			selcol="#fdf289"
 			unselcol="#ddd"
 			:data="minutesTooltips"
-		/> -->
+		/>
 	</v-container>
 </template>
 

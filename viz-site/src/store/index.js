@@ -7,7 +7,8 @@ export default new Vuex.Store({
 	state: {
 		daysSelection: null,
 		hoursSelection: null,
-		minutesSelection: null
+		minutesSelection: null,
+		timePickerDragingState: null
 	},
 	mutations: {
 		setDaysSelection(state, value) {
@@ -19,6 +20,9 @@ export default new Vuex.Store({
 		setMinutesSelection(state, value) {
 			state.minutesSelection = value;
 		},
+		setTimePickerDragingState(state, value) {
+			state.timePickerDragingState = value;
+		}
 	},
 	actions: {
 	},

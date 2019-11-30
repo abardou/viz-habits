@@ -64,13 +64,16 @@ export default {
 		},
 		a_size() {
 			return this.r_length - this.s_size;
+		},
+		draggingState() {
+			return this.$store.state.timePickerDragingState;
 		}
 	},
 	watch: {
 		selected: {
 			handler(val, oldVal) {
-				console.log(val);
-				console.log(oldVal);
+				// console.log(val);
+				// console.log(oldVal);
 			},
 			deep: true
 		}
@@ -103,14 +106,25 @@ export default {
 		mouse_over(i, pathObject) {
 			const col = this.selected[i] ? this.unselcol : this.selcol;
 			d3.select(pathObject).style('fill', col);
+
+			if (this.draggingState && this.draggingState.dragStartRing && this.draggingState.dragStartRing.includes(pathObject)) {
+				this.selected[i] = !this.selected[i];
+				const col = this.color(i);
+				d3.select(pathObject).style('fill', col);
+			}
 		},
 	
 		/* Called when the mouse is out of a ring segment
 		* i: data index, used to resolve color
 		*/
 		mouse_out(i, pathObject) {
-			const col = this.color(i);
-			d3.select(pathObject).transition().duration(400).style('fill', col);
+			if (
+				!(this.draggingState && this.draggingState.dragging)
+				&& !(this.draggingState && this.draggingState.dragStartRing && this.draggingState.dragStartRing.includes(pathObject))
+			) {
+				const col = this.color(i);
+				d3.select(pathObject).transition().duration(300).style('fill', col);
+			}
 			this.tooltip.classed('hidden', true);
 		},
 	
@@ -143,17 +157,32 @@ export default {
 		/* Draw the whole ring, need to be called by the user
 		*/
 		draw() {
-			const that = this;
+			const ring = this;
 
 			this.svg.selectAll(this.id).data(this.data).enter()
 				.append('path')
-				.attr('transform', 'translate('+that.cx+', '+that.cy+')')
-				.attr('d', function(d, i) { return that.draw_arc(i)(); })
-				.attr('fill', function(d, i) { return that.color(i); })
-				.on('mousemove', function(d) { that.mouse_move(d, this); })
-				.on('mouseout', function(d,i) { that.mouse_out(i, this); })
-				.on('mouseover', function(d, i) {that.mouse_over(i, this);})
-				.on('click', function(d, i) {that.on_click(i, this);});
+				.attr('transform', `translate(${ring.cx}, ${ring.cy})`)
+				.attr('d', function(d, i) { return ring.draw_arc(i)(); })
+				.attr('fill', function(d, i) { return ring.color(i); })
+				.on('mousemove', function(d) { ring.mouse_move(d, this); })
+				.on('mouseout', function(d, i) { ring.mouse_out(i, this); })
+				.on('mouseover', function(d, i) {ring.mouse_over(i, this);})
+				.on('click', function(d, i) {ring.on_click(i, this);})
+				.on('mousedown', function(d, i, p) {
+					const draggingState = {
+						dragging: true,
+						dragStartRing: p
+					};
+					ring.$store.commit('setTimePickerDragingState', draggingState);
+				})
+				.on('mouseup', function(d, i) {
+					const draggingState = ring.draggingState;
+
+					draggingState.dragStartRing = null;
+					draggingState.dragging = false;
+
+					ring.$store.commit('setTimePickerDragingState', draggingState);
+				});
 		}
 	}
 };
