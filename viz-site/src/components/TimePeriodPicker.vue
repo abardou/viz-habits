@@ -1,22 +1,64 @@
 <template>
 	<v-container>
 		<v-container id="picker-container" />
+		<Ring
+			v-if="initialized"
+			id="ring_1"
+			:svg="svg"
+			:tooltip="tooltip"
+			:cx="480"
+			:cy="250"
+			:outrad="132"
+			:inrad="112"
+			selcol="#374d7c"
+			unselcol="#ddd"
+			:data="daysTooltips"
+		/>
+		<!-- <Ring
+			v-if="initialized"
+			id="ring_2"
+			:svg="svg"
+			:tooltip="tooltip"
+			cx="480"
+			cy="250"
+			outrad="106"
+			inrad="86"
+			selcol="#46edc8"
+			unselcol="#ddd"
+			:data="hoursTooltips"
+		/>
+		<Ring
+			v-if="initialized"
+			id="ring_3"
+			:svg="svg"
+			:tooltip="tooltip"
+			cx="480"
+			cy="250"
+			outrad="80"
+			inrad="60"
+			selcol="#fdf289"
+			unselcol="#ddd"
+			:data="minutesTooltips"
+		/> -->
 	</v-container>
 </template>
 
 <script>
 import * as d3 from 'd3';
-import Ring from './Ring.js';
+import Ring from '@/components/Ring.vue';
 
 export default {
 	name: 'TimePeriodPicker',
+	components: {
+		Ring
+	},
 	data: () => ({
 		// Tooltip for days
 		daysTooltips: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
 		granularity_minutes: 5,
-		daysRing: null,
-		hoursRing: null,
-		minutesRing: null
+		svg: null,
+		tooltip: null,
+		initialized: false
 	}),
 	computed: {
 		hoursTooltips() {
@@ -39,36 +81,25 @@ export default {
 			return tt3;
 		}
 	},
-	watch: {
-		daysRing: {
-			handler: function (val, oldVal) {
-				console.log(val);
-				console.log(oldVal);
-			},
-			deep: true
-		},
-	},
 	mounted() {
 		// Svg variable
-		var svg = d3.select('#picker-container').append('svg')
+		this.svg = d3.select('#picker-container').append('svg')
 			.attr('width', 960)
 			.attr('height', 500);
 		
 		// Tooltip div
-		var tooltip = d3.select('#picker-container').append('div').attr('class', 'hidden tooltip');	
+		this.tooltip = d3.select('#picker-container').append('div').attr('class', 'hidden tooltip');
+
+		this.initialized = true;
 		
 		// Rings
-		this.daysRing = new Ring(svg, tooltip, 'ring_1', 480, 250, 132, 112, '#374d7c', '#ddd', this.daysTooltips);
-		this.hoursRing = new Ring(svg, tooltip, 'ring_2', 480, 250, 106, 86, '#46edc8', '#ddd', this.hoursTooltips);		
-		this.minutesRing = new Ring(svg, tooltip, 'ring_3', 480, 250, 80, 60, '#fdf289', '#ddd', this.minutesTooltips);
-		
-		this.daysRing.draw();
-		this.hoursRing.draw();
-		this.minutesRing.draw();
+		// this.daysRing = new ClassRing(svg, tooltip, 'ring_1', 480, 250, 132, 112, '#374d7c', '#ddd', this.daysTooltips);
+		// this.hoursRing = new ClassRing(svg, tooltip, 'ring_2', 480, 250, 106, 86, '#46edc8', '#ddd', this.hoursTooltips);		
+		// this.minutesRing = new ClassRing(svg, tooltip, 'ring_3', 480, 250, 80, 60, '#fdf289', '#ddd', this.minutesTooltips);
 
-		this.$store.commit('setDaysSelection', this.daysRing.selection);
-		this.$store.commit('setHoursSelection', this.hoursRing.selection);
-		this.$store.commit('setMinutesSelection', this.minutesRing.selection);
+		// this.$store.commit('setDaysSelection', this.daysRing.selection);
+		// this.$store.commit('setHoursSelection', this.hoursRing.selection);
+		// this.$store.commit('setMinutesSelection', this.minutesRing.selection);
 	}
 };
 </script>
