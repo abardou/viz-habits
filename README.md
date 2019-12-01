@@ -15,14 +15,6 @@ The Activity collection will store the list of apps used by the user, at a speci
 * `date` : the date and time at starting of the app
 * `duration` : the duration of app usage
 
-## Visualizations
-### App Graph
-![](previews/AppGraph.png)
-
-**Description** : The AppGraph visualization aims to represent habits in app navigation with a directed weighted graph. Nodes are apps and a link from node $A$ to node $B$ represents the switch between the app $A$ and the app $B$. The links are weighted according to how often the switch occurs in the data. For more precise information, we can consider printing the frequency in its absolute form or in its relative form (percentage or probability). 
-
-**Utility** : This graph tries to represent the user's behaviour as he uses several applications. The thickness of the arrows can help identify user habits and, in a way, shows a probability distribution for each application. Therefore, with several hypothesis, this graph can be considered as a Markov Chain.
-
 ## Sources
 Energy :  
     - smartphone users & smartphone penetration : https://www.bankmycell.com/blog/how-many-phones-are-in-the-world  
