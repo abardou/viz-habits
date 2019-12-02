@@ -63,10 +63,6 @@ class AppChordModel {
             }
         }
 
-        this.remove_by_switches(this.filtered_apps, this.filtered_apps_time,
-                                this.filtered_cumul_time, this.filtered_n_switches,
-                                this.filtered_adj_mat)
-
         // Normalize the matrix
         for (let line in this.adj_mat)
             for (let col in this.adj_mat[line])
@@ -75,16 +71,6 @@ class AppChordModel {
 
     get_app_index(app_name) {
         return this.apps.indexOf(app_name)
-    }
-
-    remove_by_switches(app, app_time, c_time, n_switch, adj_mat) {
-        var to_rem = []
-        for (let i in this.filtered_n_switches)
-            if (this.filtered_n_switches[i] == 0)
-                to_rem.push(i);
-        to_rem.sort(function(a, b) { return b - a; })
-
-        // TODO
     }
 
     apply_time_filter(min_time, max_time=Number.MAX_SAFE_INTEGER) {
@@ -109,14 +95,18 @@ class AppChordModel {
         }
 
         // Update n_switches
+        var coeffs = new Array(this.filtered_n_switches.length).fill(0)
         this.filtered_n_switches = this.filtered_n_switches.map(
             function(d, i) {
-                return Math.round(d * this.filtered_adj_mat[i].reduce(function(a, b) {return a + b}))
+                var new_s = Math.round(d * this.filtered_adj_mat[i].reduce(function(a, b) {return a + b}))
+                if (new_s != 0)
+                    coeffs[i] = d / new_s;
+                return new_s
             }, this);
-
-        // It is useless to keep apps with 0 switches
-        this.remove_by_switches(this.apps, this.apps_time, this.cumul_time, this.n_switches, this.adj_mat)
-        
+        // Update adj_mat coeffs
+        for (let lig in this.filtered_adj_mat)
+            for (let col in this.filtered_adj_mat[lig])
+                this.filtered_adj_mat[lig][col] = coeffs[lig]*this.filtered_adj_mat[lig][col]
     }
 
     apply_frequency_filter(min_freq, max_freq=1) {
@@ -144,7 +134,7 @@ xobj.onreadystatechange = function () {
             var f = d => d['App Name'] != "Screen off"
             data = data.filter(f)
             var acm = new AppChordModel(data)
-            acm.apply_filters(0, 1, 0, 1)
+            acm.apply_filters(0, 300, 0, 1)
         }
 };
 xobj.send(null);
