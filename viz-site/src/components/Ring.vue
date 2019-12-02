@@ -66,21 +66,24 @@ export default {
 			return this.r_length - this.s_size;
 		},
 		draggingState() {
-			return this.$store.state.timePickerDragingState;
+			return this.$store.state.draggingState;
 		}
 	},
 	watch: {
-		selected: {
-			handler(val, oldVal) {
-				// console.log(val);
-				// console.log(oldVal);
-			},
-			deep: true
-		}
+		// selected: {
+		// 	handler(val, oldVal) {
+		// 		// console.log(val);
+		// 		// console.log(oldVal);
+		// 	},
+		// 	deep: true
+		// }
 	},
 	mounted() {
 		this.selected = new Array(this.l).fill(true);
 		this.draw();
+		// setInterval(() => {
+		// 	console.log(this.selected);
+		// }, 5000);
 	},
 	methods: {
 		/* Return the color of the ith segment in the ring
@@ -104,12 +107,14 @@ export default {
 		* i: data index, used to resolve color
 		*/
 		mouse_over(i, pathObject) {
-			const col = this.selected[i] ? this.unselcol : this.selcol;
-			d3.select(pathObject).style('fill', col);
-
-			if (this.draggingState && this.draggingState.dragStartRing && this.draggingState.dragStartRing.includes(pathObject)) {
+			if (this.draggingState.dragging &&
+			this.draggingState.dragStartRing && this.draggingState.dragStartRing.includes(pathObject)) {
+				console.log(pathObject);
 				this.selected[i] = !this.selected[i];
 				const col = this.color(i);
+				d3.select(pathObject).style('fill', col);
+			} else {
+				const col = this.selected[i] ? this.unselcol : this.selcol;
 				d3.select(pathObject).style('fill', col);
 			}
 		},
@@ -118,9 +123,10 @@ export default {
 		* i: data index, used to resolve color
 		*/
 		mouse_out(i, pathObject) {
+			// Si on ne drag pas ou bien si on était sur 
 			if (
-				!(this.draggingState && this.draggingState.dragging)
-				&& !(this.draggingState && this.draggingState.dragStartRing && this.draggingState.dragStartRing.includes(pathObject))
+				!this.draggingState.dragging
+				|| !(this.draggingState.dragStartRing && this.draggingState.dragStartRing.includes(pathObject))
 			) {
 				const col = this.color(i);
 				d3.select(pathObject).transition().duration(300).style('fill', col);
@@ -169,20 +175,20 @@ export default {
 				.on('mouseover', function(d, i) {ring.mouse_over(i, this);})
 				.on('click', function(d, i) {ring.on_click(i, this);})
 				.on('mousedown', function(d, i, p) {
-					const draggingState = {
-						dragging: true,
-						dragStartRing: p
-					};
-					ring.$store.commit('setTimePickerDragingState', draggingState);
+					ring.selected[i] = !ring.selected[i];
+
+					ring.setDraggingState(true, p);
 				})
 				.on('mouseup', function(d, i) {
-					const draggingState = ring.draggingState;
-
-					draggingState.dragStartRing = null;
-					draggingState.dragging = false;
-
-					ring.$store.commit('setTimePickerDragingState', draggingState);
+					ring.setDraggingState(false, null);
 				});
+		},
+
+		setDraggingState(dragging, dragStartRing) {
+			this.$store.commit('setDraggingState', {
+				dragging,
+				dragStartRing
+			});
 		}
 	}
 };

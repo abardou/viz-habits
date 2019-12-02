@@ -34,6 +34,14 @@ export default {
 				return this.$store.state.daysSelection;
 			}
 		},
+	},
+	mounted() {
+		document.documentElement.addEventListener('mouseup', e => {
+			this.$store.commit('setDraggingState', {
+				dragging: false,
+				dragStartRing: null
+			});
+		});
 	}
 };
 </script>
