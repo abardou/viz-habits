@@ -39,7 +39,8 @@ export default {
 		document.documentElement.addEventListener('mouseup', e => {
 			this.$store.commit('setDraggingState', {
 				dragging: false,
-				dragStartRing: null
+				dragStartRing: null,
+				firstObject: null
 			});
 		});
 	}
