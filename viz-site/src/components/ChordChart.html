@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <script src="https://d3js.org/d3.v5.min.js"></script>
+  <style>
+    body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
+    .hidden {
+        display: none;
+    }
+    div.tooltip {
+        color: #222;
+        background-color: #fff;
+        padding: .5em;
+        text-shadow: #f5f5f5 0 1px 0;
+        border-radius: 2px;
+        opacity: 0.9;
+        position: absolute;
+    }
+  </style>
+</head>
+
+<body>
+    <script src="../../../viz/js/data/appchord_model.js"></script>
+    <script>
+        // Svg variable
+        var svg = d3.select("body").append("svg")
+                    .attr("width", 1000)
+                    .attr("height", 1000);
+        
+        // Tooltip div
+        var tooltip = d3.select('body').append('div').attr('class', 'hidden tooltip');
+
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++)
+                color += letters[Math.floor(Math.random() * 16)];
+            return color;
+        }
+
+        class AppChord {
+            constructor(svg, cx, cy, inrad, outrad, max_outrad) {
+                this.svg = svg;
+                this.cx = cx;
+                this.cy = cy;
+                this.inrad = inrad;
+                this.outrad = outrad;
+                this.max_outrad = max_outrad;
+            }
+
+            draw(data, times, colors) {
+                // Times normalization
+                var that = this;
+                var max = times.reduce(function(a, b) { return Math.max(a, b); })
+                times = times.map(d => d/max)
+
+                var res = d3.chord()
+                            .padAngle(0.05)     // padding between entities (black arc)
+                            .sortSubgroups(d3.descending)
+                            (data)
+
+                this.svg.datum(res)
+                    .append("g")
+                    .selectAll("g")
+                    .data(d => { return d.groups; })
+                    .enter()
+                    .append("g")
+                    .append("path")
+                        .style("fill", function(d, i) { return colors[i]; })
+                        .style("stroke", "black")
+                        .attr("d", d3.arc()
+                            .innerRadius(this.inrad)
+                            .outerRadius(function(d, i) { return that.outrad + times[i]*that.max_outrad }))
+                        .attr("transform", "translate("+this.cx+", "+this.cy+")")
+
+                // Add the links between groups
+                this.svg
+                .datum(res)
+                .append("g")
+                .selectAll("path")
+                .data(function(d) { return d; })
+                .enter()
+                .append("path")
+                    .attr("d", d3.ribbon()
+                    .radius(this.outrad - 10)
+                    )
+                    .style("fill", d => colors[d.source.index])
+                    .style("stroke", "black")
+                    .attr("transform", "translate("+this.cx+", "+this.cy+")")
+            }
+        }
+        
+        let xobj = new XMLHttpRequest();
+        xobj.overrideMimeType("application/json");
+        xobj.open('GET', '../../../data/dataset.json', true);
+        xobj.onreadystatechange = function () {
+                if (xobj.readyState == 4 && xobj.status == "200") {
+                    let data = JSON.parse(xobj.responseText)
+                    let f = d => d['App Name'] != "Screen off" && d['User_ID'] == 1
+                    data = data.filter(f)
+                    let acm = new AppChordModel(data)
+                    acm.apply_filters(0, 20000000, 0, 1)
+                    console.log(acm.filtered_adj_mat)
+
+                    colors = acm.filtered_apps_time.map(d => getRandomColor())
+                    console.log(colors)
+                    ac = new AppChord(svg, 500, 500, 300, 340, 100)
+                    ac.draw(acm.filtered_adj_mat, acm.filtered_apps_time, colors)
+                }
+        };
+        xobj.send(null);
+    </script>
+</body>
