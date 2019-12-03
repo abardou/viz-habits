@@ -33,9 +33,9 @@ class AppChordModel {
             this.apps.add(d['App Name']);
         this.apps = Array.from(this.apps);
 
-        // Attribute apps_time : collection of proportion of time consumption for each app
+        // Attribute apps_time : collection of cumulated proportion of time consumption for each app
         this.apps_time = new Array(this.apps.length).fill(0);
-        // Attribute cumul_time : sum(apps_time)
+        // Attribute cumul_time
         this.cumul_time = 0;
         for (let d of data) {
             let app_idx = this.get_app_index(d['App Name'])
@@ -43,8 +43,12 @@ class AppChordModel {
             this.cumul_time += d['Duration'];
         }
 
-        for (let i in this.apps_time)
-            this.apps_time[i] = this.apps_time[i] / this.cumul_time
+        // Build the cumulative array
+        // [0.4, 0.1, 0.07, 0.2, 0.2, 0.03] becomes [0.4, 0.5, 0.57, 0.77, 0.97, 1]
+        for (let i in this.apps_time) {
+            let to_add = i > 0 ? this.apps_time[i-1] : 0
+            this.apps_time[i] = to_add + this.apps_time[i] / this.cumul_time
+        }
     }
 
     /**
@@ -98,6 +102,22 @@ class AppChordModel {
     }
 
     /**
+     * Compute the absolute not cumulative array of consumption time
+     * 
+     * @param {Array(float)} app_time cumulative array of proportions of consumption time
+     * @param {int} c_time the cumulative absolute time of consumption
+     * 
+     * @returns {Array(int)} the absolute not cumulative array of consumption time
+     */
+    get_abs_time(app_time, c_time) {
+        var abs_time = new Array(app_time.length);
+        for (let i in app_time)
+            abs_time[i] = Math.round(c_time*(app_time[i] - (i > 0 ? app_time[i-1] : 0)))
+
+        return abs_time
+    }
+
+    /**
      * Remove in each provided attributes (must be references for side effects) the apps listed in to_rem
      * 
      * @param {Array(int)} to_rem the indexes of the apps to remove
@@ -111,7 +131,7 @@ class AppChordModel {
      */
     remove_useless_apps(to_rem, matrix, app, app_time, c_time, switches) {
         // Compute the absolute time from c_time and app_time
-        let abs_time = app_time.map(d => {return Math.round(c_time*d); })
+        let abs_time = this.get_abs_time(app_time, c_time)
         // Sort descending to_rem in order to prevent indexes issues
         to_rem = to_rem.sort(function(a, b) { return b - a; });
         // Remove apps filtered from attributes
@@ -119,6 +139,7 @@ class AppChordModel {
             c_time -= abs_time[i]
             app.splice(i, 1)
             app_time.splice(i, 1)
+            abs_time.splice(i, 1)
 
             switches.splice(i, 1)
             // Line of the matrix
@@ -128,6 +149,11 @@ class AppChordModel {
                 matrix[j].splice(i, 1)
         }
 
+        // Update app_time
+        for (let i in app_time) {
+            let to_add = i > 0 ? app_time[i-1] : 0
+            app_time[i] = to_add + abs_time[i] / c_time
+        }
         // Update n_switches
         // Compute coeffs to apply to proportions into matrix at the same time
         let coeffs = new Array(switches.length).fill(0)
@@ -176,12 +202,13 @@ class AppChordModel {
      */
     apply_time_filter(min_time, max_time=Number.MAX_SAFE_INTEGER) {
         // Build the absolute consumption time
-        let abs_time = this.apps_time.map(d => {return Math.round(this.cumul_time*d); })
+        let abs_time = this.get_abs_time(this.apps_time, this.cumul_time)
         let to_rem = []
         // Apply the filter and collect apps indexes to remove
-        for (let i in abs_time)
+        for (let i in abs_time) {
             if (abs_time[i] < min_time || abs_time[i] > max_time)
                 to_rem.push(i);
+        }
 
         // Filter with to_rem
         this.filtered_cumul_time = this.remove_useless_apps(to_rem, this.filtered_adj_mat, this.filtered_apps,
@@ -247,8 +274,7 @@ class AppChordModel {
 //             let f = d => d['App Name'] != "Screen off"
 //             data = data.filter(f)
 //             let acm = new AppChordModel(data)
-//             acm.apply_filters(0, Number.MAX_SAFE_INTEGER, 0.2, 0.5)
-//             console.log(acm.filtered_adj_mat)
+//             acm.apply_filters(0, 10, 0, 1)
 //         }
 // };
 // xobj.send(null);
