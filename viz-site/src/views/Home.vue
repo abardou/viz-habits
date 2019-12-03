@@ -5,7 +5,7 @@
 				<!-- <Timeline />
 				<FrequencyRange /> -->
 				<v-card>
-					{{ daysSelection }}
+					{{ timePickerSelection }}
 					<TimePeriodPicker />
 				</v-card>
 			</v-card>
@@ -29,9 +29,9 @@ export default {
 		TimePeriodPicker
 	},
 	computed: {
-		daysSelection: {
+		timePickerSelection: {
 			get() {
-				return this.$store.state.daysSelection;
+				return this.$store.state.timePickerSelection;
 			}
 		},
 	},

@@ -4,6 +4,7 @@
 		<Ring
 			v-if="initialized"
 			id="ring_1"
+			name="days"
 			:svg="svg"
 			:tooltip="tooltip"
 			:cx="480"
@@ -17,6 +18,7 @@
 		<Ring
 			v-if="initialized"
 			id="ring_2"
+			name="hours"
 			:svg="svg"
 			:tooltip="tooltip"
 			:cx="480"
@@ -30,6 +32,7 @@
 		<Ring
 			v-if="initialized"
 			id="ring_3"
+			name="minutes"
 			:svg="svg"
 			:tooltip="tooltip"
 			:cx="480"
@@ -91,15 +94,6 @@ export default {
 		this.tooltip = d3.select('#picker-container').append('div').attr('class', 'hidden tooltip');
 
 		this.initialized = true;
-		
-		// Rings
-		// this.daysRing = new ClassRing(svg, tooltip, 'ring_1', 480, 250, 132, 112, '#374d7c', '#ddd', this.daysTooltips);
-		// this.hoursRing = new ClassRing(svg, tooltip, 'ring_2', 480, 250, 106, 86, '#46edc8', '#ddd', this.hoursTooltips);		
-		// this.minutesRing = new ClassRing(svg, tooltip, 'ring_3', 480, 250, 80, 60, '#fdf289', '#ddd', this.minutesTooltips);
-
-		// this.$store.commit('setDaysSelection', this.daysRing.selection);
-		// this.$store.commit('setHoursSelection', this.hoursRing.selection);
-		// this.$store.commit('setMinutesSelection', this.minutesRing.selection);
 	}
 };
 </script>

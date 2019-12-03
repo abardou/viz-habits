@@ -20,6 +20,10 @@ export default {
 			default: null,
 			type: String
 		},
+		name: {
+			default: null,
+			type: String
+		},
 		cx: {
 			default: null,
 			type: Number
@@ -71,10 +75,9 @@ export default {
 	},
 	watch: {
 		selected: {
-			handler(val, oldVal) {
-				if (this.id == 'ring_1') {
-					console.log(val);
-				}
+			handler(value) {
+				const key = this.name;
+				this.$store.commit('setTimePickerSelection', {key, value});
 			},
 			deep: true
 		}
