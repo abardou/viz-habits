@@ -39,54 +39,103 @@
         }
 
         class AppChord {
-            constructor(svg, cx, cy, inrad, outrad, max_outrad) {
+            constructor(svg, tooltip, cx, cy, inrad, outrad, max_outrad, alpha) {
                 this.svg = svg;
+                this.tooltip = tooltip;
                 this.cx = cx;
                 this.cy = cy;
                 this.inrad = inrad;
                 this.outrad = outrad;
                 this.max_outrad = max_outrad;
+                this.alpha = alpha;
             }
 
-            draw(data, times, colors) {
+            seconds_to_time(sec) {
+                let h = Math.floor(sec / 3600)
+                let hs = h > 0 ? h + "h " : ""
+                sec = sec % 3600;
+                let m = Math.floor(sec / 60)
+                let ms = m > 0 ? m + "m " : ""
+                let ss = (sec % 60) + "s"
+
+                return hs + ms + ss
+            }
+
+            app_mouse_move(i, data, apps, times, pathObject) {
+                var mousePosition = d3.mouse(pathObject);
+                let switches = data[i].reduce(function(a, b) { return a + b; })
+                let html = `
+                    <b>${apps[i]}</b></br>
+                    Usage time : ${this.seconds_to_time(times[i])}</br>
+                    Switches : ${switches}`
+
+                this.tooltip.classed('hidden', false)
+                    .attr('style', 'left:' + (mousePosition[0] + 15 + this.cx) +
+                            'px; top:' + (mousePosition[1] - 35 + this.cy) + 'px')
+                    .html(html);
+            }
+
+            app_mouse_out(i, colors) {
+                let that = this;
+
+                this.tooltip.classed('hidden', true);
+                d3.selectAll("path")
+                    .transition().duration(500)
+                    .filter(d => { return 'source' in d && d.source.index != i && d.target.index != i})
+                    .style("fill", d => colors[d.source.index]+that.alpha);
+            }
+
+            app_mouse_over(i) {
+                d3.selectAll("path")
+                    .transition().duration(250)
+                    .filter(d => { return 'source' in d && d.source.index != i && d.target.index != i})
+                    .style("fill", "#CCCCCC11");
+            }
+
+            draw(apps, data, abs_times, colors) {
                 // Times normalization
                 var that = this;
-                var max = times.reduce(function(a, b) { return Math.max(a, b); })
-                times = times.map(d => d/max)
+                var max = abs_times.reduce(function(a, b) { return Math.max(a, b); })
+                let times = abs_times.map(d => d/max)
 
                 var res = d3.chord()
-                            .padAngle(0.05)     // padding between entities (black arc)
+                            .padAngle(0.04)     // padding between entities (black arc)
                             .sortSubgroups(d3.descending)
                             (data)
 
-                this.svg.datum(res)
+                let group = this.svg.datum(res)
                     .append("g")
                     .selectAll("g")
                     .data(d => { return d.groups; })
                     .enter()
+                
+                group
                     .append("g")
                     .append("path")
                         .style("fill", function(d, i) { return colors[i]; })
-                        .style("stroke", "black")
+                        //.style("stroke", "black")
                         .attr("d", d3.arc()
                             .innerRadius(this.inrad)
-                            .outerRadius(function(d, i) { return that.outrad + times[i]*that.max_outrad }))
+                            .outerRadius(function(d, i) { return that.outrad }))//+ times[i]*that.max_outrad }))
                         .attr("transform", "translate("+this.cx+", "+this.cy+")")
+                        .on("mouseover", function(d, i) { that.app_mouse_over(i); })
+                        .on("mousemove", function(d, i) { that.app_mouse_move(i, data, apps, abs_times, this) })
+                        .on("mouseout", function(d, i) { that.app_mouse_out(i, colors) })
 
                 // Add the links between groups
                 this.svg
-                .datum(res)
-                .append("g")
-                .selectAll("path")
-                .data(function(d) { return d; })
-                .enter()
-                .append("path")
-                    .attr("d", d3.ribbon()
-                    .radius(this.outrad - 10)
-                    )
-                    .style("fill", d => colors[d.source.index])
-                    .style("stroke", "black")
-                    .attr("transform", "translate("+this.cx+", "+this.cy+")")
+                    .datum(res)
+                    .append("g")
+                    .selectAll("path.links")
+                    .data(function(d) { return d; })
+                    .enter()
+                    .append("path")
+                        .attr("d", d3.ribbon()
+                        .radius(this.outrad - 10)
+                        )
+                        .style("fill", d => colors[d.source.index]+that.alpha)
+                        //.style("stroke", "black")
+                        .attr("transform", "translate("+this.cx+", "+this.cy+")")
             }
         }
         
@@ -96,16 +145,17 @@
         xobj.onreadystatechange = function () {
                 if (xobj.readyState == 4 && xobj.status == "200") {
                     let data = JSON.parse(xobj.responseText)
-                    let f = d => d['App Name'] != "Screen off" && d['User_ID'] == 1
+                    let f = d => d['App Name'] != "Screen off" && !d['App Name'].startsWith("Screen on") && d['User_ID'] == 1
                     data = data.filter(f)
                     let acm = new AppChordModel(data)
-                    acm.apply_filters(0, 20000000, 0, 1)
-                    console.log(acm.filtered_adj_mat)
+                    acm.apply_filters(60, 1e10, 0.2, 1)
 
                     colors = acm.filtered_apps_time.map(d => getRandomColor())
-                    console.log(colors)
-                    ac = new AppChord(svg, 500, 500, 300, 340, 100)
-                    ac.draw(acm.filtered_adj_mat, acm.filtered_apps_time, colors)
+                    ac = new AppChord(svg, tooltip, 500, 500, 300, 340, 120, "BB")
+                    ac.draw(acm.filtered_apps,
+                            acm.filtered_adj_mat,
+                            acm.filtered_apps_time,
+                            colors)
                 }
         };
         xobj.send(null);
