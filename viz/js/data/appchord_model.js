@@ -5,7 +5,8 @@
  * calculation on the whole dataset
  */
 class AppChordModel {
-    constructor(data) {
+    constructor(data, delta) {
+        this.delta = delta
         // Will build the attributes linked to app info
         this.build_apps_info(data);
         // Apps info need to be constructed before
@@ -61,12 +62,14 @@ class AppChordModel {
             let f_data = data.filter(d => d['User_ID'] == uid)
                              .sort(function(a, b) { return a.Time - b.Time; });
             let mem = undefined;
+            let mem_time = undefined;
             // Loop through the user sequence and compute switches
             for (let d of f_data) {
                 let app_idx = this.get_app_index(d['App Name']);
-                if (mem != undefined && mem != this.get_app_index(d['App Name']))
+                if (mem != undefined && mem != this.get_app_index(d['App Name']) && (d['Time'] - mem_time) < this.delta)
                     this.adj_mat[mem][app_idx] += 1;
                 mem = app_idx;
+                mem_time = d['Time']
             }
         }
     }
@@ -192,6 +195,19 @@ class AppChordModel {
         // Apply the filters
         this.apply_time_filter(min_time, max_time)
         this.apply_frequency_filter(min_freq, max_freq)
+    }
+
+    get_as_json() {
+        let json_obj = {"nodes": [], "links": []}
+        // Nodes
+        for (let i in this.filtered_apps)
+            json_obj.nodes.push({"id": this.filtered_apps[i], "time": this.filtered_apps_time[i], "group": i})
+
+        for (let i in this.filtered_adj_mat)
+            for (let j in this.filtered_adj_mat[i])
+                json_obj.links.push({"source": this.filtered_apps[i], "target": this.filtered_apps[j], "value": this.filtered_adj_mat[i][j]})
+
+        return json_obj
     }
 }
 
