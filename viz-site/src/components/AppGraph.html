@@ -52,8 +52,12 @@
                 this.cy = cy;
             }
 
+            get_correct_time(time) {
+                return time / 10
+            }
+
             get_size(time) {
-                return Math.sqrt(time / (10 * Math.PI))
+                return Math.sqrt(this.get_correct_time(time) / Math.PI)
             }
 
             seconds_to_time(sec) {
@@ -71,8 +75,8 @@
                 let that = this
 
                 var simulation = d3.forceSimulation()
-                                .force("link", d3.forceLink().id(d => d.id).distance(d => -d.value)) // 450
-                                .force("charge", d3.forceManyBody().strength(-4000)) // -500
+                                .force("link", d3.forceLink().id(d => d.id).distance(d => -20*Math.sqrt(d.value))) // 450
+                                .force("charge", d3.forceManyBody().strength(d => -150*that.get_size(d.time))) // -500
                                 .force("center", d3.forceCenter(this.cx, this.cy));
 
                 var link = this.svg.append("g")
@@ -87,14 +91,22 @@
                     .selectAll("g")
                     .data(graph.nodes)
                     .enter().append("g")
-                    
-                var circles = node.append("circle")
-                    .attr("r", d => that.get_size(d.time))
-                    // .attr("fill", function(d) { return color(d.group); })
                     .call(d3.drag()
                         .on("start", function(d) { that.dragstarted(d, simulation) })
                         .on("drag", function(d) { that.dragged(d) })
                         .on("end", function(d) { that.dragended(d, simulation) }))
+                    
+                var circles = node.append("circle")
+                    .attr("r", d => that.get_size(d.time))
+                    .attr("fill", "white")
+
+                // Images
+                var images = node.append("image")
+                    .attr("xlink:href", d => d.image)
+                    .attr("width", d => 2*that.get_size(d.time))
+                    .attr("height", d => 2*that.get_size(d.time))
+                    .attr("x", d => -that.get_size(d.time))
+                    .attr("y", d => -that.get_size(d.time))
 
                 var lables = node.append("text")
                     .text(d => d.id)
@@ -148,12 +160,15 @@
         xobj.onreadystatechange = function () {
                 if (xobj.readyState == 4 && xobj.status == "200") {
                     let data = JSON.parse(xobj.responseText)
-                    let f = d => d['App Name'] != "Screen off" && !d['App Name'].startsWith("Screen on") && d['User_ID'] == 1
+                    let f = d => d['App Name'] != "Screen off" && !d['App Name'].startsWith("Screen on") // && d['User_ID'] == 1
                     data = data.filter(f)
+
+
                     let acm = new AppChordModel(data, 10)
-                    acm.apply_filters(300, 1e10, 0.05, 1)
+                    acm.apply_filters(0, 1e10, 0, 1)
 
                     ag = new AppGraph(svg, tooltip, 500, 500)
+                    console.log(acm.get_as_json())
                     ag.draw(acm.get_as_json())
                 }
         };

@@ -10,14 +10,18 @@ class AppChordModel {
         // Will build the attributes linked to app info
         this.build_apps_info(data);
         // Apps info need to be constructed before
-        // Will build the attributes linked to adjacency matrix
+        // Will build the attributes relative to assets (colors, images)
+        this.build_assets();
+        // Will build the attributes relative to adjacency matrix
         this.build_adjacency_mat(data);
 
         // The filtered attributes are those to return to the user
         // Other attributes must NEVER change outside the constructor
+        setTimeout(10000)
         this.filtered_apps = this.apps.slice();
         this.filtered_apps_time = this.apps_time.slice();
         this.filtered_adj_mat = this.adj_mat.slice();
+        this.filtered_images = this.images.slice();
     }
 
     /**
@@ -38,6 +42,34 @@ class AppChordModel {
         for (let d of data) {
             let app_idx = this.get_app_index(d['App Name'])
             this.apps_time[app_idx] += d['Duration'];
+        }
+    }
+
+    get_assets_location() {
+        let loc = location.pathname;
+        return loc.substr(0, loc.indexOf("/viz-habits/")+12)+"data/logos/";
+    }
+
+    build_assets() {
+        var that = this;
+        this.images = new Array(this.apps.length);
+        this.colors = new Array(this.apps.length);
+        let assets_dir = this.get_assets_location()
+
+        for (let i in this.apps) {
+            let appname = this.apps[i].toLowerCase()
+            this.images[i] = assets_dir + appname + "/logo_" + appname + ".jpg";
+
+            let filepath = assets_dir + appname + "/best_color.txt";
+            let xobj = new XMLHttpRequest();
+            xobj.overrideMimeType("application/json");
+            xobj.open('GET', filepath, true);
+            xobj.onreadystatechange = function () {
+                    if (xobj.readyState == 4 && xobj.status == "200") {
+                        that.colors[i] = xobj.responseText.split(' ').map(d => parseInt(d))
+                    }
+            };
+            xobj.send(null);
         }
     }
 
@@ -92,14 +124,16 @@ class AppChordModel {
      * @param {Array(Array(float))} matrix the adjacency matrix of the graph
      * @param {Array(string)} app the collection of apps' names
      * @param {Array(int)} app_time the collection of proportions of app consumption time
+     * @param {Array(string)} images the collection of paths to apps icons
      */
-    remove_useless_apps(to_rem, matrix, app, app_time) {
+    remove_useless_apps(to_rem, matrix, app, app_time, images) {
         // Sort descending to_rem in order to prevent indexes issues
         to_rem = to_rem.sort(function(a, b) { return b - a; });
         // Remove apps filtered from attributes
         for (let i of to_rem) {
             app.splice(i, 1)
             app_time.splice(i, 1)
+            images.splice(i, 1)
 
             // Line of the matrix
             matrix.splice(i, 1)
@@ -147,12 +181,12 @@ class AppChordModel {
 
         // Filter with to_rem
         this.filtered_cumul_time = this.remove_useless_apps(to_rem, this.filtered_adj_mat, this.filtered_apps,
-                                                            this.filtered_apps_time);
+                                                            this.filtered_apps_time, this.filtered_images);
 
         // The filter may have produced new useless apps, we remove them
         to_rem = this.get_useless_apps(this.filtered_adj_mat)
         this.filtered_cumul_time = this.remove_useless_apps(to_rem, this.filtered_adj_mat, this.filtered_apps,
-                                                            this.filtered_apps_time);
+                                                            this.filtered_apps_time, this.filtered_images);
     }
 
     /**
@@ -175,7 +209,7 @@ class AppChordModel {
         // This action may have produced useless apps, we remove them
         let to_rem = this.get_useless_apps(this.filtered_adj_mat)
         this.filtered_cumul_time = this.remove_useless_apps(to_rem, this.filtered_adj_mat, this.filtered_apps,
-                                                            this.filtered_apps_time);
+                                                            this.filtered_apps_time, this.filtered_images);
     }
 
     /**
@@ -201,7 +235,7 @@ class AppChordModel {
         let json_obj = {"nodes": [], "links": []}
         // Nodes
         for (let i in this.filtered_apps)
-            json_obj.nodes.push({"id": this.filtered_apps[i], "time": this.filtered_apps_time[i], "group": i})
+            json_obj.nodes.push({"id": this.filtered_apps[i], "time": this.filtered_apps_time[i], "image": this.filtered_images[i]})
 
         for (let i in this.filtered_adj_mat)
             for (let j in this.filtered_adj_mat[i])
@@ -224,4 +258,4 @@ class AppChordModel {
 //             console.log(acm.filtered_adj_mat)
 //         }
 // };
-// xobj.send(null);
+// xobj.send(null)
