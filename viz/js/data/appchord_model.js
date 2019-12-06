@@ -45,11 +45,17 @@ class AppChordModel {
         }
     }
 
+    /**
+     * @returns {string} the assets dir path
+     */
     get_assets_location() {
         let loc = location.pathname;
         return loc.substr(0, loc.indexOf("/viz-habits/")+12)+"data/logos/";
     }
 
+    /**
+     * @returns {string} build filepath of icons image and colors
+     */
     build_assets() {
         var that = this;
         this.images = new Array(this.apps.length);
@@ -61,6 +67,8 @@ class AppChordModel {
             this.images[i] = assets_dir + appname + "/logo_circle.png";
 
             let filepath = assets_dir + appname + "/best_color.txt";
+
+            // Colors are stored within a file, must be requested with AJAX
             let xobj = new XMLHttpRequest();
             xobj.overrideMimeType("application/json");
             xobj.open('GET', filepath, true);
@@ -231,6 +239,9 @@ class AppChordModel {
         this.apply_frequency_filter(min_freq, max_freq)
     }
 
+    /**
+     * @returns {Object} A JavaScript Object representation of the data, built for AppGraph
+     */
     get_as_json() {
         let json_obj = {"nodes": [], "links": []}
         // Nodes
