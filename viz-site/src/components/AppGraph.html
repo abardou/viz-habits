@@ -16,14 +16,9 @@
         opacity: 0.9;
         position: absolute;
     }
-    .links line {
-        stroke: #999;
-        stroke-opacity: 0.6;
-    }
 
-    .nodes circle {
-        stroke: #fff;
-        stroke-width: 1.5px;
+    .links line {
+        stroke: #CCC;
     }
 
     text {
@@ -71,6 +66,27 @@
                 return hs + ms + ss
             }
 
+            mouse_over(node, nodes, links) {
+                let to_keep = new Set()
+
+                links.filter(d => {
+                        let f = d.source.id != node.id && d.target.id != node.id && d.value > 0;
+                        if (!f && d.value > 0)
+                            to_keep.add(d.source.id == node.id ? d.target.id : d.source.id);
+
+                        return f;
+                    })
+                     .style("opacity", 0.1)
+                
+                nodes.filter(d => !to_keep.has(d.id) && d.id != node.id)
+                    .style("opacity", 0.1)
+            }
+
+            mouse_out(nodes, links) {
+                links.style("opacity", 1)
+                nodes.style("opacity", 1)
+            }
+
             draw(graph) {
                 let that = this
 
@@ -84,6 +100,7 @@
                     .selectAll("line")
                     .data(graph.links)
                     .enter().append("line")
+
                     .attr("stroke-width", d => Math.sqrt(d.value));
 
                 var node = this.svg.append("g")
@@ -95,10 +112,13 @@
                         .on("start", function(d) { that.dragstarted(d, simulation) })
                         .on("drag", function(d) { that.dragged(d) })
                         .on("end", function(d) { that.dragended(d, simulation) }))
+                    .on('mouseover', d => that.mouse_over(d, node, link))
+                    .on('mouseout', d => that.mouse_out(node, link))
                     
                 var circles = node.append("circle")
                     .attr("r", d => that.get_size(d.time))
                     .attr("fill", "white")
+                    .attr("stroke", "black")
 
                 // Images
                 var images = node.append("image")
@@ -160,12 +180,12 @@
         xobj.onreadystatechange = function () {
                 if (xobj.readyState == 4 && xobj.status == "200") {
                     let data = JSON.parse(xobj.responseText)
-                    let f = d => d['App Name'] != "Screen off" && !d['App Name'].startsWith("Screen on")  && d['User_ID'] == 3
+                    let f = d => d['App Name'] != "Screen off" && !d['App Name'].startsWith("Screen on") // && d['User_ID'] == 2
                     data = data.filter(f)
 
 
                     let acm = new AppChordModel(data, 10)
-                    acm.apply_filters(0, 1e10, 0.05, 1)
+                    acm.apply_filters(60, 1e10, 0.1, 1)
 
                     ag = new AppGraph(svg, tooltip, 500, 500)
                     console.log(acm.get_as_json())
