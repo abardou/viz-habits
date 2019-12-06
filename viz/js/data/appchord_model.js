@@ -58,7 +58,7 @@ class AppChordModel {
 
         for (let i in this.apps) {
             let appname = this.apps[i].toLowerCase()
-            this.images[i] = assets_dir + appname + "/logo_" + appname + ".jpg";
+            this.images[i] = assets_dir + appname + "/logo_circle.png";
 
             let filepath = assets_dir + appname + "/best_color.txt";
             let xobj = new XMLHttpRequest();

@@ -160,12 +160,12 @@
         xobj.onreadystatechange = function () {
                 if (xobj.readyState == 4 && xobj.status == "200") {
                     let data = JSON.parse(xobj.responseText)
-                    let f = d => d['App Name'] != "Screen off" && !d['App Name'].startsWith("Screen on") // && d['User_ID'] == 1
+                    let f = d => d['App Name'] != "Screen off" && !d['App Name'].startsWith("Screen on")  && d['User_ID'] == 3
                     data = data.filter(f)
 
 
                     let acm = new AppChordModel(data, 10)
-                    acm.apply_filters(0, 1e10, 0, 1)
+                    acm.apply_filters(0, 1e10, 0.05, 1)
 
                     ag = new AppGraph(svg, tooltip, 500, 500)
                     console.log(acm.get_as_json())
