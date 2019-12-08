@@ -183,9 +183,11 @@ class AppChordModel {
     apply_time_filter(min_time, max_time=Number.MAX_SAFE_INTEGER) {
         let to_rem = []
         // Apply the filter and collect apps indexes to remove
-        for (let i in this.filtered_apps_time)
-            if (this.filtered_apps_time[i] < min_time || this.filtered_apps_time[i] > max_time)
+        for (let i in this.filtered_apps_time) {
+            let aii = this.get_app_index(this.filtered_apps[i])
+            if (this.apps_time[aii] < min_time || this.apps_time[aii] > max_time)
                 to_rem.push(i);
+        }
 
         // Filter with to_rem
         this.filtered_cumul_time = this.remove_useless_apps(to_rem, this.filtered_adj_mat, this.filtered_apps,
@@ -205,7 +207,10 @@ class AppChordModel {
      */
     apply_frequency_filter(min_freq, max_freq=1) {
         // Compute sum of switches for each line of the matrix
-        let s_switches = this.filtered_adj_mat.map(d => d.reduce(function(a, b) { return a + b; }))
+        let s_switches = this.filtered_adj_mat.map(function(d, i) {
+            let aii = this.get_app_index(this.filtered_apps[i])
+            return this.adj_mat[aii].reduce(function(a, b) { return a + b; })
+        }, this)
         // Replace each coefficient outside the filter by 0
         this.filtered_adj_mat = this.filtered_adj_mat.map(function(d, i) {return d.map(c => {
             let coeff = c / s_switches[i]
@@ -248,9 +253,20 @@ class AppChordModel {
         for (let i in this.filtered_apps)
             json_obj.nodes.push({"id": this.filtered_apps[i], "time": this.filtered_apps_time[i], "image": this.filtered_images[i]})
 
-        for (let i in this.filtered_adj_mat)
-            for (let j in this.filtered_adj_mat[i])
-                json_obj.links.push({"source": this.filtered_apps[i], "target": this.filtered_apps[j], "value": this.filtered_adj_mat[i][j]})
+        for (let i in this.filtered_adj_mat) {
+            let aii = this.get_app_index(this.filtered_apps[i])
+            let s_switches = this.adj_mat[aii].reduce(function(a, b) { return a+b; })
+            for (let j = 0; j < i; j++) {
+                let aij = this.get_app_index(this.filtered_apps[j])
+                let t_switches = this.adj_mat[aij].reduce(function(a, b) { return a+b; })
+                let v = this.filtered_adj_mat[i][j] + this.filtered_adj_mat[j][i];
+                if (v != 0)
+                    json_obj.links.push({"source": this.filtered_apps[i], "target": this.filtered_apps[j], "value": v,
+                                         "st": this.filtered_adj_mat[i][j], "ts": this.filtered_adj_mat[j][i],
+                                         "fst": this.adj_mat[aii][aij] / s_switches,
+                                         "fts": this.adj_mat[aij][aii] / t_switches})
+            }
+        }
 
         return json_obj
     }
