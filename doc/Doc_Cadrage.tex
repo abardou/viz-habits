@@ -72,6 +72,8 @@
     \section{Source de données}
         Les données dont nous disposons ont été générées par 3 des 4 membres du groupe. Pour chacun d'entre eux, les données d'activité de l'application \href{https://play.google.com/store/apps/details?id=com.a0soft.gphone.uninstaller&hl=fr}{App Usage} sont collectées sur une période prédifinie. Sur la même période, nous récupérons l'historique des positions \href{https://takeout.google.com/settings/takeout}{fourni par Google} et nous le lions avec les données d'activité. Enfin, nous agrégeons les données des différents membres pour former le dataset final sur lequel se formeront nos visualisations.
 
+        Pour des raisons esthétiques, nous présentons les applications grâce à leurs icônes. Afin de récupérer automatiquement les icônes des applications présentes dans notre dataset, nous avons écrit un site de webscrapping capable de récupérer l'icône d'une application dans \href{https://play.google.com/store/apps?hl=fr}{le Google Play Store}.
+
         Nous avons construit notre propre dataset après nous être rendus compte que peu de datasets de ce genre existaient en ligne, mais également parce que nous étions curieux de nos propres habitudes de consommation. Cette construction offre avantages et inconvénients :
         \begin{itemize}
             \item \textbf{\color{red} Imprévu} : un mauvais paramétrage (autorisations non accordées, GPS désactivé) au début de la période de collecte des données peut rendre toute une partie des données inutilisables
