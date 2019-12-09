@@ -5,8 +5,9 @@
  * calculation on the whole dataset
  */
 class RadialTreeModel {
-    constructor(data, delta) {
+    constructor(data, delta, start = "Screen on (unlocked)") {
         this.delta = delta
+        this.start = start
         // Will build the attributes linked to app info
         this.build_apps_info(data);
         // Apps info need to be constructed before
@@ -75,7 +76,6 @@ class RadialTreeModel {
 
 
     build_tree(data) {
-    	let start = "Screen on (unlocked)"
 
     	let users = new Set();
         for (let d of data)
@@ -93,8 +93,8 @@ class RadialTreeModel {
 	        let in_seq = false
 	        let seq = []
 	        for (let i of f_data) {
-	        	if (i['App Name'] == start && !in_seq) {
-	        		seq = [start]
+	        	if (i['App Name'] == this.start && !in_seq) {
+	        		seq = [this.start]
 	        		in_seq = true
 	        	}
 	        	else {
@@ -103,7 +103,7 @@ class RadialTreeModel {
 	        			sequences.push({'path' : seq})
 	        			in_seq = false
 	        		} else {
-	        			if (in_seq && i['App Name'] != "Screen on (unlocked)") {
+	        			if (in_seq && i['App Name'] != this.start) {
 	        				seq.push(i['App Name'])
 	        			}
 	        		}
@@ -126,6 +126,7 @@ class RadialTreeModel {
 			}, {});
 
 			this.user_sequences[uid] = goal
+			console.log(goal)
 	    }
     }
 

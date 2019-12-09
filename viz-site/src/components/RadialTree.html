@@ -410,7 +410,7 @@
                 if (xobj.readyState == 4 && xobj.status == "200") {
                     let data = JSON.parse(xobj.responseText)
 
-                    let rtm = new RadialTreeModel(data, 10)
+                    let rtm = new RadialTreeModel(data, 10, "YouTube")
                     //rtm.apply_filters(0, 1e10, 0.05, 1)
 
                     rt = new RadialTree(tooltip, 500, 500)
