@@ -5,3 +5,12 @@ test.py
 */.DS_Store
 
 */node_modules
+
+# TeX Files
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
