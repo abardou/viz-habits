@@ -93,11 +93,35 @@
         Ce sont ces données qui possèdent le plus de limites, car leur granularité temporelle est assez grosse et leur collecte est dépendante des autorisations données à Google par l'utilisateur. Certaines activités ne peuvent donc pas être rattachées à des données spatiales. Enfin, elles sont également dépendantes de la calibration GPS du mobile qui effectue les mesures, ce qui peut donner lieu à quelques imprécisions.
 
     \section{Travaux liés au projet}
+    \begin{itemize}
+    \item L'application AppUsage que nous utilisons pour récupérer nos données par CSV réalise déjà quelques visualisations simples comme une série temporelle de la durée d'utilisation journalière du smartphone ou encore un camembert représentant la durée d'utilisation par catégorie d'application (Vidéos, Social, Musique...).
+    \item Développement D3 (filtres): Anthony et Hugo;
+    \item Développement D3 (visus): Anthony et Tristan;
+    \item Traduction de JS vers VueJS: Hugo.
+    \end{itemize}
 
     \section{Organisation}
+    Nous communiquons principalement par Slack et avons mis en place une liste d'issues sur GitHub représentant chaque tâche à accomplir pour la réalisation du projet. Les issues sont réparties selon plusieurs catégories :
+    \begin{itemize}
+    \item[--] data: relatif au dataset c'est-à-dire collecter des données ou les transformer;
+    \item[--] filter: composant filtre, par exemple le filtre temporel;
+    \item[--] visu: principales visualisations des données à réaliser.
+    \end{itemize}
+    
+    Nous n'avons pas réalisé ni prévu de séances de travail particulières, la coordination se réalise par Slack et chacun réalise les tâches qui lui sont assignées.
+    
+    Rôles :
+    \begin{itemize}
+    \item[--] Pré-traitement des données: Anthony et Tristan;
+    \item[--] Développement D3 (filtres): Anthony et Hugo;
+    \item[--] Développement D3 (visus): Anthony et Tristan;
+    \item[--] Traduction de JS vers VueJS: Hugo.
+    \end{itemize}
 
     \section{Esquisses finales}
         \subsection{Force directed Graph}
-
-        \subsection{Radial Tree}
+		\begin{center} \includegraphics[height=300px]{sketches/AppGraph} \end{center}
+		
+		\subsection{Radial Tree}
+		\begin{center} \includegraphics[height=300px]{sketches/AppRadTree} \end{center}
 \end{document}
