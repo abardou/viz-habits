@@ -13,8 +13,9 @@
         padding: .5em;
         text-shadow: #f5f5f5 0 1px 0;
         border-radius: 2px;
-        opacity: 0.9;
+        opacity: 0.8;
         position: absolute;
+        font-size: 8px;
     }
     .node circle {
       fill: #fff;
@@ -34,7 +35,7 @@
 
     text {
         font-family: sans-serif;
-        font-size: 0.85em;
+        font-size: 0.5em;
     }
   </style>
 </head>
@@ -89,7 +90,7 @@
                     .style("font", "10px sans-serif")
                     .style("margin", "5px");
 
-                let tooltip = svg.append('div').attr('class', 'hidden tooltip');
+                let tooltip = d3.select("body").append('div').attr('class', 'hidden tooltip');
                   
                 const link = svg.append("g")
                     .attr("id", "links")
@@ -104,23 +105,33 @@
                         .angle(d => d.x)
                         .radius(d => d.y))
                     .on("mouseover", function(d) {
+
+                        
+                    
+                        that.enable_focus_path(d, that)
+                    })
+                    .on("mousemove", function(d) {
+                        let mouse_position = d3.mouse(d3.select("body").node())
+
+                        let nb_use = d.target.data.nb_use
+                        let str = nb_use + " sequences"
+                        if (nb_use == 1) {
+                            str = nb_use + " sequence"
+                        }
+
                     // on affiche le toolip
                         tooltip.classed('hidden', false)
                             // on positionne le tooltip
-                            .attr('style', 'left:' + (d.x + 15) +
-                                'px; top:' + (d.y - 15) + 'px')
+                            .attr('style', 'left:' + (mouse_position[0] + 10) +
+                                'px; top:' + (mouse_position[1] - 15) + 'px')
                             // on recupere le nom de l'etat 
-                            .html(d.target.data.name);
-                        that.enable_focus_path(d, that)
+                            .html(str);
                     })
                     .on('mouseout', function() {
+                        tooltip.classed('hidden', true)
                         // on cache le toolip
-                        tooltip.classed('hidden', true);
                         that.disable_focus();
                     });
-
-
-                console.log(link)
                   
                 const node = svg.append("g")
                     .attr("id", "nodes")
@@ -142,10 +153,19 @@
                         
                 
                     })
+                    .on("mousemove", function(d) {
+                        let mouse_position = d3.mouse(d3.select("body").node())
+                    // on affiche le toolip
+                        tooltip.classed('hidden', false)
+                            // on positionne le tooltip
+                            .attr('style', 'left:' + (mouse_position[0] + 10) +
+                                'px; top:' + (mouse_position[1] - 15) + 'px')
+                            // on recupere le nom de l'etat 
+                            .html(d.data.name);
+                    })
                     .on('mouseout', function() {
-                              // on cache le toolip
-                        //tooltip.classed('hidden', true);
-
+                        tooltip.classed('hidden', true)
+                        // on cache le toolip
                         that.disable_focus();
                     });
                   
@@ -173,6 +193,7 @@
 
             enable_focus_path(edge, that) {
                 let children = that.get_all_children(edge.target)
+                let parents = that.get_all_parents(edge.target)
 
                 d3.select("#links").selectAll("path")
                     .attr("opacity", function(e) {
@@ -180,6 +201,16 @@
                             return 0.2
                         }
                         return 1
+                    });
+
+                d3.select("#nodes").selectAll("g")
+                    .attr("opacity", function(e) {
+
+                        if (!parents.includes(e) && !children.includes(e)) {
+                            return 0.2
+                        }
+                        return 1
+                        
                     });
             }
 

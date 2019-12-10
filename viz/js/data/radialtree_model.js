@@ -117,13 +117,16 @@ class RadialTreeModel {
 	        	}
 	        }
 
+            
+
 			var goal = sequences.reduce(function(carry, pathEntry){
 			  // On every path entry, resolve using the base object
 			  pathEntry.path.reduce(function(pathObject, pathName){
 			    // For each path name we come across, use the existing or create a subpath
 
-			    pathObject[pathName] = pathObject[pathName] || {};
+			    pathObject[pathName] = pathObject[pathName] || {'nb_use': 0};
 			    // Then return that subpath for the next operation
+                pathObject[pathName]['nb_use'] += 1
 			    return pathObject[pathName];
 			  // Use the passed in base object to attach our resolutions
 			  }, carry);
@@ -153,7 +156,9 @@ class RadialTreeModel {
         //console.log(this.colors)
 
     	let app_name = Object.keys(this.user_sequences[id])[0]
+        
     	let json_as_tree = this.get_app_tree(app_name, this.user_sequences[id][app_name])
+        
     	return json_as_tree
     }
 
@@ -161,18 +166,22 @@ class RadialTreeModel {
     	let children = []
 		if (Object.keys(values).length > 0) {
 			for (let b of Object.keys(values)) {
-				children.push(this.get_app_tree(b, values[b]))
+                if (b != "nb_use") {
+                    let v = values[b]
+    				children.push(this.get_app_tree(b, values[b]))
+                }
 			}
 		}
+
         //console.log(index)
         //console.log(this.colors)
         //console.log(this.images[app_name])
         //console.log(this.colors[app_name])
 
 		if (children.length > 0) {
-			return {"name" : app_name, "image" : this.images[app_name], "children" : children}
+			return {"name" : app_name, "image" : this.images[app_name], "nb_use" : values['nb_use'], "children" : children}
 		} else {
-			return {"name" : app_name, "image" : this.images[app_name]}
+			return {"name" : app_name, "image" : this.images[app_name], "nb_use" : values['nb_use']}
 		}
 	}
 }
