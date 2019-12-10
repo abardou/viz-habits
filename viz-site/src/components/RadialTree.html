@@ -103,20 +103,24 @@
                     .attr("d", d3.linkRadial()
                         .angle(d => d.x)
                         .radius(d => d.y))
-                    .on("mousmove", function(d) {
+                    .on("mouseover", function(d) {
                     // on affiche le toolip
                         tooltip.classed('hidden', false)
                             // on positionne le tooltip
                             .attr('style', 'left:' + (d.x + 15) +
                                 'px; top:' + (d.y - 15) + 'px')
                             // on recupere le nom de l'etat 
-                            .html(d.data.name);
-                        })
+                            .html(d.target.data.name);
+                        that.enable_focus_path(d, that)
+                    })
                     .on('mouseout', function() {
                         // on cache le toolip
                         tooltip.classed('hidden', true);
-                        });
+                        that.disable_focus();
+                    });
 
+
+                console.log(link)
                   
                 const node = svg.append("g")
                     .attr("id", "nodes")
@@ -134,60 +138,15 @@
                         let center_y = -parseFloat(svg.attr("viewBox").split(',')[1])
 
                         
+                        that.enable_focus_application(d, that);
                         
-                        let children = []
-                        let parents = []
-
-                        d3.select("#nodes").selectAll("g")
-                            .each(function(e) {
-
-                                if (d.data.name == e.data.name) {
-                                    
-                                    children = children.concat(that.get_all_children(e))
-                                    parents = parents.concat(that.get_all_parents(e))
-                                }
-                            });
-
-
-                        let up_app = []
-                        
-                        d3.select("#nodes").selectAll("g")
-                            .attr("opacity", function(e) {
-
-                                if (!parents.includes(e) && !children.includes(e)) {
-                                    return 0.2
-                                }
-                                up_app.push(e)
-                                return 1
-                                
-                            });
-
-
-                        d3.select("#links").selectAll("path")
-                            .attr("opacity", function(e) {
-
-                                if (up_app.includes(e.target)) {
-                                    return 1
-                                }
-                                return 0.2
-                            });
-
                 
                     })
                     .on('mouseout', function() {
                               // on cache le toolip
                         //tooltip.classed('hidden', true);
 
-                        d3.selectAll("#nodes").selectAll("g")
-                            .attr("opacity", function(e) {
-                                return 1
-                            })
-
-
-                        d3.selectAll("#links").selectAll("path")
-                            .attr("opacity", function(e) {
-                                return 1
-                            })
+                        that.disable_focus();
                     });
                   
                 node.append("circle")
@@ -210,6 +169,70 @@
                   return [x, y, width*2, height*2];
                 }
 
+            }
+
+            enable_focus_path(edge, that) {
+                let children = that.get_all_children(edge.target)
+
+                d3.select("#links").selectAll("path")
+                    .attr("opacity", function(e) {
+                        if (!children.includes(e.target)) {
+                            return 0.2
+                        }
+                        return 1
+                    });
+            }
+
+            enable_focus_application(d, that) {
+                let children = []
+                let parents = []
+
+                d3.select("#nodes").selectAll("g")
+                    .each(function(e) {
+
+                        if (d.data.name == e.data.name) {
+                            
+                            children = children.concat(that.get_all_children(e))
+                            parents = parents.concat(that.get_all_parents(e))
+                        }
+                    });
+
+
+                let up_app = []
+                
+                d3.select("#nodes").selectAll("g")
+                    .attr("opacity", function(e) {
+
+                        if (!parents.includes(e) && !children.includes(e)) {
+                            return 0.2
+                        }
+                        up_app.push(e)
+                        return 1
+                        
+                    });
+
+
+                d3.select("#links").selectAll("path")
+                    .attr("opacity", function(e) {
+
+                        if (up_app.includes(e.target)) {
+                            return 1
+                        }
+                        return 0.2
+                    });
+            }
+
+            disable_focus() {
+                d3.selectAll("#nodes").selectAll("g")
+                    .attr("opacity", function(e) {
+                        return 1
+                    })
+
+
+                d3.selectAll("#links").selectAll("path")
+                    .attr("opacity", function(e) {
+                        return 1
+                    })
             }
 
             get_all_parents(d) {
@@ -474,7 +497,7 @@
                     //rtm.apply_filters(0, 1e10, 0.05, 1)
 
                     rt = new RadialTree(500, 500)
-                    rt.draw_den(rtm.get_tree("3", ))
+                    rt.draw_den(rtm.get_tree("3"))
                 }
         };
         xobj.send(null);
