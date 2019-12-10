@@ -71,54 +71,69 @@
             }
 
             draw_den(data) {
-                  "use strict";
 
-                  let that = this
+                let that = this
 
-                  let width = 975
-                  let radius = width / 2
-                  let tree = d3.cluster().size([2 * Math.PI, radius - 100])
+                let width = 975
+                let radius = width / 2
+                let tree = d3.cluster().size([2 * Math.PI, radius - 100])
 
-                  const root = tree(d3.hierarchy(data)
-                      .sort((a, b) => d3.ascending(a.data.name, b.data.name)));
+                const root = tree(d3.hierarchy(data)
+                    .sort((a, b) => d3.ascending(a.data.name, b.data.name)));
 
-                  console.log(root)
+                
 
-                  const svg = d3.select("body").append("svg")
-                      .style("max-width", "100%")
-                      .style("height", "auto")
-                      .style("font", "10px sans-serif")
-                      .style("margin", "5px");
+                const svg = d3.select("body").append("svg")
+                    .style("max-width", "100%")
+                    .style("height", "auto")
+                    .style("font", "10px sans-serif")
+                    .style("margin", "5px");
+
+                let tooltip = svg.append('div').attr('class', 'hidden tooltip');
                   
-                  const link = svg.append("g")
-                      .attr("id", "links")
-                      .attr("fill", "none")
-                      .attr("stroke", "#555")
-                      .attr("stroke-opacity", 0.4)
-                      .attr("stroke-width", 1.5)
-                      .selectAll("path")
-                      .data(root.links())
-                      .enter().append("path")
-                      .attr("d", d3.linkRadial()
-                          .angle(d => d.x)
-                          .radius(d => d.y));
+                const link = svg.append("g")
+                    .attr("id", "links")
+                    .attr("fill", "none")
+                    .attr("stroke", "#555")
+                    .attr("stroke-opacity", 0.4)
+                    .attr("stroke-width", 1.5)
+                    .selectAll("path")
+                    .data(root.links())
+                    .enter().append("path")
+                    .attr("d", d3.linkRadial()
+                        .angle(d => d.x)
+                        .radius(d => d.y))
+                    .on("mousmove", function(d) {
+                    // on affiche le toolip
+                        tooltip.classed('hidden', false)
+                            // on positionne le tooltip
+                            .attr('style', 'left:' + (d.x + 15) +
+                                'px; top:' + (d.y - 15) + 'px')
+                            // on recupere le nom de l'etat 
+                            .html(d.data.name);
+                        })
+                    .on('mouseout', function() {
+                        // on cache le toolip
+                        tooltip.classed('hidden', true);
+                        });
+
                   
-                  const node = svg.append("g")
-                      .attr("id", "nodes")
-                      .attr("stroke-linejoin", "round")
-                      .attr("stroke-width", 3)
-                      .selectAll("g")
-                      .data(root.descendants().reverse())
-                      .enter().append("g")
-                      .attr("transform", d => `
+                const node = svg.append("g")
+                    .attr("id", "nodes")
+                    .attr("stroke-linejoin", "round")
+                    .attr("stroke-width", 3)
+                    .selectAll("g")
+                    .data(root.descendants().reverse())
+                    .enter().append("g")
+                    .attr("transform", d => `
                         rotate(${d.x * 180 / Math.PI - 90})
                         translate(${d.y},0)
-                      `)
-                      .on('mouseover', function(d) {
+                    `)
+                    .on('mouseover', function(d) {
                         let center_x = -parseFloat(svg.attr("viewBox").split(',')[0])
                         let center_y = -parseFloat(svg.attr("viewBox").split(',')[1])
 
-                        console.log(d.data.name)
+                        
                         
                         let children = []
                         let parents = []
@@ -134,9 +149,7 @@
                             });
 
 
-                        console.log("parents", parents)
-                        console.log("children", children)
-
+                        let up_app = []
                         
                         d3.select("#nodes").selectAll("g")
                             .attr("opacity", function(e) {
@@ -144,16 +157,22 @@
                                 if (!parents.includes(e) && !children.includes(e)) {
                                     return 0.2
                                 }
+                                up_app.push(e)
                                 return 1
+                                
                             });
 
-                              // on affiche le toolip
-                        //tooltip.classed('hidden', false)
-                              // on positionne le tooltip
-                        //    .attr('style', 'left:' + (mousePosition[0] + center_x + 15) +
-                        //        'px; top:' + (mousePosition[1] + center_y - 15) + 'px')
-                                // on recupere le nom de l'etat 
-                        //    .html(d.data.name);
+
+                        d3.select("#links").selectAll("path")
+                            .attr("opacity", function(e) {
+
+                                if (up_app.includes(e.target)) {
+                                    return 1
+                                }
+                                return 0.2
+                            });
+
+                
                     })
                     .on('mouseout', function() {
                               // on cache le toolip
@@ -163,34 +182,28 @@
                             .attr("opacity", function(e) {
                                 return 1
                             })
+
+
+                        d3.selectAll("#links").selectAll("path")
+                            .attr("opacity", function(e) {
+                                return 1
+                            })
                     });
                   
-                    node.append("circle")
-                      .attr("fill", d => d.children ? "#555" : "#999")
-                      .attr("r", 2.5);
+                node.append("circle")
+                    .attr("fill", d => d.children ? "#555" : "#999")
+                    .attr("r", 2.5);
 
-                  const images = node.append("image")
+                const images = node.append("image")
                     .attr("xlink:href", d => d.data.image)
                     .attr("width", 20)
                     .attr("height", 20)
                     .attr("x", -10)
                     .attr("y", -10)
                   
-                  //node.append("text")
-                  //    .attr("dy", "0.31em")
-                  //    .attr("x", d => d.x < Math.PI === !d.children ? 6 : -6)
-                  //    .attr("text-anchor", d => d.x < Math.PI === !d.children ? "start" : "end")
-                  //    .attr("transform", d => d.x >= Math.PI ? "rotate(180)" : null)
-                  //    .text(d => d.data.name)
-                  //  .filter(d => d.children)
-                  //  .clone(true).lower()
-                  //    .attr("stroke", "white");
+                svg.attr("viewBox", autoBox);
 
-
-                  svg.attr("viewBox", autoBox);
-
-
-                  let tooltip = d3.select('body').append('div').attr('class', 'hidden tooltip');
+                  
 
                 function autoBox() {
                   const {x, y, width, height} = this.getBBox();
@@ -222,53 +235,7 @@
                         
                     }
                 }
-                
                 return res
-            }
-
-            draw_radial(root) {
-                var diameter = 760;
-
-                var tree = d3.tree()
-                    .nodeSize([360, diameter / 2 - 190])
-                    .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
-
-                var diagonal = d3.linkRadial()
-                    .angle(d => d.x)
-                    .radius(d => d.y)
-                    //.projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
-
-                var svg = d3.select("body").append("svg")
-                    .attr("width", diameter + 20)
-                    .attr("height", diameter - 40)
-                  .append("g")
-                    .attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
-
-                  var nodes = tree.nodes(root),
-                      links = tree.links(nodes);
-
-                  var link = svg.selectAll(".link")
-                      .data(links)
-                    .enter().append("path")
-                      .attr("class", "link")
-                      .attr("d", diagonal);
-
-                  var node = svg.selectAll(".node")
-                      .data(nodes)
-                    .enter().append("g")
-                      .attr("class", "node")
-                      .attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
-
-                  node.append("circle")
-                      .attr("r", 5);
-
-                  node.append("text")
-                      .attr("dy", ".31em")
-                      .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-                      .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
-                      .text(function(d) { return d.name; });
-
-                d3.select(self.frameElement).style("height", diameter - 150 + "px");
             }
 
             draw_in_line(tree) {
@@ -312,7 +279,7 @@
 
                 // Collapse after the second level
                 root.children.forEach(collapse);
-                console.log(root)
+                
 
                 update(root);
 
