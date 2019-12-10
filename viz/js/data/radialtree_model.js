@@ -12,7 +12,7 @@ class RadialTreeModel {
         this.build_apps_info(data);
         // Apps info need to be constructed before
         // Will build the attributes relative to assets (colors, images)
-        //this.build_assets();
+        this.build_assets();
 
         this.build_tree(data);
 
@@ -53,25 +53,32 @@ class RadialTreeModel {
 
     build_assets() {
         var that = this;
-        this.images = new Array(this.apps.length);
-        this.colors = new Array(this.apps.length);
+        this.images = {}
+        this.colors = {}
         let assets_dir = this.get_assets_location()
+
 
         for (let i in this.apps) {
             let appname = this.apps[i].toLowerCase().split('/').join('-')
-            this.images[i] = assets_dir + appname + "/logo_circle.png";
+            this.images[this.apps[i]] = assets_dir + appname + "/logo_circle.png";
 
             let filepath = assets_dir + appname + "/best_color.txt";
+
+
             let xobj = new XMLHttpRequest();
             xobj.overrideMimeType("application/json");
             xobj.open('GET', filepath, true);
             xobj.onreadystatechange = function () {
                     if (xobj.readyState == 4 && xobj.status == "200") {
-                        that.colors[i] = xobj.responseText.split(' ').map(d => parseInt(d))
+                        let data = xobj.responseText.split(' ').map(d => parseInt(d))
+                        that.colors[that.apps[i]] = {'r' : data[0], 'g' : data[1], 'b' : data[2]}
                     }
             };
             xobj.send(null);
         }
+
+        //console.log(this.images)
+        //console.log(this.colors)
     }
 
 
@@ -126,7 +133,6 @@ class RadialTreeModel {
 			}, {});
 
 			this.user_sequences[uid] = goal
-			console.log(goal)
 	    }
     }
 
@@ -143,6 +149,9 @@ class RadialTreeModel {
 
 
     get_tree(id) {
+        //console.log(this.images)
+        //console.log(this.colors)
+
     	let app_name = Object.keys(this.user_sequences[id])[0]
     	let json_as_tree = this.get_app_tree(app_name, this.user_sequences[id][app_name])
     	return json_as_tree
@@ -155,10 +164,15 @@ class RadialTreeModel {
 				children.push(this.get_app_tree(b, values[b]))
 			}
 		}
+        //console.log(index)
+        //console.log(this.colors)
+        //console.log(this.images[app_name])
+        //console.log(this.colors[app_name])
+
 		if (children.length > 0) {
-			return {"name" : app_name, "children" : children}
+			return {"name" : app_name, "image" : this.images[app_name], "children" : children}
 		} else {
-			return {"name" : app_name}
+			return {"name" : app_name, "image" : this.images[app_name]}
 		}
 	}
 }
