@@ -73,6 +73,8 @@
             draw_den(data) {
                   "use strict";
 
+                  let that = this
+
                   let width = 975
                   let radius = width / 2
                   let tree = d3.cluster().size([2 * Math.PI, radius - 100])
@@ -89,18 +91,20 @@
                       .style("margin", "5px");
                   
                   const link = svg.append("g")
+                      .attr("id", "links")
                       .attr("fill", "none")
                       .attr("stroke", "#555")
                       .attr("stroke-opacity", 0.4)
                       .attr("stroke-width", 1.5)
-                    .selectAll("path")
-                    .data(root.links())
-                    .enter().append("path")
+                      .selectAll("path")
+                      .data(root.links())
+                      .enter().append("path")
                       .attr("d", d3.linkRadial()
                           .angle(d => d.x)
                           .radius(d => d.y));
                   
                   const node = svg.append("g")
+                      .attr("id", "nodes")
                       .attr("stroke-linejoin", "round")
                       .attr("stroke-width", 3)
                       .selectAll("g")
@@ -110,11 +114,39 @@
                         rotate(${d.x * 180 / Math.PI - 90})
                         translate(${d.y},0)
                       `)
-                      .on('mousemove', function(d) {
+                      .on('mouseover', function(d) {
                         let center_x = -parseFloat(svg.attr("viewBox").split(',')[0])
                         let center_y = -parseFloat(svg.attr("viewBox").split(',')[1])
 
-                        var mousePosition = d3.mouse(svg.node());
+                        console.log(d.data.name)
+                        
+                        let children = []
+                        let parents = []
+
+                        d3.select("#nodes").selectAll("g")
+                            .each(function(e) {
+
+                                if (d.data.name == e.data.name) {
+                                    
+                                    children = children.concat(that.get_all_children(e))
+                                    parents = parents.concat(that.get_all_parents(e))
+                                }
+                            });
+
+
+                        console.log("parents", parents)
+                        console.log("children", children)
+
+                        
+                        d3.select("#nodes").selectAll("g")
+                            .attr("opacity", function(e) {
+
+                                if (!parents.includes(e) && !children.includes(e)) {
+                                    return 0.2
+                                }
+                                return 1
+                            });
+
                               // on affiche le toolip
                         //tooltip.classed('hidden', false)
                               // on positionne le tooltip
@@ -125,10 +157,15 @@
                     })
                     .on('mouseout', function() {
                               // on cache le toolip
-                        tooltip.classed('hidden', true);
+                        //tooltip.classed('hidden', true);
+
+                        d3.selectAll("#nodes").selectAll("g")
+                            .attr("opacity", function(e) {
+                                return 1
+                            })
                     });
                   
-                  node.append("circle")
+                    node.append("circle")
                       .attr("fill", d => d.children ? "#555" : "#999")
                       .attr("r", 2.5);
 
@@ -136,6 +173,8 @@
                     .attr("xlink:href", d => d.data.image)
                     .attr("width", 20)
                     .attr("height", 20)
+                    .attr("x", -10)
+                    .attr("y", -10)
                   
                   //node.append("text")
                   //    .attr("dy", "0.31em")
@@ -157,6 +196,34 @@
                   const {x, y, width, height} = this.getBBox();
                   return [x, y, width*2, height*2];
                 }
+
+            }
+
+            get_all_parents(d) {
+                let res = []
+
+                while (d.parent != null) {
+                    res.push(d.parent)
+                    d = d.parent
+                }
+
+                return res
+            }
+
+            get_all_children(d) {
+                let res = []
+                res.push(d)
+            
+                if (d.children != undefined) {
+                    for (let c of d.children) {
+                        let chi = this.get_all_children(c)
+                        
+                        res = res.concat(chi)
+                        
+                    }
+                }
+                
+                return res
             }
 
             draw_radial(root) {
@@ -440,7 +507,7 @@
                     //rtm.apply_filters(0, 1e10, 0.05, 1)
 
                     rt = new RadialTree(500, 500)
-                    rt.draw_den(rtm.get_tree("2"))
+                    rt.draw_den(rtm.get_tree("3", ))
                 }
         };
         xobj.send(null);
