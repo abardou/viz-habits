@@ -65,7 +65,11 @@ def aggregate_aggregates(aggregates, aggregate_target):
     data.to_json(aggregate_target, orient='records')
 
 if __name__ == "__main__":
-    # build_aggregate_for_user(3, "data/user3/AUM_V4_Activity_2019-11-26_09-26-10.csv", None, "data/user3/u3_aggregate.csv")
+    # pprint.pprint(tools.diff_app_names(tools.get_dataframe("data/user2/AUM_V4_Activity_2019-12-10_22-19-45.csv"), tools.get_dataframe("data/user1/AUM_V4_Activity_2019-12-05_00-46-03.csv")))
+    build_aggregate_for_user(1, "data/user1/AUM_V4_Activity_2019-12-05_00-46-03.csv", "data/user1/position.csv", "data/user1/u1_aggregate.csv")
+    build_aggregate_for_user(2, "data/user2/AUM_V4_Activity_2019-12-10_22-19-45.csv", "data/user2/position.csv", "data/user2/u2_aggregate.csv")
+    build_aggregate_for_user(3, "data/user3/AUM_V4_Activity_2019-12-10_14-47-33.csv", "data/user3/position.csv", "data/user3/u3_aggregate.csv")
+    
     aggregate_aggregates([
         "data/user1/u1_aggregate.csv",
         "data/user2/u2_aggregate.csv",
