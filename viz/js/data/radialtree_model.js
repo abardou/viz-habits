@@ -120,11 +120,14 @@ class RadialTreeModel {
             
 
 			var goal = sequences.reduce(function(carry, pathEntry){
+                
 			  // On every path entry, resolve using the base object
 			  pathEntry.path.reduce(function(pathObject, pathName){
 			    // For each path name we come across, use the existing or create a subpath
 
 			    pathObject[pathName] = pathObject[pathName] || {'nb_use': 0};
+
+                
 			    // Then return that subpath for the next operation
                 pathObject[pathName]['nb_use'] += 1
 			    return pathObject[pathName];
@@ -139,6 +142,8 @@ class RadialTreeModel {
 	    }
     }
 
+   
+
        /**
      * Find the index of the an app name by searching into the apps attribute
      * 
@@ -152,12 +157,12 @@ class RadialTreeModel {
 
 
     get_tree(id) {
-        //console.log(this.images)
-        //console.log(this.colors)
 
     	let app_name = Object.keys(this.user_sequences[id])[0]
         
     	let json_as_tree = this.get_app_tree(app_name, this.user_sequences[id][app_name])
+
+        //json_as_tree = this.filter_screen_off_leaf(json_as_tree)
         
     	return json_as_tree
     }
@@ -173,15 +178,48 @@ class RadialTreeModel {
 			}
 		}
 
-        //console.log(index)
-        //console.log(this.colors)
-        //console.log(this.images[app_name])
-        //console.log(this.colors[app_name])
-
 		if (children.length > 0) {
 			return {"name" : app_name, "image" : this.images[app_name], "nb_use" : values['nb_use'], "children" : children}
 		} else {
 			return {"name" : app_name, "image" : this.images[app_name], "nb_use" : values['nb_use']}
 		}
 	}
+
+     filter_screen_off_leaf(sequences) {
+        console.log(sequences)
+        
+        //console.log(res)
+        let children = []
+
+        if (sequences.children != undefined && sequences.children.length == 1 && sequences.children[0].name == "Screen off") {
+            delete sequences.children
+            sequences.children = children
+        }
+
+        if (sequences.children != undefined && sequences.children.length > 0) {
+            
+                for (let child of sequences.children) {
+                    let ret = this.filter_screen_off_leaf(child)
+                    children.push(ret)
+                }
+            
+        }
+
+        delete sequences.children
+
+        sequences.children = children
+
+        if (sequences.children.length > 0) {
+            let sum = 0
+
+            for (let c of sequences.children) {
+                sum += c.nb_use
+            }
+
+            sequences.nb_use = sum
+        }
+
+        return sequences
+    }
+
 }

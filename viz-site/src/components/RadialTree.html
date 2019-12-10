@@ -97,17 +97,16 @@
                     .attr("fill", "none")
                     .attr("stroke", "#555")
                     .attr("stroke-opacity", 0.4)
-                    .attr("stroke-width", 1.5)
                     .selectAll("path")
                     .data(root.links())
                     .enter().append("path")
+                    .attr("stroke-width", d => (d.target.data.nb_use) / 3)
                     .attr("d", d3.linkRadial()
                         .angle(d => d.x)
                         .radius(d => d.y))
+
                     .on("mouseover", function(d) {
 
-                        
-                    
                         that.enable_focus_path(d, that)
                     })
                     .on("mousemove", function(d) {
@@ -145,13 +144,9 @@
                         translate(${d.y},0)
                     `)
                     .on('mouseover', function(d) {
-                        let center_x = -parseFloat(svg.attr("viewBox").split(',')[0])
-                        let center_y = -parseFloat(svg.attr("viewBox").split(',')[1])
-
                         
                         that.enable_focus_application(d, that);
                         
-                
                     })
                     .on("mousemove", function(d) {
                         let mouse_position = d3.mouse(d3.select("body").node())
