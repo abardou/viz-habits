@@ -39,7 +39,7 @@ def get_dataframe(filepath):
 
 # Process each appname by translating it and encoding it properly
 def appname_process(string):
-    return translate_appname(string.replace('\xa0', ' '))
+    return translate_appname(string.replace('\xa0', ' ').replace('.', ''))
 
 # Return a list of apps to remove
 def app_to_remove():
