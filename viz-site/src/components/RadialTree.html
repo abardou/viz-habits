@@ -45,19 +45,68 @@
     <script src="../../../viz/js/data/radialtree_model.js"></script>
     <script>
 
-        class SequenceLengthSlider {
-            constructor(range) {
-                this.range = range.filter(x => x < 30)
-                console.log(this.range)
+        class Tools {
+            constructor(range, users) {
+                this.sls = new SequenceLengthSlider(range, this);
+                this.sls.draw()
+                this.um = new UserMenu(users, this)
+                this.um.draw()
             }
 
             set_tree_ref(ref) {
                 this.tree_ref = ref
             }
 
+            send_filters() {
+                
+                
+                this.tree_ref.update_filters(this.um.get_value(), this.sls.get_value())
+            }
+        }
+
+        class UserMenu {
+            constructor(users, tools_ref) {
+                this.users = []
+                for (let u of users) {
+                    this.users.push(u)
+                }
+                this.tools_ref = tools_ref
+                this.selectedValue = this.users[0]
+
+            }
 
             draw() {
-                var sliderFill = d3
+                let that = this
+   
+
+                this.dropdown = d3.select("body")
+                    .append('select')
+                    .on("change", function() {
+                        that.selectedValue = this.children[this.selectedIndex].value
+                        that.tools_ref.send_filters()
+                    })
+
+                this.dropdown.selectAll('option').data(this.users).enter().append('option')
+                    .attr('value', d => d.toString())
+                    .text(d => d)
+            }
+
+            get_value() {
+                return this.selectedValue
+            }
+        }
+
+        class SequenceLengthSlider {
+            constructor(range, tools_ref) {
+                this.range = range.filter(x => x < 30)
+                this.tools_ref = tools_ref
+            }
+
+
+
+
+            draw() {
+                this.sliderFill = d3
                     .sliderBottom()
                     .width(300)
                     .min(d3.min(this.range))
@@ -68,7 +117,7 @@
                     .step(1)
                     .fill('#2196f3')
                     .on('onchange', d => {
-                      this.tree_ref.update_filters(d)
+                      this.tools_ref.send_filters()
                     });
 
                 var gFill = d3
@@ -79,8 +128,12 @@
                     .append('g')
                     .attr('transform', 'translate(30,30)');
 
-                gFill.call(sliderFill);
+                gFill.call(this.sliderFill);
 
+            }
+
+            get_value() {
+                return this.sliderFill.value()
             }
 
         }
@@ -113,9 +166,8 @@
                 return hs + ms + ss
             }
 
-            update_filters(minimum) {
-                this.rtm.build_tree_from_json()
-                this.rtm.filter_tree(minimum)
+            update_filters(id, minimum) {
+                this.rtm.filter_tree(id=id, minimum=minimum)
                 d3.select("#radial_tree").node().remove()
                 this.draw_den()
             }
@@ -233,7 +285,7 @@
 
                 function autoBox() {
                   const {x, y, width, height} = this.getBBox();
-                  return [x, y, width*2, height*2];
+                  return [x, y, width*3, height*3];
                 }
 
             }
@@ -338,231 +390,6 @@
                 }
                 return res
             }
-
-            draw_in_line(tree) {
-                let that = this
-
-                var width = 960, height = 500
-
-                // Set the dimensions and margins of the diagram
-                var margin = {top: 20, right: 90, bottom: 30, left: 90},
-                    width = 960 - margin.left - margin.right,
-                    height = 500 - margin.top - margin.bottom;
-                // Feel free to change or delete any of the code you see in this editor!
-                var svg = d3.select("body").append("svg")
-                    .attr("id", "radial_tree")
-                    .attr("width", width + margin.right + margin.left)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform", "translate("
-                          + margin.left + "," + margin.top + ")");
-
-                var i = 0,
-                    duration = 750,
-                    root;
-
-                var tree = d3.layout.tree()
-                    .size([360, diameter / 2 - 190])
-                    .separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
-
-                var diagonal = d3.svg.diagonal.radial()
-                    .projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
-
-
-                // declares a tree layout and assigns the size
-                var treemap = d3.tree().size([height, width]);
-
-                // load the external data
-    
-                // Assigns parent, children, height, depth
-                root = d3.hierarchy(tree, function(d) { return d.children; });
-                root.x0 = height / 2;
-                root.y0 = 0;
-
-                // Collapse after the second level
-                root.children.forEach(collapse);
-                
-
-                update(root);
-
-                // Collapse the node and all it's children
-                function collapse(d) {
-                  if(d.children) {
-                    d._children = d.children
-                    d._children.forEach(collapse)
-                    d.children = null
-                  }
-                }
-
-                function update(source) {
-
-                  // Assigns the x and y position for the nodes
-                  var treeData = treemap(root);
-
-                  // Compute the new tree layout.
-                  var nodes = treeData.descendants(),
-                      links = treeData.descendants().slice(1);
-
-                  // Normalize for fixed-depth.
-                  nodes.forEach(function(d){ d.y = d.depth * 180});
-
-                  // ****************** Nodes section ***************************
-
-                  // Update the nodes...
-                  var node = svg.selectAll('g.node')
-                      .data(nodes, function(d) {return d.id || (d.id = ++i); });
-
-                  // Enter any new modes at the parent's previous position.
-                  var nodeEnter = node.enter().append('g')
-                      .attr('class', 'node')
-                      .attr("transform", function(d) {
-                        return "translate(" + source.y0 + "," + source.x0 + ")";
-                    })
-                    .on('click', click);
-
-                  // Add Circle for the nodes
-                  nodeEnter.append('circle')
-                      .attr('class', 'node')
-                      .attr('r', 1e-6)
-                      .style("fill", function(d) {
-                          return d._children ? "lightsteelblue" : "#fff";
-                      });
-
-                  // Add labels for the nodes
-                  nodeEnter.append('text')
-                      .attr("dy", ".35em")
-                      .attr("x", function(d) {
-                          return d.children || d._children ? -13 : 13;
-                      })
-                      .attr("text-anchor", function(d) {
-                          return d.children || d._children ? "end" : "start";
-                      })
-                      .text(function(d) { return d.data.name; });
-
-                  // UPDATE
-                  var nodeUpdate = nodeEnter.merge(node);
-
-                  // Transition to the proper position for the node
-                  nodeUpdate.transition()
-                    .duration(duration)
-                    .attr("transform", function(d) { 
-                        return "translate(" + d.y + "," + d.x + ")";
-                     });
-
-                  // Update the node attributes and style
-                  nodeUpdate.select('circle.node')
-                    .attr('r', 10)
-                    .style("fill", function(d) {
-                        return d._children ? "lightsteelblue" : "#fff";
-                    })
-                    .attr('cursor', 'pointer');
-
-
-                  // Remove any exiting nodes
-                  var nodeExit = node.exit().transition()
-                      .duration(duration)
-                      .attr("transform", function(d) {
-                          return "translate(" + source.y + "," + source.x + ")";
-                      })
-                      .remove();
-
-                  // On exit reduce the node circles size to 0
-                  nodeExit.select('circle')
-                    .attr('r', 1e-6);
-
-                  // On exit reduce the opacity of text labels
-                  nodeExit.select('text')
-                    .style('fill-opacity', 1e-6);
-
-                  // ****************** links section ***************************
-
-                  // Update the links...
-                  var link = svg.selectAll('path.link')
-                      .data(links, function(d) { return d.id; });
-
-                  // Enter any new links at the parent's previous position.
-                  var linkEnter = link.enter().insert('path', "g")
-                      .attr("class", "link")
-                      .attr('d', function(d){
-                        var o = {x: source.x0, y: source.y0}
-                        return diagonal(o, o)
-                      });
-
-                  // UPDATE
-                  var linkUpdate = linkEnter.merge(link);
-
-                  // Transition back to the parent element position
-                  linkUpdate.transition()
-                      .duration(duration)
-                      .attr('d', function(d){ return diagonal(d, d.parent) });
-
-                  // Remove any exiting links
-                  var linkExit = link.exit().transition()
-                      .duration(duration)
-                      .attr('d', function(d) {
-                        var o = {x: source.x, y: source.y}
-                        return diagonal(o, o)
-                      })
-                      .remove();
-
-                  // Store the old positions for transition.
-                  nodes.forEach(function(d){
-                    d.x0 = d.x;
-                    d.y0 = d.y;
-                  });
-
-                  // Creates a curved (diagonal) path from parent to the child nodes
-                  function diagonal(s, d) {
-
-                    var path = `M ${s.y} ${s.x}
-                            C ${(s.y + d.y) / 2} ${s.x},
-                              ${(s.y + d.y) / 2} ${d.x},
-                              ${d.y} ${d.x}`
-
-                    return path
-                  }
-
-                  // Toggle children on click.
-                  function click(d) {
-                    if (d.children) {
-                        d._children = d.children;
-                        d.children = null;
-                      } else {
-                        d.children = d._children;
-                        d._children = null;
-                      }
-                    update(d);
-                  }
-            }
-        }
-
-            ticked(link, node) {
-                link
-                    .attr("x1", d => d.source.x)
-                    .attr("y1", d => d.source.y)
-                    .attr("x2", d => d.target.x)
-                    .attr("y2", d => d.target.y);
-
-                node
-                    .attr("transform", d => "translate(" + d.x + "," + d.y + ")")
-            }
-
-            dragstarted(d, simulation) {
-                if (!d3.event.active) simulation.alphaTarget(0.3).restart();
-                d.fx = d.x;
-                d.fy = d.y;
-            }
-
-            dragged(d) {
-                d.fx = d3.event.x;
-                d.fy = d3.event.y;
-            }
-
-            dragended(d, simulation) {
-                if (!d3.event.active) simulation.alphaTarget(0);
-                d.fx = null;
-                d.fy = null;
-            }
         }
 
         let xobj = new XMLHttpRequest();
@@ -572,17 +399,18 @@
                 if (xobj.readyState == 4 && xobj.status == "200") {
                     let data = JSON.parse(xobj.responseText)
 
-                    let rtm = new RadialTreeModel(data, 10, "3")
+                    let rtm = new RadialTreeModel(data, 10)
                     //rtm.apply_filters(0, 1e10, 0.05, 1)
-                    rtm.build_tree_from_json()
+                    rtm.filter_tree(id="1")
 
-                    let sls = new SequenceLengthSlider(rtm.get_tree_uses())
-                    sls.draw()
+
+                    let tools = new Tools(rtm.get_tree_uses(), rtm.get_users())
+                    
 
                     let rt = new RadialTree(500, 500, rtm)
                     rt.draw_den()
 
-                    sls.set_tree_ref(rt)
+                    tools.set_tree_ref(rt)
 
 
                     

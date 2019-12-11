@@ -5,17 +5,17 @@
  * calculation on the whole dataset
  */
 class RadialTreeModel {
-    constructor(data, delta, user_id, start = "Screen on (unlocked)") {
+    constructor(data, delta, start = "Screen on (unlocked)") {
         this.delta = delta
         this.start = start
-        this.user_id = user_id
+        this.data = data
         // Will build the attributes linked to app info
-        this.build_apps_info(data);
+        this.build_apps_info(this.data);
         // Apps info need to be constructed before
         // Will build the attributes relative to assets (colors, images)
         this.build_assets();
 
-        this.build_tree(data);
+        this.build_tree(this.data);
 
         // The filtered attributes are those to return to the user
         // Other attributes must NEVER change outside the constructor
@@ -81,14 +81,14 @@ class RadialTreeModel {
 
     build_tree(data) {
 
-    	let users = new Set();
+    	this.users = new Set();
         for (let d of data)
-            users.add(d['User_ID'])
+            this.users.add(d['User_ID'])
 
 
         this.user_sequences = {}
 
-        for (let uid of users) {
+        for (let uid of this.users) {
 
 	    	let f_data = data.filter(d => d['User_ID'] == uid)
 	                             .sort(function(a, b) { return a.Time - b.Time; });
@@ -150,6 +150,10 @@ class RadialTreeModel {
      */
     get_app_index(app_name) {
         return this.apps.indexOf(app_name)
+    }
+
+    get_users() {
+        return this.users
     }
 
     get_maximum_length() {
@@ -215,9 +219,12 @@ class RadialTreeModel {
         return res
     }
 
-    filter_tree(minimum, begin_with="Screen on (unlocked)", contains=undefined, end_with="Screen off") {
-
+    filter_tree(id="1", minimum=1, begin_with="Screen on (unlocked)", contains=undefined, end_with="Screen off") {
+        this.user_id = id
+        this.build_tree(this.data)
+        this.build_tree_from_json()
         this.json_as_tree = this.filter_minimum(this.json_as_tree, minimum)
+
     }
 
     filter_minimum(sequences, minimum) {
