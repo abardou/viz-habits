@@ -5,9 +5,10 @@
  * calculation on the whole dataset
  */
 class RadialTreeModel {
-    constructor(data, delta, start = "Screen on (unlocked)") {
+    constructor(data, delta, user_id, start = "Screen on (unlocked)") {
         this.delta = delta
         this.start = start
+        this.user_id = user_id
         // Will build the attributes linked to app info
         this.build_apps_info(data);
         // Apps info need to be constructed before
@@ -19,10 +20,6 @@ class RadialTreeModel {
         // The filtered attributes are those to return to the user
         // Other attributes must NEVER change outside the constructor
         setTimeout(10000)
-        this.filtered_apps = this.apps.slice();
-        this.filtered_apps_time = this.apps_time.slice();
-        //this.filtered_images = this.images.slice();
-        //this.filtered_tree = this.tree.slice();
     }
 
     /**
@@ -155,16 +152,22 @@ class RadialTreeModel {
         return this.apps.indexOf(app_name)
     }
 
+    get_maximum_length() {
+        return this.maximum
+    }
 
-    get_tree(id) {
+    get_tree() {
+        return this.json_as_tree
+    }
 
-    	let app_name = Object.keys(this.user_sequences[id])[0]
+    build_tree_from_json() {
+        let app_name = Object.keys(this.user_sequences[this.user_id])[0]
         
-    	let json_as_tree = this.get_app_tree(app_name, this.user_sequences[id][app_name])
+        this.json_as_tree = this.get_app_tree(app_name, this.user_sequences[this.user_id][app_name])
 
         //json_as_tree = this.filter_screen_off_leaf(json_as_tree)
         
-    	return json_as_tree
+        return this.json_as_tree
     }
 
     get_app_tree(app_name, values) {
@@ -185,9 +188,70 @@ class RadialTreeModel {
 		}
 	}
 
-     filter_screen_off_leaf(sequences) {
-        console.log(sequences)
+    get_tree_uses() {
+        let res = this.get_node_uses(this.json_as_tree).sort()
+        let r = []
+        for (let val of res) {
+            if (!r.includes(val)) {
+                r.push(val)
+            }
+        }
         
+        return r.sort(function (a, b) {  return a - b;  });
+    }
+
+    get_node_uses(sequences) {
+        let res = []
+
+        res.push(sequences.nb_use)
+
+        if (sequences.children != undefined && sequences.children.length > 0) {
+            for (let child of sequences.children) {
+                let ret = this.get_node_uses(child)
+                res = res.concat(ret)
+            }
+        }
+
+        return res
+    }
+
+    filter_tree(minimum, begin_with="Screen on (unlocked)", contains=undefined, end_with="Screen off") {
+
+        this.json_as_tree = this.filter_minimum(this.json_as_tree, minimum)
+    }
+
+    filter_minimum(sequences, minimum) {
+        
+        if (sequences.nb_use >= minimum) {
+
+            let children = []
+
+            if (sequences.children != undefined && sequences.children.length > 0) {
+                for (let child of sequences.children) {
+                    let ret = this.filter_minimum(child, minimum)
+                    if (ret != undefined) {
+                        children.push(ret)
+                    }
+                }
+            } else {
+                return sequences
+            }
+
+            delete sequences.children
+
+            if (children.length > 0) {
+                sequences.children = children
+            }
+
+            return sequences
+
+        } else {
+            return undefined
+        }
+    }
+
+
+    filter_screen_off_leaf(sequences) {
         //console.log(res)
         let children = []
 

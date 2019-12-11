@@ -41,15 +41,57 @@
 </head>
 
 <body>
+    <script src="https://unpkg.com/d3-simple-slider"></script>
     <script src="../../../viz/js/data/radialtree_model.js"></script>
     <script>
+
+        class SequenceLengthSlider {
+            constructor(range) {
+                this.range = range.filter(x => x < 30)
+                console.log(this.range)
+            }
+
+            set_tree_ref(ref) {
+                this.tree_ref = ref
+            }
+
+
+            draw() {
+                var sliderFill = d3
+                    .sliderBottom()
+                    .width(300)
+                    .min(d3.min(this.range))
+                    .max(d3.max(this.range))
+                    .tickFormat(d3.format("i"))
+                    .tickValues(this.range)
+                    .default(1)
+                    .step(1)
+                    .fill('#2196f3')
+                    .on('onchange', d => {
+                      this.tree_ref.update_filters(d)
+                    });
+
+                var gFill = d3
+                    .select('body')
+                    .append('svg')
+                    .attr('width', 500)
+                    .attr('height', 100)
+                    .append('g')
+                    .attr('transform', 'translate(30,30)');
+
+                gFill.call(sliderFill);
+
+            }
+
+        }
         
     
 
         class RadialTree {
-            constructor(cx, cy) {
+            constructor(cx, cy, rtm) {
                 this.cx = cx;
                 this.cy = cy;
+                this.rtm = rtm
             }
 
             get_correct_time(time) {
@@ -71,9 +113,18 @@
                 return hs + ms + ss
             }
 
-            draw_den(data) {
+            update_filters(minimum) {
+                this.rtm.build_tree_from_json()
+                this.rtm.filter_tree(minimum)
+                d3.select("#radial_tree").node().remove()
+                this.draw_den()
+            }
+
+            draw_den() {
 
                 let that = this
+
+                let data = this.rtm.get_tree()
 
                 let width = 975
                 let radius = width / 2
@@ -85,6 +136,7 @@
                 
 
                 const svg = d3.select("body").append("svg")
+                    .attr("id", "radial_tree")
                     .style("max-width", "100%")
                     .style("height", "auto")
                     .style("font", "10px sans-serif")
@@ -298,6 +350,7 @@
                     height = 500 - margin.top - margin.bottom;
                 // Feel free to change or delete any of the code you see in this editor!
                 var svg = d3.select("body").append("svg")
+                    .attr("id", "radial_tree")
                     .attr("width", width + margin.right + margin.left)
                     .attr("height", height + margin.top + margin.bottom)
                     .append("g")
@@ -519,11 +572,24 @@
                 if (xobj.readyState == 4 && xobj.status == "200") {
                     let data = JSON.parse(xobj.responseText)
 
-                    let rtm = new RadialTreeModel(data, 10)
+                    let rtm = new RadialTreeModel(data, 10, "3")
                     //rtm.apply_filters(0, 1e10, 0.05, 1)
+                    rtm.build_tree_from_json()
 
-                    rt = new RadialTree(500, 500)
-                    rt.draw_den(rtm.get_tree("3"))
+                    let sls = new SequenceLengthSlider(rtm.get_tree_uses())
+                    sls.draw()
+
+                    let rt = new RadialTree(500, 500, rtm)
+                    rt.draw_den()
+
+                    sls.set_tree_ref(rt)
+
+
+                    
+
+                    
+
+                    
                 }
         };
         xobj.send(null);
