@@ -15,7 +15,7 @@ The Activity collection will store the list of apps used by the user, at a speci
 * `date` : the date and time at starting of the app
 * `duration` : the duration of app usage
 
-## Sources
+## Sources (deprecated)
 Energy :  
     - smartphone users & smartphone penetration : https://www.bankmycell.com/blog/how-many-phones-are-in-the-world  
     - % of smartphones by brand by country : https://gs.statcounter.com/vendor-market-share/mobile/worldwide  
