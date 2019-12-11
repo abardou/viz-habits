@@ -72,7 +72,7 @@
     \section{Source de données}
         Les données dont nous disposons ont été générées par 3 des 4 membres du groupe. Pour chacun d'entre eux, les données d'activité de l'application \href{https://play.google.com/store/apps/details?id=com.a0soft.gphone.uninstaller&hl=fr}{App Usage} sont collectées sur une période prédifinie. Sur la même période, nous récupérons l'historique des positions \href{https://takeout.google.com/settings/takeout}{fourni par Google} et nous le lions avec les données d'activité. Enfin, nous agrégeons les données des différents membres pour former le dataset final sur lequel se formeront nos visualisations.
 
-        Pour des raisons esthétiques, nous présentons les applications grâce à leurs icônes. Afin de récupérer automatiquement les icônes des applications présentes dans notre dataset, nous avons écrit un site de webscrapping capable de récupérer l'icône d'une application dans \href{https://play.google.com/store/apps?hl=fr}{le Google Play Store}.
+        Pour des raisons pratiques et esthétiques, nous présentons les applications grâce à leurs icônes et leur catégorie (réseau social, actualités, etc...). Afin de récupérer automatiquement ces données pour les applications présentes dans notre dataset, nous avons écrit des scripts de webscrapping capable de récupérer l'icône et la catégorie d'une application dans \href{https://play.google.com/store/apps?hl=fr}{le Google Play Store}.
 
         Nous avons construit notre propre dataset après nous être rendus compte que peu de datasets de ce genre existaient en ligne, mais également parce que nous étions curieux de nos propres habitudes de consommation. Cette construction offre avantages et inconvénients :
         \begin{itemize}
@@ -93,29 +93,29 @@
         Ce sont ces données qui possèdent le plus de limites, car leur granularité temporelle est assez grosse et leur collecte est dépendante des autorisations données à Google par l'utilisateur. Certaines activités ne peuvent donc pas être rattachées à des données spatiales. Enfin, elles sont également dépendantes de la calibration GPS du mobile qui effectue les mesures, ce qui peut donner lieu à quelques imprécisions.
 
     \section{Travaux liés au projet}
+    Nous n'avons pas trouvé de projet proposant le même genre de visualisations que les nôtres. En revanche, il existe beaucoup de projets qui collectent et analysent des données similaires pour essayer d'en sortir les habitudes de consommation des applications chez l'utilisateur propriétaire. Parmi ces projets, nous pouvons citer 3 applications mobiles :
     \begin{itemize}
-    \item L'application AppUsage que nous utilisons pour récupérer nos données par CSV réalise déjà quelques visualisations simples comme une série temporelle de la durée d'utilisation journalière du smartphone ou encore un camembert représentant la durée d'utilisation par catégorie d'application (Vidéos, Social, Musique...).
-    \item Développement D3 (filtres): Anthony et Hugo;
-    \item Développement D3 (visus): Anthony et Tristan;
-    \item Traduction de JS vers VueJS: Hugo.
+        \item \href{https://play.google.com/store/apps/details?id=com.a0soft.gphone.uninstaller&hl=fr}{App Usage} que nous utilisons pour récupérer nos données en format CSV réalise déjà quelques visualisations simples comme celle d'une série temporelle de la durée d'utilisation journalière du smartphone ou encore un pie chart représentant la durée d'utilisation par catégorie d'application (Vidéos, Social, Musique...)
+        \item \href{https://www.rescuetime.com/}{RescueTime}, dont le but est similaire à App Usage mais qui semble capable d'analyser des données agrégées provenant de plusieurs utilisateurs et de fonctionner sur la plupart des appareils (PC, tablette, mobile)
+        \item \href{https://play.google.com/store/apps/details?id=com.zerodesktop.appdetox.qualitytime&hl=fr}{QualityTime}, un projet une nouvelle fois similaire aux deux autres ci-dessus
     \end{itemize}
 
     \section{Organisation}
     Nous communiquons principalement par Slack et avons mis en place une liste d'issues sur GitHub représentant chaque tâche à accomplir pour la réalisation du projet. Les issues sont réparties selon plusieurs catégories :
     \begin{itemize}
-    \item[--] data: relatif au dataset c'est-à-dire collecter des données ou les transformer;
-    \item[--] filter: composant filtre, par exemple le filtre temporel;
-    \item[--] visu: principales visualisations des données à réaliser.
+    \item[--] data: relatif au dataset, à la collection des données ou à leur transformation;
+    \item[--] filter: relatif aux composants filtres (par exemple le filtre temporel) qui jouent un rôle important dans nos visualisations;
+    \item[--] visu: relatifs aux principales visualisations des données à réaliser.
     \end{itemize}
     
-    Nous n'avons pas réalisé ni prévu de séances de travail particulières, la coordination se réalise par Slack et chacun réalise les tâches qui lui sont assignées.
+    Nous n'avons pas réalisé ni prévu de séances de travail particulières, la coordination se réalise via un channel Slack dédié et chacun réalise les tâches qui lui sont assignées. L'avancement d'une certaine tâche est connue de tous via les issues GitHub référencées dans les commits ou le channel dans lequel chaque membre informe périodiquement le groupe de sa progression.
     
-    Rôles :
+    Tendances principales :
     \begin{itemize}
     \item[--] Pré-traitement des données: Anthony et Tristan;
     \item[--] Développement D3 (filtres): Anthony et Hugo;
     \item[--] Développement D3 (visus): Anthony et Tristan;
-    \item[--] Traduction de JS vers VueJS: Hugo.
+    \item[--] Traduction de JS vers VueJS: Hugo et Théo.
     \end{itemize}
 
     \section{Esquisses finales}
