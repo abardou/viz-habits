@@ -107,7 +107,7 @@ class RadialTreeModel {
 	        			sequences.push({'path' : seq})
 	        			in_seq = false
 	        		} else {
-	        			if (in_seq && i['App Name'] != this.start) {
+	        			if (in_seq) {
 	        				seq.push(i['App Name'])
 	        			}
 	        		}
