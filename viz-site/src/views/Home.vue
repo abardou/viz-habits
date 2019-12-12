@@ -2,12 +2,9 @@
 	<div class="home">
 		<v-container grid-list-xs>
 			<v-card>
-				<!-- <Timeline />
-				<FrequencyRange /> -->
-				<v-card>
-					{{ timePickerSelection }}
-					<TimePeriodPicker />
-				</v-card>
+				<v-container grid-list-xs>
+					<ForceGraph />
+				</v-container>
 			</v-card>
 		</v-container>
 	</div>
@@ -15,10 +12,11 @@
 
 <script>
 // @ is an alias to /src
-// import Timeline from '@/components/Timeline.vue';
-// import FrequencyRange from '@/components/FrequencyRange.vue';
-import TimePeriodPicker from '@/components/TimePeriodPicker.vue';
-// import Map from '@/components/Map.vue';
+// import Timeline from '@/components/filters/Timeline.vue';
+// import FrequencyRange from '@/components/filters/FrequencyRange.vue';
+// import TimePeriodPicker from '@/components/filters/TimePeriodPicker.vue';
+import ForceGraph from '@/components/visus/ForceGraph.vue';
+// import Map from '@/components/filters/Map.vue';
 
 export default {
 	name: 'Home',
@@ -26,7 +24,8 @@ export default {
 		// Timeline,
 		// FrequencyRange,
 		// Map,
-		TimePeriodPicker
+		// TimePeriodPicker,
+		ForceGraph
 	},
 	computed: {
 		timePickerSelection: {
