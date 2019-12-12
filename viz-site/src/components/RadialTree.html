@@ -51,16 +51,38 @@
                 this.sls.draw()
                 this.um = new UserMenu(users, this)
                 this.um.draw()
+                this.rtb = new RestartTreeButton(this)
+                this.rtb.draw()
             }
 
             set_tree_ref(ref) {
                 this.tree_ref = ref
             }
 
-            send_filters() {
-                
-                
-                this.tree_ref.update_filters(this.um.get_value(), this.sls.get_value())
+            send_filters(start="Screen on (unlocked)") {
+                this.tree_ref.update_filters(start, this.um.get_value(), this.sls.get_value())
+            }
+
+            restartTree() {
+                this.send_filters()
+            }
+        }
+
+        class RestartTreeButton {
+            constructor(tools_ref) {
+                this.tools_ref = tools_ref
+            }
+
+            draw() {
+                let that = this
+
+                this.button = d3.select("body")
+                    .append("button")
+                    .attr("type", "button")
+                    .text("Restart Tree")
+                    .on("click", function() {
+                        that.tools_ref.restartTree()
+                    })
             }
         }
 
@@ -141,10 +163,12 @@
     
 
         class RadialTree {
-            constructor(cx, cy, rtm) {
+            constructor(cx, cy, rtm, tools_ref) {
                 this.cx = cx;
                 this.cy = cy;
                 this.rtm = rtm
+                this.tools_ref = tools_ref
+                this.tooltip = d3.select("body").append('div').attr('class', 'hidden tooltip');
             }
 
             get_correct_time(time) {
@@ -166,8 +190,8 @@
                 return hs + ms + ss
             }
 
-            update_filters(id, minimum) {
-                this.rtm.filter_tree(id=id, minimum=minimum)
+            update_filters(start, id, minimum) {
+                this.rtm.filter_tree(id, minimum, start)
                 d3.select("#radial_tree").node().remove()
                 this.draw_den()
             }
@@ -194,7 +218,6 @@
                     .style("font", "10px sans-serif")
                     .style("margin", "5px");
 
-                let tooltip = d3.select("body").append('div').attr('class', 'hidden tooltip');
                   
                 const link = svg.append("g")
                     .attr("id", "links")
@@ -223,7 +246,7 @@
                         }
 
                     // on affiche le toolip
-                        tooltip.classed('hidden', false)
+                        that.tooltip.classed('hidden', false)
                             // on positionne le tooltip
                             .attr('style', 'left:' + (mouse_position[0] + 10) +
                                 'px; top:' + (mouse_position[1] - 15) + 'px')
@@ -231,7 +254,7 @@
                             .html(str);
                     })
                     .on('mouseout', function() {
-                        tooltip.classed('hidden', true)
+                        that.tooltip.classed('hidden', true)
                         // on cache le toolip
                         that.disable_focus();
                     });
@@ -255,7 +278,7 @@
                     .on("mousemove", function(d) {
                         let mouse_position = d3.mouse(d3.select("body").node())
                     // on affiche le toolip
-                        tooltip.classed('hidden', false)
+                        that.tooltip.classed('hidden', false)
                             // on positionne le tooltip
                             .attr('style', 'left:' + (mouse_position[0] + 10) +
                                 'px; top:' + (mouse_position[1] - 15) + 'px')
@@ -263,9 +286,13 @@
                             .html(d.data.name);
                     })
                     .on('mouseout', function() {
-                        tooltip.classed('hidden', true)
+                        that.tooltip.classed('hidden', true)
                         // on cache le toolip
                         that.disable_focus();
+                    })
+                    .on('click', function(d) {
+                        that.tools_ref.send_filters(d.data.name)
+                        that.tooltip.classed('hidden', true)
                     });
                   
                 node.append("circle")
@@ -285,7 +312,7 @@
 
                 function autoBox() {
                   const {x, y, width, height} = this.getBBox();
-                  return [x, y, width*3, height*3];
+                  return [x, y, width*2, height*2];
                 }
 
             }
@@ -407,7 +434,7 @@
                     let tools = new Tools(rtm.get_tree_uses(), rtm.get_users())
                     
 
-                    let rt = new RadialTree(500, 500, rtm)
+                    let rt = new RadialTree(500, 500, rtm, tools)
                     rt.draw_den()
 
                     tools.set_tree_ref(rt)
