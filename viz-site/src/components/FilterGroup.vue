@@ -14,6 +14,10 @@ export default {
 		filtersname: {
 			default: null,
 			type: Array
+		}, 
+		dataset: {
+			default: null,
+			type: Object
 		}
 	}
 };
