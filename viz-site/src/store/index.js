@@ -10,6 +10,7 @@ export default new Vuex.Store({
 			hours: null,
 			minutes: null
 		},
+		usersSelection: [],
 		draggingState: {
 			dragging: false,
 			dragStartRing: null
@@ -18,6 +19,9 @@ export default new Vuex.Store({
 	mutations: {
 		setTimePickerSelection(state, o) {
 			state.timePickerSelection[o.key] = o.value;
+		},
+		setUsersSelection(state, value) {
+			state.usersSelection = value;
 		},
 		setDraggingState(state, value) {
 			state.draggingState = value;

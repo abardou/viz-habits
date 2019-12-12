@@ -2,7 +2,7 @@ import json
 import urllib.request
 from bs4 import BeautifulSoup
 
-with open('../data/dataset.json', 'r') as file:
+with open('../data/dataset.json', 'r', encoding='utf-8') as file:
 	data = json.load(file)
 	res = []
 	for app in data:
@@ -10,6 +10,9 @@ with open('../data/dataset.json', 'r') as file:
 			res.append(app['App Name']) 
 
 	file.close()
+
+# with open('../data/categories.json', 'r', encoding='utf-8') as f:
+# 	categories = json.load(f)
 
 categories = {}
 for d in res:
@@ -24,5 +27,5 @@ for d in res:
 	categories[d] = soup2.find('a', {'itemprop': 'genre'}).text
 
 print(categories)
-with open('../data/categories.json', 'w') as f:
+with open('../data/categories.json', 'w', encoding='utf-8') as f:
 	json.dump(categories, f)
