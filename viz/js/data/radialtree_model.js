@@ -94,7 +94,6 @@ class RadialTreeModel {
 	                             .sort(function(a, b) { return a.Time - b.Time; });
 
 	        let sequences = []
-            console.log(this.start)
 	        let in_seq = false
 	        let seq = []
 	        for (let i of f_data) {
