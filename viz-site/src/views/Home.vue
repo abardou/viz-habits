@@ -6,7 +6,8 @@
 					<!-- {{ timePickerSelection }}
 					<TimePeriodPicker /> -->
 					<!-- <Map /> -->
-					<UserFilter :users="['User1', 'User2', 'User3']" />
+					<!-- <UserFilter :users="['User1', 'User2', 'User3']" /> -->
+					<FilterGroup :filtersname="['UserFilter']" />
 				</v-card>
 			</v-card>
 		</v-container>
@@ -19,7 +20,7 @@
 // import FrequencyRange from '@/components/FrequencyRange.vue';
 // import TimePeriodPicker from '@/components/TimePeriodPicker.vue';
 // import Map from '@/components/Map.vue';
-import UserFilter from '@/components/filters/UserFilter.vue';
+import FilterGroup from '@/components/FilterGroup.vue';
 
 export default {
 	name: 'Home',
@@ -28,7 +29,7 @@ export default {
 		// FrequencyRange,
 		// Map,
 		// TimePeriodPicker,
-		UserFilter
+		FilterGroup
 	},
 	computed: {
 		timePickerSelection: {
