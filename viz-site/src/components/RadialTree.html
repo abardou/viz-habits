@@ -3,7 +3,7 @@
   <meta charset="utf-8">
   <script src="https://d3js.org/d3.v5.min.js"></script>
   <style>
-    body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; }
+    body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; height: 3000px }
     .hidden {
         display: none;
     }
@@ -46,13 +46,15 @@
     <script>
 
         class Tools {
-            constructor(range, users) {
+            constructor(range, users, display_functions) {
                 this.sls = new SequenceLengthSlider(range, this);
                 this.sls.draw()
                 this.um = new UserMenu(users, this)
                 this.um.draw()
                 this.rtb = new RestartTreeButton(this)
                 this.rtb.draw()
+                this.dm = new DisplayMenu(display_functions, this)
+                this.dm.draw()
             }
 
             set_tree_ref(ref) {
@@ -60,7 +62,8 @@
             }
 
             send_filters(start="Screen on (unlocked)") {
-                this.tree_ref.update_filters(start, this.um.get_value(), this.sls.get_value())
+                console.log(start)
+                this.tree_ref.update_filters(start, this.um.get_value(), this.sls.get_value(), this.dm.get_value())
             }
 
             restartTree() {
@@ -109,6 +112,38 @@
                     })
 
                 this.dropdown.selectAll('option').data(this.users).enter().append('option')
+                    .attr('value', d => d.toString())
+                    .text(d => d)
+            }
+
+            get_value() {
+                return this.selectedValue
+            }
+        }
+
+        class DisplayMenu {
+            constructor(displays_functions, tools_ref) {
+                this.displays = []
+                for (let d of displays_functions) {
+                    this.displays.push(d)
+                }
+                this.tools_ref = tools_ref
+                this.selectedValue = this.displays[0]
+
+            }
+
+            draw() {
+                let that = this
+   
+
+                this.dropdown = d3.select("body")
+                    .append('select')
+                    .on("change", function() {
+                        that.selectedValue = this.children[this.selectedIndex].value
+                        that.tools_ref.send_filters()
+                    })
+
+                this.dropdown.selectAll('option').data(this.displays).enter().append('option')
                     .attr('value', d => d.toString())
                     .text(d => d)
             }
@@ -168,6 +203,7 @@
                 this.cy = cy;
                 this.rtm = rtm
                 this.tools_ref = tools_ref
+                this.display_function = this.draw_line
                 this.tooltip = d3.select("body").append('div').attr('class', 'hidden tooltip');
             }
 
@@ -190,34 +226,47 @@
                 return hs + ms + ss
             }
 
-            update_filters(start, id, minimum) {
+            update_filters(start, id, minimum, display_function) {
                 this.rtm.filter_tree(id, minimum, start)
-                d3.select("#radial_tree").node().remove()
-                this.draw_den()
+
+                let t = d3.select("#tree").node()
+                if (t != null) {
+                    t.remove()
+                }
+
+
+                console.log(display_function)
+                
+
+                if (display_function == 'dendogram') {
+                    this.display_function = this.draw_den
+                } else if (display_function == 'tidy') {
+                    this.display_function = this.draw_tidy
+                } else if (display_function == 'line') {
+                    this.display_function = this.draw_line
+                }
+                this.display_function()
+            }
+
+            set_display_function(df) {
+                this.display_function = df
             }
 
             draw_den() {
-
                 let that = this
-
                 let data = this.rtm.get_tree()
-
                 let width = 975
                 let radius = width / 2
                 let tree = d3.cluster().size([2 * Math.PI, radius - 100])
-
                 const root = tree(d3.hierarchy(data)
                     .sort((a, b) => d3.ascending(a.data.name, b.data.name)));
-
                 
-
                 const svg = d3.select("body").append("svg")
-                    .attr("id", "radial_tree")
+                    .attr("id", "tree")
                     .style("max-width", "100%")
                     .style("height", "auto")
                     .style("font", "10px sans-serif")
                     .style("margin", "5px");
-
                   
                 const link = svg.append("g")
                     .attr("id", "links")
@@ -231,20 +280,16 @@
                     .attr("d", d3.linkRadial()
                         .angle(d => d.x)
                         .radius(d => d.y))
-
                     .on("mouseover", function(d) {
-
                         that.enable_focus_path(d, that)
                     })
                     .on("mousemove", function(d) {
                         let mouse_position = d3.mouse(d3.select("body").node())
-
                         let nb_use = d.target.data.nb_use
                         let str = nb_use + " sequences"
                         if (nb_use == 1) {
                             str = nb_use + " sequence"
                         }
-
                     // on affiche le toolip
                         that.tooltip.classed('hidden', false)
                             // on positionne le tooltip
@@ -298,7 +343,6 @@
                 node.append("circle")
                     .attr("fill", d => d.children ? "#555" : "#999")
                     .attr("r", 2.5);
-
                 const images = node.append("image")
                     .attr("xlink:href", d => d.data.image)
                     .attr("width", 20)
@@ -307,14 +351,11 @@
                     .attr("y", -10)
                   
                 svg.attr("viewBox", autoBox);
-
                   
-
                 function autoBox() {
                   const {x, y, width, height} = this.getBBox();
                   return [x, y, width*2, height*2];
                 }
-
             }
 
             enable_focus_path(edge, that) {
@@ -417,6 +458,221 @@
                 }
                 return res
             }
+
+
+            draw_line() {
+                let that = this
+
+                let data = this.rtm.get_tree()
+
+                var margin = {top: 100, right: 10, bottom: 240, left: 10},
+                    width = 900 - margin.left - margin.right,
+                    height = 900 - margin.top - margin.bottom;
+
+
+                var svg = d3.select("body")
+                        .append("svg")
+                        .attr("id", "tree")
+                        .attr("width", width + margin.left + margin.right)
+                        .attr("height", height + margin.top + margin.bottom)
+                        .append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+                      
+
+                // Compute the layout.
+                var treemap = d3.tree().size([width, height]);
+                    
+                var nodes = d3.hierarchy(data);
+                
+                    nodes = treemap(nodes);
+                
+                var links = nodes.descendants().slice(1);
+
+
+                // Create the link lines.
+                svg.selectAll(".link")
+                    .data(nodes.links())
+                    .enter().append("path")
+                    .attr("class", "link")
+                    .attr("d", d3.linkHorizontal()
+                        .x(d => d.y)
+                        .y(d => d.x))
+                    .on("mouseover", function(d) {
+
+                        that.enable_focus_path(d, that)
+                    })
+                    .on("mousemove", function(d) {
+                        let mouse_position = d3.mouse(d3.select("body").node())
+
+                        let nb_use = d.target.data.nb_use
+                        let str = nb_use + " sequences"
+                        if (nb_use == 1) {
+                            str = nb_use + " sequence"
+                        }
+
+                    // on affiche le toolip
+                        that.tooltip.classed('hidden', false)
+                            // on positionne le tooltip
+                            .attr('style', 'left:' + (mouse_position[0] + 10) +
+                                'px; top:' + (mouse_position[1] - 15) + 'px')
+                            // on recupere le nom de l'etat 
+                            .html(str);
+                    })
+                    .on('mouseout', function() {
+                        that.tooltip.classed('hidden', true)
+                        // on cache le toolip
+                        that.disable_focus();
+                    });
+
+                // Create the node circles.
+                var node = svg.selectAll(".node")
+                    .data(nodes.descendants())
+                    .enter()
+                    .append("g")
+                    .on('mouseover', function(d) {
+                        
+                        that.enable_focus_application(d, that);
+                        
+                    })
+                    .on("mousemove", function(d) {
+                        let mouse_position = d3.mouse(d3.select("body").node())
+                    // on affiche le toolip
+                        that.tooltip.classed('hidden', false)
+                            // on positionne le tooltip
+                            .attr('style', 'left:' + (mouse_position[0] + 10) +
+                                'px; top:' + (mouse_position[1] - 15) + 'px')
+                            // on recupere le nom de l'etat 
+                            .html(d.data.name);
+                    })
+                    .on('mouseout', function() {
+                        that.tooltip.classed('hidden', true)
+                        // on cache le toolip
+                        that.disable_focus();
+                    })
+                    .on('click', function(d) {
+                        that.tools_ref.send_filters(d.data.name)
+                        that.tooltip.classed('hidden', true)
+                    });
+
+                const images = node.append("image")
+                    .attr("xlink:href", d => d.data.image)
+                    .attr("width", 20)
+                    .attr("height", 20)
+                    .attr("x", (d => d.y-10))
+                    .attr("y", (d => d.x-10))
+                
+            }
+
+            draw_tidy() {
+
+                let that = this
+
+                let data = this.rtm.get_tree()
+
+                let width = 975
+                let radius = width / 2
+                let tree =  d3.tree()
+                    .size([2 * Math.PI, radius])
+                    .separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth)
+
+                  const root = tree(d3.hierarchy(data)
+                      .sort((a, b) => d3.ascending(a.data.name, b.data.name)));
+                  
+                  const svg = d3.select("body").append("svg")
+                      .attr("id", "tree")
+                      .style("max-width", "100%")
+                      .style("height", "auto")
+                      .style("font", "10px sans-serif")
+                      .style("margin", "5px");
+
+                  const link = svg.append("g")
+                      .attr("fill", "none")
+                      .attr("stroke", "#555")
+                      .attr("stroke-opacity", 0.4)
+                      .attr("stroke-width", 1.5)
+                    .selectAll("path")
+                    .data(root.links())
+                    .join("path")
+                      .attr("d", d3.linkRadial()
+                          .angle(d => d.x)
+                          .radius(d => d.y))
+                      .on("mouseover", function(d) {
+                        that.enable_focus_path(d, that)
+                    })
+                    .on("mousemove", function(d) {
+                        let mouse_position = d3.mouse(d3.select("body").node())
+                        let nb_use = d.target.data.nb_use
+                        let str = nb_use + " sequences"
+                        if (nb_use == 1) {
+                            str = nb_use + " sequence"
+                        }
+                    // on affiche le toolip
+                        that.tooltip.classed('hidden', false)
+                            // on positionne le tooltip
+                            .attr('style', 'left:' + (mouse_position[0] + 10) +
+                                'px; top:' + (mouse_position[1] - 15) + 'px')
+                            // on recupere le nom de l'etat 
+                            .html(str);
+                    })
+                    .on('mouseout', function() {
+                        that.tooltip.classed('hidden', true)
+                        // on cache le toolip
+                        that.disable_focus();
+                    });
+                  
+                  const node = svg.append("g")
+                      .attr("stroke-linejoin", "round")
+                      .attr("stroke-width", 3)
+                    .selectAll("g")
+                    .data(root.descendants().reverse())
+                    .join("g")
+                      .attr("transform", d => `
+                        rotate(${d.x * 180 / Math.PI - 90})
+                        translate(${d.y},0)
+                      `)
+                      .on('mouseover', function(d) {
+                        
+                        that.enable_focus_application(d, that);
+                        
+                    })
+                    .on("mousemove", function(d) {
+                        let mouse_position = d3.mouse(d3.select("body").node())
+                    // on affiche le toolip
+                        that.tooltip.classed('hidden', false)
+                            // on positionne le tooltip
+                            .attr('style', 'left:' + (mouse_position[0] + 10) +
+                                'px; top:' + (mouse_position[1] - 15) + 'px')
+                            // on recupere le nom de l'etat 
+                            .html(d.data.name);
+                    })
+                    .on('mouseout', function() {
+                        that.tooltip.classed('hidden', true)
+                        // on cache le toolip
+                        that.disable_focus();
+                    })
+                    .on('click', function(d) {
+                        that.tools_ref.send_filters(d.data.name)
+                        that.tooltip.classed('hidden', true)
+                    });
+                  
+                  node.append("circle")
+                      .attr("fill", d => d.children ? "#555" : "#999")
+                      .attr("r", 2.5);
+                  const images = node.append("image")
+                    .attr("xlink:href", d => d.data.image)
+                    .attr("width", 20)
+                    .attr("height", 20)
+                    .attr("x", -10)
+                    .attr("y", -10)
+
+
+                  svg.attr("viewBox", autoBox);
+
+                  function autoBox() {
+                    const {x, y, width, height} = this.getBBox();
+                    return [x, y, width*2, height*2];
+                    }
+            }
         }
         let xobj = new XMLHttpRequest();
         xobj.overrideMimeType("application/json");
@@ -427,16 +683,17 @@
 
                     let rtm = new RadialTreeModel(data, 10)
                     //rtm.apply_filters(0, 1e10, 0.05, 1)
-                    rtm.filter_tree(id="1")
+                    rtm.filter_tree(id="3")
 
+                    let displays = ['dendogram', 'tidy', 'line']
 
-                    //let tools = new Tools(rtm.get_tree_uses(), rtm.get_users())
-                    let filter_group = new FilterGroup(["UserFilter"], this)
+                  //  let tools = new Tools(rtm.get_tree_uses(), rtm.get_users(), displays)
 
                     let rt = new RadialTree(500, 500, rtm, tools)
-                    rt.draw_den()
+
 
                     tools.set_tree_ref(rt)
+                    tools.send_filters()
 
 
                     
