@@ -1,32 +1,36 @@
-<!-- TODO 
-Check l'architecture de vue
-Affiche une simple checkbox pour chaque user
-    -> Rework later
-Appel updateViz avec params.
--->
+<div id='userfilter'>
 
-<div id="company">
-    <ul id='BestBrands'>
-        <script>
-            for user in users
-    <label class="checkbox">
-                                                    <input class="select-all" type="checkbox" id="brandAll"  name="bands" value="M&B"
-                                                    onclick="selectMainBrandALL('brandAll');">
-                                                    Select All</label>
-
-    <label class="checkbox">
-                                                    <input type="checkbox" id="TCS"  name="TCS" 
-                                                     >
-                                                    TCS</label>
-
-    <label class="checkbox">
-                                                    <input id="CTS" type="checkbox" name="CTS" " >
-                                                    CTS </label>
-
-     <label class="checkbox">
-                                                    <input type="checkbox" id="info"  name="info" >
-                                                    Info</label>
-            
-        </script>
-    </ul>
 </div>
+<script>
+    class UserFilter {
+        constructor(users, tools_ref) {
+            this.users = []
+            for (let u of users) {
+                this.users.push(u)
+            }
+            this.tools_ref = tools_ref
+            this.selectedValue = this.users[0]
+
+        }
+
+        draw() {
+            let that = this
+
+
+            this.dropdown = d3.select("body")
+                .append('select')
+                .on("change", function() {
+                    that.selectedValue = this.children[this.selectedIndex].value
+                    that.tools_ref.send_filters()
+                })
+
+            this.dropdown.selectAll('option').data(this.users).enter().append('option')
+                .attr('value', d => d.toString())
+                .text(d => d)
+        }
+
+        get_value() {
+            return this.selectedValue
+        }
+    }
+</script>

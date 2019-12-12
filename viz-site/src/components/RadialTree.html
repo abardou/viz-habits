@@ -391,7 +391,6 @@
                 return res
             }
         }
-
         let xobj = new XMLHttpRequest();
         xobj.overrideMimeType("application/json");
         xobj.open('GET', '../../../data/dataset.json', true);
@@ -404,8 +403,8 @@
                     rtm.filter_tree(id="1")
 
 
-                    let tools = new Tools(rtm.get_tree_uses(), rtm.get_users())
-                    
+                    //let tools = new Tools(rtm.get_tree_uses(), rtm.get_users())
+                    let filter_group = new FilterGroup(["UserFilter"], this)
 
                     let rt = new RadialTree(500, 500, rtm)
                     rt.draw_den()
