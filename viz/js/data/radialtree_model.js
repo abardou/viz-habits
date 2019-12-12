@@ -221,6 +221,7 @@ class RadialTreeModel {
 
     filter_tree(id="1", minimum=1, begin_with="Screen on (unlocked)", contains=undefined, end_with="Screen off") {
         this.user_id = id
+        this.start = begin_with
         this.build_tree(this.data)
         this.build_tree_from_json()
         this.json_as_tree = this.filter_minimum(this.json_as_tree, minimum)
