@@ -48,7 +48,7 @@
 
 <script>
 import * as d3 from 'd3';
-import Ring from '@/components/Ring.vue';
+import Ring from '@/components/filters/subComponents/Ring.vue';
 
 export default {
 	name: 'TimePeriodPicker',
