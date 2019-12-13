@@ -1,5 +1,5 @@
 <template>
-	<svg id="slider" />
+	<svg :id="htmlid" />
 </template>
  
 <script>
@@ -16,28 +16,22 @@ export default {
 			default: null,
 			type: Number
 		},
-		heightHist: {
-			default: 175,
-			type: Number
-		},
-		heightSlid: {
-			default: 80,
-			type: Number
-		},
-		width: {
-			default: 400,
-			type: Number
+		htmlid: {
+			default: null,
+			type: String
 		}
 	},
 	data: () => ({
 		svg: null,
 		bins: null,
-		thickness: 4,
+		thickness: 5,
 		cursorRad: 7,
 		selColor: '#69b3a2',
 		unselColor: '#ddd',
-		margin: {top: 10, left: 10, right:10, bottom:10, bet: 20},
-		selected: [0, 1]
+		margin: {top: 10, left: 10, right:10, bottom:10, bet: 15},
+		selected: [0, 1],
+		heightHist: 175,
+		width: 400
 	}),
 	computed: {
 		min: function() {
@@ -52,10 +46,12 @@ export default {
 	},
 	mounted() {
 		let that = this;
+		this.width = this.width - this.margin.left - this.margin.right;
 
-		this.svg = d3.select('#slider')
-			.attr('width', this.width)
-			.attr('height', this.heightHist + this.heightSlid + this.margin.bet + this.thickness)
+		this.svg = d3.select('#'+this.htmlid)
+			.attr('width', this.width + this.margin.left + this.margin.right)
+			.attr('height', this.heightHist + this.margin.bet + this.thickness + this.margin.top + this.margin.bottom)
+			.append('g')
 			.attr('transform', 'translate('+this.margin.left+','+this.margin.top+')');
 
 		let nbBins = (this.max - this.min) / this.step;
@@ -86,30 +82,99 @@ export default {
 			.attr('width', function(d) { return x(d.x1) - x(d.x0) - 1; })
 			.attr('height', function(d) { return that.heightHist - y(d.length); })
 			.style('fill', d => d.x0 >= this.selected[0] && d.x1 <= this.selected[1] ? this.selColor : this.unselColor);
-		
-		// Draw slider
-		let l_cor = [
-			{x0: 0, x1: this.selected[0], c:this.unselColor},
-			{x0: this.selected[0], x1: this.selected[1], c:this.selColor},
-			{x0: this.selected[1], x1: this.max, c:this.unselColor}
-		];
-		this.svg.selectAll('slines').data(l_cor)
-			.enter()
-			.append('line')
-			.attr('x1', d => x(d.x0))
-			.attr('y1', this.heightHist + this.margin.bet)
-			.attr('x2', d => x(d.x1))
-			.attr('y2', this.heightHist + this.margin.bet)
-			.attr('stroke', d => d.c)
-			.attr('stroke-width', this.thickness);
+
+		this.draw_slider_line(x);
 			
 		this.svg.selectAll('cursors').data(this.selected)
 			.enter()
 			.append('circle')
 			.attr('cx', d => x(d))
-			.attr('cy', d => this.heightHist + this.margin.bet)
+			.attr('cy', this.heightHist + this.margin.bet)
 			.attr('r', this.cursorRad)
-			.style('fill', this.selColor);
+			.style('fill', this.selColor)
+			.call(d3.drag()
+				.on('start', this.dragstarted)
+				.on('drag', (d, i) => this.dragged(i))
+				.on('end', this.dragended)
+			);
+	},
+	methods: {
+		dragstarted() {
+
+		},
+
+		dragged(idx) {
+			let x = d3.scaleLinear()
+				.domain([this.min, this.max])
+				.range([0, this.width]);
+			let bin_idx = this.get_cursor_index(idx, x);
+			let attr = 'x'+idx;
+
+			this.selected[idx] = this.bins[bin_idx][attr];
+			this.draw_slider_line(x, false);
+			this.svg.selectAll('circle')
+				.filter((d, i) => i == idx)
+				.attr('cx', x(this.bins[bin_idx][attr]));
+
+			this.svg.selectAll('rect')
+				.style('fill', d => d.x0 >= this.selected[0] && d.x1 <= this.selected[1] ? this.selColor : this.unselColor);
+		},
+
+		dragended() {
+
+		},
+
+		get_cursor_index(idx, x) {
+			// Get bin index
+			let other_curs = this.svg.selectAll('circle').filter((d, i) => i != idx).attr('cx');
+			let other_idx = this.get_point_index(other_curs, 'x'+(1-idx), this.bins, x);
+
+			let attr = 'x'+idx;
+			let diffs = this.bins.filter((d, i) => idx == 1 && i >= other_idx || idx == 0 && i <= other_idx)
+				.map(d => Math.abs(x(d[attr]) - d3.event.x));
+			let bin_idx = 0;
+			for (let i = 1; i < diffs.length; i++) {
+				if (diffs[i] < diffs[bin_idx])
+					bin_idx = i;
+			}
+			bin_idx += idx == 1 ? other_idx : 0;
+
+			return bin_idx;
+		},
+
+		get_point_index(posx, attr, bins, x) {
+			let diffs = bins.map(d => Math.abs(x(d[attr]) - posx));
+			let bin_idx = 0;
+			for (let i = 1; i < diffs.length; i++) {
+				if (diffs[i] < diffs[bin_idx])
+					bin_idx = i;
+			}
+
+			return bin_idx;
+		},
+
+		draw_slider_line(x, full=true) {
+			// Draw slider
+			let l_cor = [
+				{x0: this.min, x1: this.max, c:this.unselColor, d:full},
+				{x0: this.selected[0], x1: this.selected[1], c:this.selColor, d:true}
+			].filter(d => d.d);
+
+			let to_rem = d3.select('#'+this.htmlid).selectAll('line');
+			if (!full)
+				to_rem = to_rem.filter((d, i) => i == 1);
+			to_rem.remove();
+
+			this.svg.selectAll('slines').data(l_cor)
+				.enter()
+				.append('line')
+				.attr('x1', d => x(d.x0))
+				.attr('y1', this.heightHist + this.margin.bet)
+				.attr('x2', d => x(d.x1))
+				.attr('y2', this.heightHist + this.margin.bet)
+				.attr('stroke', d => d.c)
+				.attr('stroke-width', this.thickness);
+		}
 	}
 };
 </script>
