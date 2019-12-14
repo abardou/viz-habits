@@ -1,5 +1,9 @@
 <template>
-	<svg :id="htmlid" />
+	<v-container style="display: inline">
+		<div :id="htmlid+'-tt1'" class="hidden tooltip" />
+		<div :id="htmlid+'-tt2'" class="hidden tooltip" />
+		<svg :id="htmlid" />
+	</v-container>
 </template>
  
 <script>
@@ -31,7 +35,8 @@ export default {
 		margin: {top: 10, left: 10, right:10, bottom:10, bet: 15},
 		selected: [0, 1],
 		heightHist: 175,
-		width: 400
+		width: 400,
+		tooltips: null
 	}),
 	computed: {
 		min: function() {
@@ -48,6 +53,7 @@ export default {
 		let that = this;
 		this.width = this.width - this.margin.left - this.margin.right;
 
+		this.tooltips = [d3.select('#'+this.htmlid+'-tt1'), d3.select('#'+this.htmlid+'-tt2')];
 		this.svg = d3.select('#'+this.htmlid)
 			.attr('width', this.width + this.margin.left + this.margin.right)
 			.attr('height', this.heightHist + this.margin.bet + this.thickness + this.margin.top + this.margin.bottom)
@@ -92,18 +98,18 @@ export default {
 			.attr('cy', this.heightHist + this.margin.bet)
 			.attr('r', this.cursorRad)
 			.style('fill', this.selColor)
+			.on('mouseover', () => that.show_tooltips())
+			.on('mouseout', () => that.hide_tooltips())
 			.call(d3.drag()
-				.on('start', this.dragstarted)
+				.on('start', () => that.show_tooltips())
 				.on('drag', (d, i) => this.dragged(i))
-				.on('end', this.dragended)
+				.on('end', () => that.hide_tooltips())
 			);
 	},
 	methods: {
-		dragstarted() {
-
-		},
-
 		dragged(idx) {
+			this.show_tooltips();
+
 			let x = d3.scaleLinear()
 				.domain([this.min, this.max])
 				.range([0, this.width]);
@@ -118,10 +124,6 @@ export default {
 
 			this.svg.selectAll('rect')
 				.style('fill', d => d.x0 >= this.selected[0] && d.x1 <= this.selected[1] ? this.selColor : this.unselColor);
-		},
-
-		dragended() {
-
 		},
 
 		get_cursor_index(idx, x) {
@@ -174,7 +176,43 @@ export default {
 				.attr('y2', this.heightHist + this.margin.bet)
 				.attr('stroke', d => d.c)
 				.attr('stroke-width', this.thickness);
+		},
+
+		show_tooltips() {
+			let that = this;
+
+			this.svg.selectAll('circle')
+				.each(function(d, i) {
+					let matrix = this.getScreenCTM()
+						.translate(this.getAttribute('cx')-3*that.width/4, (parseInt(this.getAttribute('r')) + parseInt(this.getAttribute('cy')))/2);
+					that.tooltips[i].classed('hidden', false)
+						.style('left', (window.pageXOffset + matrix.e) + 'px')
+						.style('top', (window.pageYOffset + matrix.f + 25) + 'px')
+						.html(d);
+				});
+		},
+
+		hide_tooltips() {
+			this.svg.selectAll('circle')
+				.each((d, i) => {
+					this.tooltips[i].classed('hidden', true);
+				});
 		}
 	}
 };
 </script>
+
+<style>
+.hidden {
+	display: none;
+}
+
+div.tooltip {
+	color: #222;
+	background-color: #fff;
+	padding: .4em;
+	border-radius: 2px;
+	opacity: 0.9;
+	position: absolute;
+}
+</style>
