@@ -3,7 +3,7 @@
 		<v-container grid-list-xs>
 			<v-card>
 				<v-container grid-list-xs>
-					<ForceGraph />
+					<MapFilter />
 				</v-container>
 			</v-card>
 		</v-container>
@@ -15,17 +15,17 @@
 // import Timeline from '@/components/filters/Timeline.vue';
 // import FrequencyRange from '@/components/filters/FrequencyRange.vue';
 // import TimePeriodPicker from '@/components/filters/TimePeriodPicker.vue';
-import ForceGraph from '@/components/visus/ForceGraph.vue';
-// import Map from '@/components/filters/Map.vue';
+// import ForceGraph from '@/components/visus/ForceGraph.vue';
+import MapFilter from '@/components/filters/MapFilter.vue';
 
 export default {
 	name: 'Home',
 	components: {
 		// Timeline,
 		// FrequencyRange,
-		// Map,
+		MapFilter,
 		// TimePeriodPicker,
-		ForceGraph
+		// ForceGraph
 	},
 	computed: {
 		timePickerSelection: {
