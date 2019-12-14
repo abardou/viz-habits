@@ -23,7 +23,7 @@ export default {
 
 		fetch('dataset.json').then(async resp => {
 			let data = await resp.json();
-			let f = d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'); // && d['User_ID'] == 2
+			let f = d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on');// && d['User_ID'] == 3;
 			data = data.filter(f);
 
 			// Build the logical representation of the model
@@ -45,7 +45,7 @@ export default {
 		 * @returns {float} the time scaled at an adequate value
 		 */
 		get_correct_time(time) {
-			return time / 10;
+			return time / 30;
 		},
 		/**
 		 * @param {float} time the time scaled to an adequate value
