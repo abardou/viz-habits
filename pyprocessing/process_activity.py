@@ -35,10 +35,10 @@ def build_positions_for_activity(activity, location):
         loc_points = location[location['Time'].between(tmin, tmax, inclusive=True)]
 
         if not loc_points.empty:
-            means = location[['Lat', 'Long']].mean()
+            means = loc_points[['Lat', 'Long']].mean()
             lat[i] = means['Lat']
             long[i] = means['Long']
-
+    
     return lat, long
 
 def build_aggregate_for_user(userId, activity_source, location_source, aggregate_target):
