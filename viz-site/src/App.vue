@@ -1,8 +1,8 @@
 <template>
 	<v-app>
-		<v-app-bar app color="indigo" dark>
+		<!-- <v-app-bar app color="indigo" dark>
 			<v-toolbar-title>Viz THAT</v-toolbar-title>
-		</v-app-bar>
+		</v-app-bar> -->
 
 		<v-content>
 			<router-view />

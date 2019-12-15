@@ -1,8 +1,8 @@
 <template>
 	<div class="home">
-		<v-container grid-list-xs>
+		<v-container>
 			<v-card>
-				<v-container grid-list-xs>
+				<v-container>
 					<MapFilter />
 				</v-container>
 			</v-card>
