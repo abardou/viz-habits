@@ -46,15 +46,16 @@ export default {
 		longitudeRange: [0, 1],
 		map: null,
 		latLines: [null, null],
-		lngLines: [null, null]
+		lngLines: [null, null],
+		veils: [null, null, null, null]
 	}),
 	async mounted() {
-		const posData = await d3.csv('data/position.csv');
+		const posData = await d3.json('dataset.json');
 
 		const lat = 45.782569,
 			lng = 4.86673;
 
-		this.map = new L.Map('map').setView([lat, lng], 7);
+		this.map = new L.Map('map', {preferCanvas: true}).setView([lat, lng], 7);
 		const tileLayer = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 			minZoom: 1,
@@ -65,12 +66,12 @@ export default {
 			const pd = posData[i];
 			if (pd.Lat != undefined && pd.Long != undefined) {
 				posData[i].latlng = new L.LatLng(pd.Lat, pd.Long);
-				if (Math.random() < 0.05) {
+				if (Math.random() < 0.1) {
 					L.circle(pd.latlng, {
 						color: 'red',
 						fillColor: 'red',
 						fillOpacity: 0.5,
-						radius: 5
+						radius: 3
 					})
 						.addTo(this.map);
 				}
@@ -79,12 +80,17 @@ export default {
 
 		const [minLatMap, maxLatMap, minLngMap, maxLngMap] = this.getMapBounds();
 
+		this.veils[0] = this.makeVeil({lat: minLatMap, lng: minLngMap}, {lat: maxLatMap, lng: minLngMap});
+		this.veils[1] = this.makeVeil({lat: minLatMap, lng: minLngMap}, {lat: minLatMap, lng: maxLngMap});
+		this.veils[2] = this.makeVeil({lat: minLatMap, lng: maxLngMap}, {lat: maxLatMap, lng: maxLngMap});
+		this.veils[3] = this.makeVeil({lat: maxLatMap, lng: minLngMap}, {lat: maxLatMap, lng: maxLngMap});
 		this.latLines[0] = this.makePolyline({lat: minLatMap, lng: minLngMap}, {lat: minLatMap, lng: maxLngMap});
 		this.latLines[1] = this.makePolyline({lat: maxLatMap, lng: minLngMap}, {lat: maxLatMap, lng: maxLngMap});
 		this.lngLines[0] = this.makePolyline({lat: minLatMap, lng: minLngMap}, {lat: maxLatMap, lng: minLngMap});
 		this.lngLines[1] = this.makePolyline({lat: minLatMap, lng: maxLngMap}, {lat: maxLatMap, lng: maxLngMap});
 
 		this.map.on('move', () => {
+			this.drawVeils();
 			this.drawHorLines();
 			this.drawVerLines();
 		});
@@ -101,6 +107,7 @@ export default {
 			return [minLatMap, maxLatMap, minLngMap, maxLngMap];
 		},
 		drawHorLines() {
+			this.drawVeils();
 			// Clear les anciennes lignes
 			for (const marker of this.latLines) {
 				this.map.removeLayer(marker);
@@ -118,6 +125,7 @@ export default {
 			this.latLines[1] = this.makePolyline({lat: newMaxLat, lng: minLngMap}, {lat: newMaxLat, lng: maxLngMap});
 		},
 		drawVerLines() {
+			this.drawVeils();
 			// Clear les anciennes lignes
 			for (const marker of this.lngLines) {
 				this.map.removeLayer(marker);
@@ -134,6 +142,23 @@ export default {
 			this.lngLines[0] = this.makePolyline({lat: minLatMap, lng: newMinLng}, {lat: maxLatMap, lng: newMinLng});
 			this.lngLines[1] = this.makePolyline({lat: minLatMap, lng: newMaxLng}, {lat: maxLatMap, lng: newMaxLng});
 		},
+		drawVeils() {
+			// Clear les anciens voiles
+			for (const marker of this.veils) {
+				this.map.removeLayer(marker);
+			}
+
+			const [minLatMap, maxLatMap, minLngMap, maxLngMap] = this.getMapBounds();
+			const newMinLng = this.intervalShift(this.longitudeRange[0], 0, 1, minLngMap, maxLngMap),
+				newMaxLng = this.intervalShift(this.longitudeRange[1], 0, 1, minLngMap, maxLngMap),
+				newMinLat = this.intervalShift(this.latitudeRange[0], 0, 1, minLatMap, maxLatMap),
+				newMaxLat = this.intervalShift(this.latitudeRange[1], 0, 1, minLatMap, maxLatMap);
+
+			this.veils[0] = this.makeVeil({lat: minLatMap, lng: minLngMap}, {lat: maxLatMap, lng: newMinLng});
+			this.veils[1] = this.makeVeil({lat: minLatMap, lng: newMinLng}, {lat: newMinLat, lng: newMaxLng});
+			this.veils[2] = this.makeVeil({lat: minLatMap, lng: newMaxLng}, {lat: maxLatMap, lng: maxLngMap});
+			this.veils[3] = this.makeVeil({lat: newMaxLat, lng: newMinLng}, {lat: maxLatMap, lng: newMaxLng});
+		},
 		intervalShift(x, a, b, c, d) {
 			return c + ((d - c) / (b - a)) * (x - a);
 		},
@@ -142,10 +167,19 @@ export default {
 				[pt1.lat, pt1.lng],
 				[pt2.lat, pt2.lng],
 			], {
-				color: 'green',
-				weight: 5,
+				color: 'black',
+				weight: 2,
 				opacity: 0.9,
-				dashArray: '20'
+				//dashArray: '20'
+			}).addTo(this.map);
+		},
+		makeVeil(pul, pbr) {
+			return L.rectangle([
+				[pul.lat, pul.lng],
+				[pbr.lat, pbr.lng]
+			], {
+				color: 'black',
+				weight: 1
 			}).addTo(this.map);
 		}
 	}
