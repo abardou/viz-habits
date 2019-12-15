@@ -5,10 +5,12 @@
 </template>
 <script>
 import UserFilter from '@/components/filters/UserFilter.vue';
+import SequenceLengthSlider from '@/components/filers/SequenceLengthFilterSlide.vue'
 export default {
 	name: 'FilterGroup',
 	components: {
-		UserFilter
+		UserFilter,
+		SequenceLengthSlider
 	},
 	props: {
 		filtersname: {

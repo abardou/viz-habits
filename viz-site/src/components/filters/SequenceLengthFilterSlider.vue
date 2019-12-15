@@ -10,7 +10,46 @@ export default {
 			default: null,
 			type: float
 		}
+	}, 
+	data: () => {
+
+	},
+	computed: {
+
+	}, 
+	mounted() {
+ 		this.sliderFill = d3
+			.sliderBottom()
+			.width(300)
+			.min(d3.min(this.range))
+			.max(d3.max(this.range))
+			.tickFormat(d3.format("i"))
+			.tickValues(this.range)
+			.default(1)
+			.step(1)
+			.fill('#2196f3')
+			.on('onchange', d => {
+				sliderChanged(d)
+			});
+
+		var gFill = d3
+			.select('body')
+			.append('svg')
+			.attr('width', 500)
+			.attr('height', 100)
+			.append('g')
+			.attr('transform', 'translate(30,30)');
+
+		gFill.call(this.sliderFill);
+
+	},
+	methods: {
+		sliderChanged(d) {
+			this.$store.commit('sequencelength', d);
+		}
 	}
+
+
 }
 /*
 class SequenceLengthSlider {
