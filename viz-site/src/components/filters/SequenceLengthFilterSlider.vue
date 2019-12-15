@@ -3,12 +3,13 @@
 </template>
 
 <script>
+import * as d3 from 'd3';
+
 export default {
 	name: 'SequenceLengthSlider',
 	props: {
 		range: {
-			default: null,
-			type: float
+			default: null
 		}
 	}, 
 	data: () => {
@@ -18,18 +19,19 @@ export default {
 
 	}, 
 	mounted() {
- 		this.sliderFill = d3
+		let that = this;
+		this.sliderFill = d3
 			.sliderBottom()
 			.width(300)
 			.min(d3.min(this.range))
 			.max(d3.max(this.range))
-			.tickFormat(d3.format("i"))
+			.tickFormat(d3.format('i'))
 			.tickValues(this.range)
 			.default(1)
 			.step(1)
 			.fill('#2196f3')
 			.on('onchange', d => {
-				sliderChanged(d)
+				that.sliderChanged(d);
 			});
 
 		var gFill = d3
@@ -50,7 +52,7 @@ export default {
 	}
 
 
-}
+};
 /*
 class SequenceLengthSlider {
             constructor(range, tools_ref) {
