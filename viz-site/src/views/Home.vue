@@ -58,6 +58,14 @@ export default {
 				firstObject: null
 			});
 		});
+		xobj.overrideMimeType("application/json");
+        xobj.open('GET', '../../../data/dataset.json', true);
+		xobj.onreadystatechange = function () {
+			if (xobj.readyState == 4 && xobj.status == "200") {
+				let data = JSON.parse(xobj.responseText)
+				this.$store.commit('data', data);
+			}
+		};
 	}
 };
 </script>
