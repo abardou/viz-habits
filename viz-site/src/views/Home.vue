@@ -18,10 +18,12 @@
 						:step="0.1"
 						:htmlid="'freq'"
 					/>
+					
 				</v-card>
-				<v-container>
+			<!--	<v-container>
 					<MapFilter />
 				</v-container>
+			-->
 			</v-card>
 		</v-container>
 	</div>
@@ -39,8 +41,8 @@ import RangeSlider from '@/components/filters/RangeSlider.vue';
 // import FrequencyRange from '@/components/filters/FrequencyRange.vue';
 // import TimePeriodPicker from '@/components/filters/TimePeriodPicker.vue';
 // import ForceGraph from '@/components/visus/ForceGraph.vue';
-import MapFilter from '@/components/filters/MapFilter.vue';
-
+// import MapFilter from '@/components/filters/MapFilter.vue';
+import RadialTree from '@/components/visus/RadialTree.vue';
 export default {
 	name: 'Home',
 	components: {
@@ -50,7 +52,8 @@ export default {
 		// TimePeriodPicker,
 		FilterGroup,
 		RangeSlider
-		MapFilter
+		// RadialTree
+		// MapFilter
 		// TimePeriodPicker,
 		// ForceGraph
 	},
@@ -69,6 +72,7 @@ export default {
 				firstObject: null
 			});
 		});
+		let xobj = new XMLHttpRequest();
 		xobj.overrideMimeType("application/json");
         xobj.open('GET', '../../../data/dataset.json', true);
 		xobj.onreadystatechange = function () {
