@@ -271,18 +271,3 @@ class AppChordModel {
         return json_obj
     }
 }
-
-// let xobj = new XMLHttpRequest();
-// xobj.overrideMimeType("application/json");
-// xobj.open('GET', './../../../data/dataset.json', true);
-// xobj.onreadystatechange = function () {
-//         if (xobj.readyState == 4 && xobj.status == "200") {
-//             let data = JSON.parse(xobj.responseText)
-//             let f = d => d['App Name'] != "Screen off"
-//             data = data.filter(f)
-//             let acm = new AppChordModel(data)
-//             acm.apply_filters(0, 5, 0, 1)
-//             console.log(acm.filtered_adj_mat)
-//         }
-// };
-// xobj.send(null)
