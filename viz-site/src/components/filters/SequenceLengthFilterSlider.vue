@@ -13,7 +13,7 @@ export default {
 		}
 	}, 
 	data: () => {
-		return {}
+		return {"hello":0}
 	},
 	computed: {
 
