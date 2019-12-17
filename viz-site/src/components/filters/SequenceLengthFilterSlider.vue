@@ -9,11 +9,11 @@ export default {
 	name: 'SequenceLengthSlider',
 	props: {
 		range: {
-			default: null
+			default: null,
 		}
 	}, 
 	data: () => {
-		return {"hello":0}
+		return {'FIXME':0};
 	},
 	computed: {
 
