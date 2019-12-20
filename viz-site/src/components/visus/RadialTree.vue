@@ -62,7 +62,7 @@ export default {
 			this.svg = d3.select('#radial-container').append('svg')
 				.attr('width', 1000)
 				.attr('height', 1000);
-
+			this.tooltip = d3.select('body').append('div').attr('class', 'hidden tooltip');
 			this.update_filters('Screen on (unlocked)', '1', 10, 'dendogram');
 		});
 
