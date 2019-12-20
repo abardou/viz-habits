@@ -54,7 +54,8 @@ export default {
 		},
 	},
 	data: () => ({
-		selected: null
+		selected: null,
+		g: null
 	}),
 	computed: {
 		l() {
@@ -99,11 +100,19 @@ export default {
 		*/
 		mouse_move(d, pathObject) {
 			const mousePosition = d3.mouse(pathObject);
+
+			console.log(mousePosition);
+
 			this.tooltip.classed('hidden', false)
 				.attr('style', `left: ${(mousePosition[0] + 15 + this.cx)}px; top: ${(mousePosition[1] - 35 + this.cy)}px`)
 				.html(d);
 		},
-	
+
+		// this.tooltip.classed('hidden', false)
+		// 		.style('left', (window.pageXOffset + pathObject.getBoundingClientRect().left) + 'px')
+		// 		.style('top', (window.pageYOffset + pathObject.getBoundingClientRect().top) + 'px')
+		// 		.html(d);
+
 		/* Called when the mouse is over a ring segment
 		* i: data index, used to resolve color
 		*/
@@ -158,7 +167,9 @@ export default {
 		draw() {
 			const ring = this;
 
-			this.svg.selectAll(this.id).data(this.data).enter()
+			this.g = this.svg.append('g');
+			
+			this.g.selectAll(this.id).data(this.data).enter()
 				.append('path')
 				.attr('transform', `translate(${ring.cx}, ${ring.cy})`)
 				.attr('d', function(d, i) { return ring.draw_arc(i)(); })

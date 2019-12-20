@@ -6,6 +6,7 @@
  
 <script>
 import * as d3 from 'd3';
+import { htmlToElement } from '@/utils/elementCreation.js';
 
 export default {
 	name: 'RangeSlider',
@@ -65,16 +66,12 @@ export default {
 		this.width = this.width - this.margin.left - this.margin.right;
 
 		this.tooltips = [
-			d3.select('body').append(() => {
-				const template = document.createElement('template');
-				template.innerHTML = `<div id="${this.htmlid}-tt1" style="${this.tooltip_style}" class="hidden tooltipSlider" />`;
-				return template.content.firstChild;
-			}), 
-			d3.select('body').append(() => {
-				const template = document.createElement('template');
-				template.innerHTML = `<div id="${this.htmlid}-tt2" style="${this.tooltip_style}" class="hidden tooltipSlider" />`;
-				return template.content.firstChild;
-			})
+			d3.select('body').append(() => 
+				htmlToElement(`<div id="${this.htmlid}-tt1" style="${this.tooltip_style}" class="hidden tooltipSlider" />`)
+			), 
+			d3.select('body').append(() => 
+				htmlToElement(`<div id="${this.htmlid}-tt2" style="${this.tooltip_style}" class="hidden tooltipSlider" />`)
+			)
 		];
 
 		this.svg = d3.select('#'+this.htmlid)
@@ -230,3 +227,4 @@ export default {
 .hidden {
 	display: none;
 }
+</style>
