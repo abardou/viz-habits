@@ -1,7 +1,7 @@
 <template>
 	<v-card>
 		<UserFilter :users="['User1', 'User2', 'User3']" />
-		<SequenceLengthSlider range="2.0" />
+		<!-- <SequenceLengthSlider range="2.0" /> -->
 	</v-card>
 
 </template>

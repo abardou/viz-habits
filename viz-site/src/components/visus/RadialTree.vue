@@ -53,8 +53,35 @@ export default {
 	mounted () {
 		this.renderChart(this.chartData, this.options);
 		this.$emit('created', this.$data._chart);
+		this.rtm = new RadialTreeModel(data, 10);
+		//rtm.apply_filters(0, 1e10, 0.05, 1)
+		this.rtm.filter_tree(id="3"); // 
+
+		let displays = ['dendogram', 'tidy', 'line'];
+		update_filters( 'Screen on (unlocked)', '1', 10, 'dendogram');
 	},
 	methods: {
+		update_filters(start, id, minimum, display_function) {
+                this.rtm.filter_tree(id, minimum, start);
+
+                let t = d3.select('#tree').node();
+                if (t != null) {
+                    t.remove();
+                }
+
+
+                console.log(display_function);
+                
+
+                if (display_function == 'dendogram') {
+                    this.display_function = this.draw_den;
+                } else if (display_function == 'tidy') {
+                    this.display_function = this.draw_tidy;
+                } else if (display_function == 'line') {
+                    this.display_function = this.draw_line;
+                }
+                this.display_function();
+        },
 		get_correct_time(time){
 			return time / 10;
 		},

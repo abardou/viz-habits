@@ -7,7 +7,9 @@
 					<TimePeriodPicker /> -->
 					<!-- <Map /> -->
 					<!-- <UserFilter :users="['User1', 'User2', 'User3']" /> -->
-					<FilterGroup :filtersname="['UserFilter']" />
+					<FilterGroup 
+						:filtersname="['UserFilter']" 
+					/>
 					<RangeSlider
 						:data="[100,470,770,250,290,730,700,680,450,580,560,650,570,610,860,5.30e0,870,510,480,820,670,710,490,640,150,590,760,120,680,200,480,560,750,460,720,580,100,630,580,230,530,610,680,700,430,710,600,350,710,920,960,340,800,390,750,580,430,790,850,830,620,750,800,610,690,660,700,480,310,830,470,710,980,620,440,650,810,530,620,510,660,680,790,400,530,900,560,450,660,640,4.00e0,580,300,650,940,490,700,630,610,110,111]"
 						:step="50"
@@ -18,7 +20,9 @@
 						:step="0.1"
 						:htmlid="'freq'"
 					/>
-					
+					<RadialTree 
+						:options="{}"
+					/>
 				</v-card>
 			<!--	<v-container>
 					<MapFilter />
@@ -51,8 +55,8 @@ export default {
 		// Map,
 		// TimePeriodPicker,
 		FilterGroup,
-		RangeSlider
-		// RadialTree
+		RangeSlider,
+		RadialTree
 		// MapFilter
 		// TimePeriodPicker,
 		// ForceGraph
@@ -73,11 +77,11 @@ export default {
 			});
 		});
 		let xobj = new XMLHttpRequest();
-		xobj.overrideMimeType("application/json");
-        xobj.open('GET', '../../../data/dataset.json', true);
+		xobj.overrideMimeType('application/json');
+		xobj.open('GET', '../../../data/dataset.json', true);
 		xobj.onreadystatechange = function () {
-			if (xobj.readyState == 4 && xobj.status == "200") {
-				let data = JSON.parse(xobj.responseText)
+			if (xobj.readyState == 4 && xobj.status == '200') {
+				let data = JSON.parse(xobj.responseText);
 				this.$store.commit('data', data);
 			}
 		};
