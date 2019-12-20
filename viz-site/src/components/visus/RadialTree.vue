@@ -38,7 +38,6 @@
 	}
 </style>
 <script>
-import { Radar } from 'vue-chartjs';
 import * as d3 from 'd3';
 import RadialTreeModel from '../../utils/force_model';
 
@@ -231,11 +230,11 @@ export default {
 		},
 		disable_focus() {
 			d3.selectAll('#nodes').selectAll('g')
-				.attr('opacity', function(e) {
+				.attr('opacity', () => {
 					return 1;
 				});
 			d3.selectAll('#links').selectAll('path')
-				.attr('opacity', function(e) {
+				.attr('opacity', () => {
 					return 1;
 				});
 		},

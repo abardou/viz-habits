@@ -27,7 +27,7 @@ module.exports = {
       'always'
     ],
     'no-console': 'off',
-    'no-unused-vars': 'warn',
+    'no-unused-vars': 'off',
     'vue/html-indent': ['error', 'tab'],
     'vue/max-attributes-per-line': ['error', { 'singleline': 3 }]
   },

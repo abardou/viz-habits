@@ -1,18 +1,17 @@
 <template>
 	<v-card>
 		<UserFilter :users="['User1', 'User2', 'User3']" />
-		<SequenceLengthSlider range="2.0" />
 	</v-card>
-
 </template>
 <script>
 import UserFilter from '@/components/filters/UserFilter.vue';
-import SequenceLengthSlider from '@/components/filters/SequenceLengthFilterSlider.vue';
+import RangeSlider from '@/components/filters/RangeSlider.vue';
+import MapFilter from '@/components/filters/MapFilter.vue';
+
 export default {
 	name: 'FilterGroup',
 	components: {
-		UserFilter,
-		SequenceLengthSlider
+		UserFilter
 	},
 	props: {
 		filtersname: {

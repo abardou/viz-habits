@@ -95,7 +95,7 @@ export default class AppChordModel {
 		// Build the matrix
 		this.adj_mat = new Array(this.apps.length)
 			.fill(0)
-			.map(d => {return new Array(this.apps.length).fill(0);});
+			.map(() => {return new Array(this.apps.length).fill(0);});
 
 		// Fill the matrix with each user sequence
 		for (let uid of users) {

@@ -18,7 +18,6 @@
 						:step="0.1"
 						:htmlid="'freq'"
 					/>
-					
 				</v-card>
 			<!--	<v-container>
 					<MapFilter />
@@ -30,19 +29,15 @@
 </template>
 
 <script>
-// @ is an alias to /src
-// import Timeline from '@/components/Timeline.vue';
-// import FrequencyRange from '@/components/FrequencyRange.vue';
-// import TimePeriodPicker from '@/components/TimePeriodPicker.vue';
-// import Map from '@/components/Map.vue';
+// Filters
 import FilterGroup from '@/components/FilterGroup.vue';
+import TimePeriodPicker from '@/components/filters/TimePeriodPicker.vue';
 import RangeSlider from '@/components/filters/RangeSlider.vue';
-// import Timeline from '@/components/filters/Timeline.vue';
-// import FrequencyRange from '@/components/filters/FrequencyRange.vue';
-// import TimePeriodPicker from '@/components/filters/TimePeriodPicker.vue';
-// import ForceGraph from '@/components/visus/ForceGraph.vue';
-// import MapFilter from '@/components/filters/MapFilter.vue';
+import FrequencyRange from '@/components/filters/FrequencyRange.vue';
+import ForceGraph from '@/components/visus/ForceGraph.vue';
+import MapFilter from '@/components/filters/MapFilter.vue';
 import RadialTree from '@/components/visus/RadialTree.vue';
+
 export default {
 	name: 'Home',
 	components: {
@@ -73,11 +68,11 @@ export default {
 			});
 		});
 		let xobj = new XMLHttpRequest();
-		xobj.overrideMimeType("application/json");
-        xobj.open('GET', '../../../data/dataset.json', true);
+		xobj.overrideMimeType('application/json');
+		xobj.open('GET', '../../../data/dataset.json', true);
 		xobj.onreadystatechange = function () {
-			if (xobj.readyState == 4 && xobj.status == "200") {
-				let data = JSON.parse(xobj.responseText)
+			if (xobj.readyState == 4 && xobj.status == '200') {
+				let data = JSON.parse(xobj.responseText);
 				this.$store.commit('data', data);
 			}
 		};

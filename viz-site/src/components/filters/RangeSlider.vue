@@ -1,7 +1,5 @@
 <template>
 	<v-container style="display: inline">
-		<div :id="htmlid+'-tt1'" class="hidden tooltip" />
-		<div :id="htmlid+'-tt2'" class="hidden tooltip" />
 		<svg :id="htmlid" />
 	</v-container>
 </template>
@@ -47,13 +45,38 @@ export default {
 		},
 		range: function() {
 			return [this.min + 0.2*(this.max - this.min), this.min + 0.8*(this.max - this.min)];
+		},
+		tooltip_style: function() {
+			return `
+				color: ${this.selColor};
+				background-color: #fff;
+				padding: .4em;
+				border-radius: 10px;
+				border: 2px solid ${this.selColor};
+				font-size: 0.8em;
+				font-weight: bold;
+				opacity: 0.9;
+				position: absolute;
+			`;
 		}
 	},
 	mounted() {
 		let that = this;
 		this.width = this.width - this.margin.left - this.margin.right;
 
-		this.tooltips = [d3.select('#'+this.htmlid+'-tt1'), d3.select('#'+this.htmlid+'-tt2')];
+		this.tooltips = [
+			d3.select('body').append(() => {
+				const template = document.createElement('template');
+				template.innerHTML = `<div id="${this.htmlid}-tt1" style="${this.tooltip_style}" class="hidden tooltipSlider" />`;
+				return template.content.firstChild;
+			}), 
+			d3.select('body').append(() => {
+				const template = document.createElement('template');
+				template.innerHTML = `<div id="${this.htmlid}-tt2" style="${this.tooltip_style}" class="hidden tooltipSlider" />`;
+				return template.content.firstChild;
+			})
+		];
+
 		this.svg = d3.select('#'+this.htmlid)
 			.attr('width', this.width + this.margin.left + this.margin.right)
 			.attr('height', this.heightHist + this.margin.bet + this.thickness + this.margin.top + this.margin.bottom)
@@ -156,6 +179,7 @@ export default {
 		},
 
 		draw_slider_line(x, full=true) {
+			let that = this;
 			// Draw slider
 			let l_cor = [
 				{x0: this.min, x1: this.max, c:this.unselColor, d:full},
@@ -175,7 +199,9 @@ export default {
 				.attr('x2', d => x(d.x1))
 				.attr('y2', this.heightHist + this.margin.bet)
 				.attr('stroke', d => d.c)
-				.attr('stroke-width', this.thickness);
+				.attr('stroke-width', this.thickness)
+				.on('mouseover', () => that.show_tooltips())
+				.on('mouseout', () => that.hide_tooltips());
 		},
 
 		show_tooltips() {
@@ -183,12 +209,10 @@ export default {
 
 			this.svg.selectAll('circle')
 				.each(function(d, i) {
-					let matrix = this.getScreenCTM()
-						.translate(this.getAttribute('cx')-3*that.width/4, (parseInt(this.getAttribute('r')) + parseInt(this.getAttribute('cy')))/2);
 					that.tooltips[i].classed('hidden', false)
-						.style('left', (window.pageXOffset + matrix.e) + 'px')
-						.style('top', (window.pageYOffset + matrix.f + 25) + 'px')
-						.html(d);
+						.style('left', (window.pageXOffset + this.getBoundingClientRect().left - that.cursorRad) + 'px')
+						.style('top', (window.pageYOffset + this.getBoundingClientRect().top + 25) + 'px')
+						.html(that.selected[i]);
 				});
 		},
 
@@ -206,13 +230,3 @@ export default {
 .hidden {
 	display: none;
 }
-
-div.tooltip {
-	color: #222;
-	background-color: #fff;
-	padding: .4em;
-	border-radius: 2px;
-	opacity: 0.9;
-	position: absolute;
-}
-</style>
