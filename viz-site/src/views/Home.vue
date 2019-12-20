@@ -20,14 +20,12 @@
 						:step="0.1"
 						:htmlid="'freq'"
 					/>
+					
 					<RadialTree 
 						:options="{}"
 					/>
+					
 				</v-card>
-			<!--	<v-container>
-					<MapFilter />
-				</v-container>
-			-->
 			</v-card>
 		</v-container>
 	</div>
@@ -55,7 +53,7 @@ export default {
 		// Map,
 		// TimePeriodPicker,
 		FilterGroup,
-		RangeSlider,
+		RangeSlider, 
 		RadialTree
 		// MapFilter
 		// TimePeriodPicker,

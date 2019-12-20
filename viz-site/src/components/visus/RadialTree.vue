@@ -1,5 +1,5 @@
 <template>
-	<div />
+	<v-container id="radial-container" />
 </template>
 <style>
 	body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; height: 3000px }
@@ -38,9 +38,8 @@
 	}
 </style>
 <script>
-import { Radar } from 'vue-chartjs';
 import * as d3 from 'd3';
-import RadialTreeModel from '../../utils/force_model';
+import RadialTreeModel from '../../utils/radial_model';
 
 export default {
 	name: 'RadialTree',
@@ -51,37 +50,46 @@ export default {
 		}
 	},
 	mounted () {
-		this.renderChart(this.chartData, this.options);
-		this.$emit('created', this.$data._chart);
-		this.rtm = new RadialTreeModel(data, 10);
-		//rtm.apply_filters(0, 1e10, 0.05, 1)
-		this.rtm.filter_tree(id="3"); // 
+		//this.renderChart(this.chartData, this.options);
+		//this.$emit('created', this.$data._chart);
+		fetch('dataset.json').then(async resp => {
+			let data = await resp.json();
+			this.rtm = new RadialTreeModel(data, 10);
+			// Apply last filters
+			// acm.apply_filters(0, 1e10, 0, 1);
+			// Build the visualization
+			this.rtm.filter_tree();
+			this.svg = d3.select('#radial-container').append('svg')
+				.attr('width', 1000)
+				.attr('height', 1000);
 
-		let displays = ['dendogram', 'tidy', 'line'];
-		update_filters( 'Screen on (unlocked)', '1', 10, 'dendogram');
+			this.update_filters('Screen on (unlocked)', '1', 10, 'dendogram');
+		});
+
+
+		
+		// ? let displays = ['dendogram', 'tidy', 'line'];
+		
 	},
 	methods: {
 		update_filters(start, id, minimum, display_function) {
-                this.rtm.filter_tree(id, minimum, start);
+			console.log('hzelo');
+			//this.rtm.filter_tree(id, minimum, start);
 
-                let t = d3.select('#tree').node();
-                if (t != null) {
-                    t.remove();
-                }
-
-
-                console.log(display_function);
-                
-
-                if (display_function == 'dendogram') {
-                    this.display_function = this.draw_den;
-                } else if (display_function == 'tidy') {
-                    this.display_function = this.draw_tidy;
-                } else if (display_function == 'line') {
-                    this.display_function = this.draw_line;
-                }
-                this.display_function();
-        },
+			let t = d3.select('#tree').node();
+			if (t != null) {
+				t.remove();
+			}
+			console.log(display_function);
+			if (display_function == 'dendogram') {
+				this.display_function = this.draw_den;
+			} else if (display_function == 'tidy') {
+				this.display_function = this.draw_tidy;
+			} else if (display_function == 'line') {
+				this.display_function = this.draw_line;
+			}
+			this.display_function();
+		},
 		get_correct_time(time){
 			return time / 10;
 		},
@@ -107,16 +115,16 @@ export default {
 			const root = tree(d3.hierarchy(data)
 				.sort((a, b) => d3.ascending(a.data.name, b.data.name)));
 
-			const svg = d3
+			/*const svg = d3
 				.select('body')
 				.append('svg')
 				.attr('id', 'tree')
 				.style('max-width', '100%')
 				.style('height', 'auto')
 				.style('font', '10px sans-serif')
-				.style('margin', '5px');
+				.style('margin', '5px');*/
 
-			const link = svg.append('g')
+			const link = this.svg.append('g')
 				.attr('id', 'links')
 				.attr('fill', 'none')
 				.attr('stroke', '#555')
@@ -153,7 +161,7 @@ export default {
 					that.disable_focus();
 				});
 
-			const node = svg.append('g')
+			const node = this.svg.append('g')
 				.attr('id', 'nodes')
 				.attr('stroke-linejoin', 'round')
 				.attr('stroke-width', 3)
@@ -197,7 +205,7 @@ export default {
 				.attr('x', -10)
 				.attr('y', -10);
 
-			svg.attr('viewBox', autoBox);
+			this.svg.attr('viewBox', autoBox);
 
 			function autoBox() {
 				const {x, y, width, height} = this.getBBox();
@@ -246,8 +254,6 @@ export default {
 					return 1;
 
 				});
-
-
 			d3.select('#links').selectAll('path')
 				.attr('opacity', function(e) {
 					if (up_app.includes(e.target)) {
@@ -299,7 +305,7 @@ export default {
 				width = 900 - margin.left - margin.right,
 				height = 900 - margin.top - margin.bottom;
 
-
+			/*
 			var svg = d3.select('body')
 				.append('svg')
 				.attr('id', 'tree')
@@ -307,7 +313,7 @@ export default {
 				.attr('height', height + margin.top + margin.bottom)
 				.append('g')
 				.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-
+			*/
 
 			// Compute the layout.
 			var treemap = d3.tree().size([width, height]);
@@ -320,7 +326,7 @@ export default {
 
 
 			// Create the link lines.
-			svg.selectAll('.link')
+			this.svg.selectAll('.link')
 				.data(nodes.links())
 				.enter().append('path')
 				.attr('class', 'link')
@@ -355,7 +361,7 @@ export default {
 				});
 
 			// Create the node circles.
-			var node = svg.selectAll('.node')
+			var node = this.svg.selectAll('.node')
 				.data(nodes.descendants())
 				.enter()
 				.append('g')
@@ -403,15 +409,15 @@ export default {
 
 			const root = tree(d3.hierarchy(data)
 				.sort((a, b) => d3.ascending(a.data.name, b.data.name)));
-
+			/*
 			const svg = d3.select('body').append('svg')
 				.attr('id', 'tree')
 				.style('max-width', '100%')
 				.style('height', 'auto')
 				.style('font', '10px sans-serif')
 				.style('margin', '5px');
-
-			const link = svg.append('g')
+			*/
+			const link = this.svg.append('g')
 				.attr('fill', 'none')
 				.attr('stroke', '#555')
 				.attr('stroke-opacity', 0.4)
@@ -447,7 +453,7 @@ export default {
 					that.disable_focus();
 				});
 
-			const node = svg.append('g')
+			const node = this.svg.append('g')
 				.attr('stroke-linejoin', 'round')
 				.attr('stroke-width', 3)
 				.selectAll('g')
@@ -491,7 +497,7 @@ export default {
 				.attr('y', -10);
 
 
-			svg.attr('viewBox', autoBox);
+			this.svg.attr('viewBox', autoBox);
 
 			function autoBox() {
 				const {x, y, width, height} = this.getBBox();

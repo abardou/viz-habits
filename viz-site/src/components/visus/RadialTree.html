@@ -678,30 +678,30 @@
         xobj.overrideMimeType("application/json");
         xobj.open('GET', '../../../data/dataset.json', true);
         xobj.onreadystatechange = function () {
-			if (xobj.readyState == 4 && xobj.status == "200") {
-				let data = JSON.parse(xobj.responseText)
+                if (xobj.readyState == 4 && xobj.status == "200") {
+                    let data = JSON.parse(xobj.responseText)
 
-				let rtm = new RadialTreeModel(data, 10)
-				//rtm.apply_filters(0, 1e10, 0.05, 1)
-				rtm.filter_tree(id="3")
+                    let rtm = new RadialTreeModel(data, 10)
+                    //rtm.apply_filters(0, 1e10, 0.05, 1)
+                    rtm.filter_tree(id="3")
 
-				let displays = ['dendogram', 'tidy', 'line']
+                    let displays = ['dendogram', 'tidy', 'line']
 
-			//  let tools = new Tools(rtm.get_tree_uses(), rtm.get_users(), displays)
+                  //  let tools = new Tools(rtm.get_tree_uses(), rtm.get_users(), displays)
 
-				let rt = new RadialTree(500, 500, rtm, tools)
-
-
-				tools.set_tree_ref(rt)
-				tools.send_filters()
+                    let rt = new RadialTree(500, 500, rtm, tools)
 
 
-				
+                    tools.set_tree_ref(rt)
+                    tools.send_filters()
 
-				
 
-				
-			}
+                    
+
+                    
+
+                    
+                }
         };
         xobj.send(null);
     </script>
