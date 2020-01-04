@@ -1,5 +1,5 @@
 <template>
-	<v-container style="display: inline">
+	<v-container :id="'container-' + htmlid" style="display: inline">
 		<svg :id="htmlid" />
 	</v-container>
 </template>
@@ -33,7 +33,7 @@ export default {
 		unselColor: '#ddd',
 		margin: {top: 10, left: 10, right:10, bottom:10, bet: 15},
 		selected: [0, 1],
-		heightHist: 175,
+		heightHist: 100,
 		width: 400,
 		tooltips: null
 	}),
@@ -63,6 +63,7 @@ export default {
 	},
 	mounted() {
 		let that = this;
+		this.width = document.getElementById('container-' + this.htmlid).offsetWidth + 50;
 		this.width = this.width - this.margin.left - this.margin.right;
 
 		this.tooltips = [

@@ -1,12 +1,14 @@
 <template>
-	<v-select
-		v-model="selected"
-		:items="users"
-		truc
-		label="Users"
-		multiple
-		outlined
-	/>
+	<v-container>
+		<v-select
+			v-model="selected"
+			:items="users"
+			truc
+			label="Users"
+			multiple
+			outlined
+		/>
+	</v-container>
 </template>
 
 <script>

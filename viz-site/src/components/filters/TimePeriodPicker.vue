@@ -7,8 +7,8 @@
 			name="days"
 			:svg="svg"
 			:tooltip="tooltip"
-			:cx="480"
-			:cy="250"
+			:cx="cx"
+			:cy="135"
 			:outrad="132"
 			:inrad="112"
 			selcol="#374d7c"
@@ -21,8 +21,8 @@
 			name="hours"
 			:svg="svg"
 			:tooltip="tooltip"
-			:cx="480"
-			:cy="250"
+			:cx="cx"
+			:cy="135"
 			:outrad="106"
 			:inrad="86"
 			selcol="#46edc8"
@@ -35,8 +35,8 @@
 			name="minutes"
 			:svg="svg"
 			:tooltip="tooltip"
-			:cx="480"
-			:cy="250"
+			:cx="cx"
+			:cy="135"
 			:outrad="80"
 			:inrad="60"
 			selcol="#fdf289"
@@ -62,7 +62,8 @@ export default {
 		granularity_minutes: 5,
 		svg: null,
 		tooltip: null,
-		initialized: false
+		initialized: false,
+		cx: null
 	}),
 	computed: {
 		// Tooltip for hours
@@ -86,10 +87,14 @@ export default {
 		}
 	},
 	mounted() {
+		const container = document.getElementById('picker-container');
+		const width = container.offsetWidth;
 		// Svg variable
-		this.svg = d3.select('#picker-container').append('svg')
-			.attr('width', 960)
-			.attr('height', 500);
+		this.svg = d3.select(container).append('svg')
+			.attr('width', width)
+			.attr('height', 270);
+
+		this.cx = width/2;
 		
 		// Tooltip div
 		this.tooltip = d3.select('body').append(() => htmlToElement('<div class="hidden tooltipTimePicker" />'));

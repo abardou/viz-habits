@@ -1,6 +1,6 @@
 <template>
-	<v-container>
-		<v-container class="d-inline-flex pa-2" outlined>
+	<v-container id="mapFilter-container" pb-0>
+		<v-container class="d-inline-flex pa-0" outlined>
 			<div style="width: 20px">
 				<v-range-slider
 					v-model="latitudeRange"
@@ -13,10 +13,10 @@
 				/>
 			</div>
 			<div>
-				<div id="map" />
+				<div id="map" :style="{width: mapWidth + 'px'}" />
 			</div>
 		</v-container>
-		<v-container class="d-inline-flex pa-2" outlined>
+		<v-container class="d-inline-flex pa-0" outlined>
 			<div style="width: 20px" />
 			<div>
 				<v-range-slider 
@@ -25,6 +25,7 @@
 					:max="1"
 					:step="0.001"
 					class="large-slider-hor"
+					:style="{width: mapWidth + 'px'}"
 					@input="drawVerLines"
 				/>
 			</div>
@@ -47,9 +48,12 @@ export default {
 		map: null,
 		latLines: [null, null],
 		lngLines: [null, null],
-		veils: [null, null, null, null]
+		veils: [null, null, null, null],
+		mapWidth: null
 	}),
 	async mounted() {
+		const filtersGroupContainerWidth = document.getElementById('mapFilter-container').parentNode.offsetWidth;
+		this.mapWidth = filtersGroupContainerWidth - 50;
 		const posData = await d3.json('dataset.json');
 
 		const lat = 45.782569,
@@ -187,18 +191,16 @@ export default {
 
 <style>
 #map {
-	width: 1000px;
-	height: 500px;
+	height: 358px;
 }
 
 .latitude-slider .v-slider {
-  height: 500px;
+  height: 358px;
 	margin-top: 0px;
 	margin-bottom: 0px;
 }
 
 .large-slider-hor .v-slider {
-  width: 1000px;
 	margin-left: 0px;
 	margin-right: 0px;
 }

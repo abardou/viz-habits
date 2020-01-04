@@ -11,13 +11,25 @@ export default {
 	data: () => ({
 		svg: null,
 		tooltip: null,
-		cx: 500, // the center of the graph visualization
-		cy: 500  // the center of the graph visualization
+		width: null,
+		height: null
 	}),
+	computed: {
+		cx: function() {
+			return this.width/2; // the center of the graph visualization
+		},
+		cy: function() {
+			return this.height/2; // the center of the graph visualization
+		}
+	},
 	mounted() {
+		const container = document.getElementById('force-container');
+		this.width = container.offsetWidth;
+		this.height = 890;
+
 		this.svg = d3.select('#force-container').append('svg')
-			.attr('width', 1000)
-			.attr('height', 1000);
+			.attr('width', this.width)
+			.attr('height', this.height);
 
 		this.tooltip = d3.select('#force-container').append('div').attr('class', 'hidden tooltip');
 

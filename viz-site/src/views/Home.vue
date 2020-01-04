@@ -1,12 +1,18 @@
 <template>
 	<div class="home">
-		<v-container>
-			<v-card>
-				<v-card>
-					<FilterGroup />					
-					<!-- <RadialTree :options="{}" /> -->
-				</v-card>
-			</v-card>
+		<v-container fluid>
+			<v-row dense>
+				<v-col cols="5">
+					<v-card>
+						<FilterGroup />	
+					</v-card>
+				</v-col>
+				<v-col cols="7">
+					<v-card>
+						<ForceGraph />
+					</v-card>
+				</v-col>
+			</v-row>
 		</v-container>
 	</div>
 </template>
@@ -20,15 +26,8 @@ import RadialTree from '@/components/visus/RadialTree.vue';
 export default {
 	name: 'Home',
 	components: {
-		// Timeline,
-		// FrequencyRange,
-		// Map,
-		// TimePeriodPicker,
 		FilterGroup,
-		// RadialTree
-		// MapFilter
-		// TimePeriodPicker,
-		// ForceGraph
+		ForceGraph
 	},
 	computed: {
 		timePickerSelection: {
