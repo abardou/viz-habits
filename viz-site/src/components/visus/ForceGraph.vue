@@ -41,9 +41,6 @@ export default {
 
 		// Build the logical representation of the model
 		let acm = new ForceModel(data, 10);
-		// Apply last filters
-		acm.apply_filters(0, 1e10, 0, 1);
-
 		data = acm.get_as_json();
 		// console.log(data);
 

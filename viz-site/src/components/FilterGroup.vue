@@ -46,12 +46,6 @@ export default {
 		MapFilter,
 		TimePeriodPicker
 	},
-	props: {
-		dataset: {
-			default: null,
-			type: Object
-		}
-	},
 	data: () => ({
 		index_filtered: {
 			default: {'user': [], 'map': [], 'range': [], 'time': []},
@@ -66,34 +60,27 @@ export default {
 			this.$emit('changeVisu', data);
 		},
 		mapChange(data) {
-			console.log(data);
+			this.index_filtered.map = new Set(data);
+			this.filter_norange();
 		},
 		rangeChange(data, name) {
+			if (this.name == 'time') {
+				this.index_filtered.range = new Set(data);
+			}
 			// console.log(data);
 			// console.log(name);
-			// do something like : this.filters[name] = data
 		},
 		userChange(data) {
-			// value -> rien a voir avec le this.$emit
-			// On recupere tout les index à filtrer 
-			console.log(data);
+			this.index_filtered.user = new Set(data);
+			this.filter_norange();
 		},
 		timePickerChange(data) {
-			console.log(data);
+			this.index_filtered.time = new Set(data);
+			this.filter_norange();
 		}, 
-		filter_all() {
-			const filter_dset = [];
-			const filt = [];
-			this.index_filtered.map(x => {
-				if (!filt.includes(x)) {
-					filt.push(x);
-				}
-			});
-			this.dataset.map((d, i) => {
-				if (!filt.includes(i)){
-					filter_dset.push(d);
-				}
-			});
+
+		filter_norange() {
+			// let to_rem = this.index_filtered.filter(d => console.log(d));
 		}
 	}
 };
