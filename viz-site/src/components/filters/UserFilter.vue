@@ -39,6 +39,12 @@ export default {
 	},
 	methods: {
 		changed(value) {
+			let clone = this.users.slice(0);
+			clone = clone.filter(function(item) {
+				return value.indexOf(item) === -1;
+			});
+			console.log(clone);
+
 			this.$emit('userChange', value);
 		}
 	}
