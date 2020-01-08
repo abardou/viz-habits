@@ -265,9 +265,12 @@ export default {
 
 		time_usage() {
 			let tu = new Array(this.app_names.length).fill(0);
-			for (let d of this.$store.state.data) {
-				let i = this.app_names.indexOf(d['App Name']);
-				tu[i] += d['Duration'];
+
+			const data = JSON.parse(JSON.stringify(this.$store.state.data));
+			const indices = JSON.parse(JSON.stringify(this.$store.state.indices));
+
+			for (const d of data) {
+				tu[indices[d['App Name']]] += d['Duration'];
 			}
 
 			this.utime = tu;
@@ -276,15 +279,19 @@ export default {
 		},
 
 		switches() {
+			
 			let users = new Set();
-			for (let d of this.$store.state.data)
+			const data = JSON.parse(JSON.stringify(this.$store.state.data));
+			const indices = JSON.parse(JSON.stringify(this.$store.state.indices));
+
+			for (let d of data)
 				users.add(d['User_ID']);
 
 			// Fill the matrix with each user sequence
 			let mt = new Array(this.app_names.length).fill(0).map(() => new Array(this.app_names.length).fill(0));
 			for (let uid of users) {
 				// Build the user sequence
-				let f_data = this.$store.state.data
+				let f_data = data
 					.filter(d => d['User_ID'] == uid)
 					.sort(function(a, b) { return a.Time - b.Time; });
 
@@ -292,7 +299,7 @@ export default {
 				let mem_time = undefined;
 				// Loop through the user sequence and compute switches
 				for (let d of f_data) {
-					let app_idx = this.app_names.indexOf(d['App Name']);
+					const app_idx = indices[d['App Name']];
 					if (mem != undefined && mem != app_idx && (d['Time'] - mem_time) < this.delta)
 						mt[mem][app_idx] += 1;
 					mem = app_idx;
