@@ -45,6 +45,10 @@ export default {
 		dataset: {
 			default: null,
 			type: Object
+		}, 
+		index_filtered: {
+			default: {'user': [], 'map': [], 'range': [], 'time': []},
+			type: Object
 		}
 	},
 	methods: {
@@ -57,10 +61,26 @@ export default {
 			// do something like : this.filters[name] = data
 		},
 		userChange(data) {
-			// console.log(data);
+			// value -> rien a voir avec le this.$emit
+			// On recupere tout les index à filtrer 
+			console.log(data);
 		},
 		timePickerChange(data) {
 			console.log(data);
+		}, 
+		filter_all() {
+			const filter_dset = []
+			const filt = []
+			this.index_filtered.map(x => {
+				if (!filt.includes(x)) {
+					filt.push(x);
+				}
+			});
+			this.dataset.map((d, i) => {
+				if (!filt.includes(i)){
+					filter_dset.push(d);
+				}
+			});
 		}
 	}
 };

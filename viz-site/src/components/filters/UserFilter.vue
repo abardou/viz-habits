@@ -49,7 +49,7 @@ export default {
 					todel.push(i);
 				}
 			}
-			this.$emit('userChange', value);
+			this.$emit('userChange', 'pd');
 		}
 	}
 };
