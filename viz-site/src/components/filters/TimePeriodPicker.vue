@@ -1,5 +1,5 @@
 <template>
-	<v-container>
+	<v-container id="picker-component">
 		<v-container id="picker-container" />
 		<Ring
 			v-if="initialized"
@@ -101,7 +101,7 @@ export default {
 		this.cx = width/2;
 		
 		// Tooltip div
-		this.tooltip = d3.select('body').append(() => htmlToElement('<div class="hidden tooltipTimePicker" />'));
+		this.tooltip = d3.select(document.getElementById('picker-container')).append(() => htmlToElement('<div class="hidden tooltipTimePicker" />'));
 
 		this.initialized = true;
 	},
@@ -117,6 +117,10 @@ export default {
 <style>
 .hidden {
 	display: none;
+}
+
+div#picker-component {
+	position: relative;
 }
 
 div.tooltipTimePicker {

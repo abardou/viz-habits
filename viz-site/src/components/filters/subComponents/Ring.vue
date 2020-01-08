@@ -87,6 +87,7 @@ export default {
 	mounted() {
 		this.selected = new Array(this.l).fill(true);
 		this.draw();
+		this.parent = this.$el.parentNode;
 	},
 	methods: {
 		/* Return the color of the ith segment in the ring
@@ -102,11 +103,27 @@ export default {
 		mouse_move(d, pathObject) {
 			const mousePosition = d3.mouse(pathObject);
 
-			console.log(mousePosition);
+			mousePosition[0] = mousePosition[0] + 30;
+			mousePosition[1] = mousePosition[1] + 30;
 
 			this.tooltip.classed('hidden', false)
-				.attr('style', `left: ${(mousePosition[0] + 15 + this.cx)}px; top: ${(mousePosition[1] - 35 + this.cy)}px`)
+				// .style('left', (window.pageXOffset + (mousePosition[0]) + pathObject.getBoundingClientRect().left) + 'px')
+				// .style('top', (window.pageYOffset + (mousePosition[1]) + pathObject.getBoundingClientRect().top + 25) + 'px')
+				.style('left', (window.pageXOffset + mousePosition[0] + this.cx) + 'px')
+				.style('top', (window.pageYOffset + mousePosition[1] + this.cy) + 'px')
 				.html(d);
+		},
+
+		/**
+		 * Extend a vector by a fixed length
+		 * vector : the vector to extend
+		 * toAdd : the length by wich you want to extend it
+		 */
+		extendVector(vector, toAdd) {
+			// Get unit vector
+			const currentLength = Math.sqrt(vector[0] ** 2 + vector[1] ** 2);
+			const normalized = [vector[0] / currentLength, vector[1] / currentLength];
+			
 		},
 
 		// this.tooltip.classed('hidden', false)

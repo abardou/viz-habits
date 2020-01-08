@@ -33,22 +33,22 @@ export default {
 
 		this.tooltip = d3.select('#force-container').append('div').attr('class', 'hidden tooltip');
 
-		fetch('dataset.json').then(async resp => {
-			let data = await resp.json();
-			let f = d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on');// && d['User_ID'] == 3;
-			data = data.filter(f);
 
-			// Build the logical representation of the model
-			let acm = new ForceModel(data, 10);
-			// Apply last filters
-			acm.apply_filters(0, 1e10, 0, 1);
+		let data = this.$store.state.data;
 
-			data = acm.get_as_json();
-			console.log(data);
+		let f = d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on');// && d['User_ID'] == 3;
+		data = data.filter(f);
 
-			// Build the visualization
-			this.draw(acm.get_as_json());
-		});
+		// Build the logical representation of the model
+		let acm = new ForceModel(data, 10);
+		// Apply last filters
+		acm.apply_filters(0, 1e10, 0, 1);
+
+		data = acm.get_as_json();
+		// console.log(data);
+
+		// Build the visualization
+		this.draw(acm.get_as_json());
 	},
 	methods: {
 		/**

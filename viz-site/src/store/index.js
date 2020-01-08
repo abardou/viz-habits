@@ -5,6 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
 	state: {
+		data: null,
 		timePickerSelection: {
 			days: null,
 			hours: null,
@@ -25,6 +26,9 @@ export default new Vuex.Store({
 		},
 		setDraggingState(state, value) {
 			state.draggingState = value;
+		},
+		setDataset(state, value) {
+			state.data = value;
 		}
 	},
 	actions: {

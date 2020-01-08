@@ -1,6 +1,6 @@
 <template>
 	<div class="home">
-		<v-container fluid>
+		<v-container v-if="fetched" fluid>
 			<v-row dense>
 				<v-col cols="5">
 					<v-card>
@@ -29,6 +29,9 @@ export default {
 		FilterGroup,
 		ForceGraph
 	},
+	data: () => ({
+		fetched: false
+	}),
 	computed: {
 		timePickerSelection: {
 			get() {
@@ -44,15 +47,13 @@ export default {
 				firstObject: null
 			});
 		});
-		let xobj = new XMLHttpRequest();
-		xobj.overrideMimeType('application/json');
-		xobj.open('GET', '../../../data/dataset.json', true);
-		xobj.onreadystatechange = function () {
-			if (xobj.readyState == 4 && xobj.status == '200') {
-				let data = JSON.parse(xobj.responseText);
-				this.$store.commit('data', data);
-			}
-		};
+
+		fetch('dataset.json').then(async resp => {
+			let data = await resp.json();
+			// const str = JSON.stringify(data);
+			this.$store.commit('setDataset', data);
+			this.fetched = true;
+		});
 	}
 };
 </script>
