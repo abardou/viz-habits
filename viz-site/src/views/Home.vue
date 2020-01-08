@@ -15,6 +15,15 @@
 				</v-col>
 			</v-row>
 		</v-container>
+		<v-container v-else style="text-align: center;">
+			<v-progress-circular
+				style="margin-top: 200px;"
+				:size="200"
+				:width="20"
+				color="red"
+				indeterminate
+			/>
+		</v-container>
 	</div>
 </template>
 
