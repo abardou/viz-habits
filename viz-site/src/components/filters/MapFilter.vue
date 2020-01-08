@@ -119,15 +119,15 @@ export default {
 			this.sendEvent();
 		},
 		sendEvent() {
-			const that = this;
-			const data = {
-				minLat: that.minLat,
-				maxLat: that.maxLat,
-				minLng: that.minLng,
-				maxLng: that.maxLng,
-			};
+			const toDel = [];
 			
-			this.$emit('mapChange', data);
+			for (const [i, d] of this.$store.state.data.entries()) {
+				if (d.Lat == null || d.Long == null || d.Lat < this.minLat || d.Lat > this.maxLat || d.Long < this.minLng || d.Long > this.maxLng) {
+					toDel.push(i);
+				}
+			}
+
+			this.$emit('mapChange', toDel);
 		},
 		computeNewMinMax() {
 			this.mapBounds = this.getMapBounds();
