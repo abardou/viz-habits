@@ -47,10 +47,9 @@ export default {
 		TimePeriodPicker
 	},
 	data: () => ({
-		index_filtered: {
-			default: {'user': [], 'map': [], 'range': [], 'time': []},
-			type: Object
-		},
+		index_filtered: [new Set(), new Set(), new Set()],
+		range_filtered: new Array(),
+		edges_filtered: new Array(),
 		mapFilterActive: true,
 		// True : forceGraph False : Dendogram
 		visuSwitch: true,
@@ -60,27 +59,34 @@ export default {
 			this.$emit('changeVisu', data);
 		},
 		mapChange(data) {
-			this.index_filtered.map = new Set(data);
+			this.index_filtered[0] = new Set(data);
 			this.filter_norange();
 		},
 		rangeChange(data, name) {
 			if (this.name == 'time') {
-				this.index_filtered.range = new Set(data);
+				this.range_filtered = data;
+			} else if (this.name == 'switch') {
+				this.edges_filtered = data;
 			}
-			// console.log(data);
-			// console.log(name);
 		},
 		userChange(data) {
-			this.index_filtered.user = new Set(data);
+			this.index_filtered[1] = new Set(data);
 			this.filter_norange();
 		},
 		timePickerChange(data) {
-			this.index_filtered.time = new Set(data);
+			this.index_filtered[2] = new Set(data);
 			this.filter_norange();
 		}, 
 
 		filter_norange() {
-			// let to_rem = this.index_filtered.filter(d => console.log(d));
+			let to_rem = this.index_filtered.reduce((a, b) => new Set([...a, ...b]));
+			let fdata = this.$store.state.data.filter((d, i) => !to_rem.includes(i));
+			this.$store.commit('setFilteredDataset', fdata);
+		},
+
+		filter_range() {
+			let fdata = this.$store.state.fdata.filter((d, i) => !this.range_filtered.includes(i));
+			this.$store.commit('setFinalDataset', fdata);
 		}
 	}
 };
