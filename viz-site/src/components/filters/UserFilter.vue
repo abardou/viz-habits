@@ -39,12 +39,16 @@ export default {
 	},
 	methods: {
 		changed(value) {
-			let clone = this.users.slice(0);
-			clone = clone.filter(function(item) {
-				return value.indexOf(item) === -1;
+			const todel = [];
+			const keep = []; 
+			value.map( x => {
+				keep.push(x.replace('User', ''));
 			});
-			console.log(clone);
-
+			for (const [i, d] of this.$store.state.data.entries()) {
+				if (!keep.includes(d['User_ID'].toString())) {
+					todel.push(i);
+				}
+			}
 			this.$emit('userChange', value);
 		}
 	}
