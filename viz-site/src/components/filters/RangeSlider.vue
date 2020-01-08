@@ -123,11 +123,24 @@ export default {
 			.on('mouseout', () => that.hide_tooltips())
 			.call(d3.drag()
 				.on('start', () => that.show_tooltips())
-				.on('drag', (d, i) => this.dragged(i))
+				.on('drag', (d, i) => {
+					this.dragged(i);
+					that.sendEvent();
+				})
 				.on('end', () => that.hide_tooltips())
 			);
 	},
 	methods: {
+		sendEvent() {
+			const that = this;
+
+			const data = {
+				min: that.selected[0] * that.min,
+				max: that.selected[1] * that.max
+			};
+
+			this.$emit('rangeChange', data, this.htmlid);
+		},
 		dragged(idx) {
 			this.show_tooltips();
 

@@ -120,14 +120,14 @@ export default {
 		},
 		sendEvent() {
 			const that = this;
-			const dataObject = {
+			const data = {
 				minLat: that.minLat,
 				maxLat: that.maxLat,
 				minLng: that.minLng,
 				maxLng: that.maxLng,
 			};
 			
-			this.$emit('mapChange', dataObject);
+			this.$emit('mapChange', data);
 		},
 		computeNewMinMax() {
 			this.mapBounds = this.getMapBounds();
