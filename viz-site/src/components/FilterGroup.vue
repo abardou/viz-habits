@@ -55,7 +55,7 @@ export default {
 	}),
 	methods: {
 		mapChange(data) {
-			// console.log(data);
+			console.log(data);
 		},
 		rangeChange(data, name) {
 			// console.log(data);
