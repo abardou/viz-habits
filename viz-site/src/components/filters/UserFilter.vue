@@ -24,32 +24,25 @@ export default {
 	data: () => ({
 		selected: null
 	}),
-	// watch: {
-	// 	selected: {
-	// 		handler(value) {
-	// 			this.$store.commit('setUsersSelection', value);
-	// 			// console.log(value);
-	// 		},
-	// 		// Deep car on watch on tableau (objet avec profondeur) faire pareil si on watch un objet
-	// 		deep: true
-	// 	}
-	// },
 	mounted() {
 		this.selected = this.users;
 	},
 	methods: {
 		changed(value) {
-			const todel = [];
+			const toDel = [];
 			const keep = []; 
+
 			value.map( x => {
-				keep.push(x.replace('User', ''));
+				keep.push(parseInt(x.replace('User', '')));
 			});
+
 			for (const [i, d] of this.$store.state.data.entries()) {
-				if (!keep.includes(d['User_ID'].toString())) {
-					todel.push(i);
+				if (!keep.includes(d.User_ID)) {
+					toDel.push(i);
 				}
 			}
-			this.$emit('userChange', 'pd');
+
+			this.$emit('userChange', toDel);
 		}
 	}
 };
