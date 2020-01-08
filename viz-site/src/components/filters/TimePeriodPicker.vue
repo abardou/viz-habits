@@ -133,5 +133,6 @@ div.tooltipTimePicker {
 	font-weight: bold;
 	opacity: 0.9;
 	position: absolute;
+	z-index: 1000;
 }
 </style>

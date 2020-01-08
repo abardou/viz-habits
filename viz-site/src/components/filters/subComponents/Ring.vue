@@ -103,14 +103,11 @@ export default {
 		mouse_move(d, pathObject) {
 			const mousePosition = d3.mouse(pathObject);
 
-			mousePosition[0] = mousePosition[0] + 30;
-			mousePosition[1] = mousePosition[1] + 30;
+			const mpp = this.extendVector(mousePosition, 50);
 
 			this.tooltip.classed('hidden', false)
-				// .style('left', (window.pageXOffset + (mousePosition[0]) + pathObject.getBoundingClientRect().left) + 'px')
-				// .style('top', (window.pageYOffset + (mousePosition[1]) + pathObject.getBoundingClientRect().top + 25) + 'px')
-				.style('left', (window.pageXOffset + mousePosition[0] + this.cx) + 'px')
-				.style('top', (window.pageYOffset + mousePosition[1] + this.cy) + 'px')
+				.style('left', (window.pageXOffset + mpp[0] + this.cx) + 'px')
+				.style('top', (window.pageYOffset + mpp[1] + this.cy) + 'px')
 				.html(d);
 		},
 
@@ -121,15 +118,22 @@ export default {
 		 */
 		extendVector(vector, toAdd) {
 			// Get unit vector
+			if (this.name == 'days') {
+				toAdd += 10;
+			}
 			const currentLength = Math.sqrt(vector[0] ** 2 + vector[1] ** 2);
-			const normalized = [vector[0] / currentLength, vector[1] / currentLength];
-			
-		},
+			const newLength = currentLength + toAdd;
+			const newVector = [
+				vector[0] / currentLength * newLength,
+				vector[1] / currentLength * newLength
+			];
 
-		// this.tooltip.classed('hidden', false)
-		// 		.style('left', (window.pageXOffset + pathObject.getBoundingClientRect().left) + 'px')
-		// 		.style('top', (window.pageYOffset + pathObject.getBoundingClientRect().top) + 'px')
-		// 		.html(d);
+			if (this.name == 'days') {
+				newVector[0] -= 10;
+			}
+
+			return newVector;
+		},
 
 		/* Called when the mouse is over a ring segment
 		* i: data index, used to resolve color
