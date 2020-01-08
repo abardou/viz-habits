@@ -23,6 +23,9 @@ export default {
 		}
 	},
 	mounted() {
+
+		this.$root.$on('redrawForceGraph', () => { this.draw_graph(); });
+
 		const container = document.getElementById('force-container');
 		this.width = container.offsetWidth;
 		this.height = 890;
@@ -33,21 +36,22 @@ export default {
 
 		this.tooltip = d3.select('#force-container').append('div').attr('class', 'hidden tooltip');
 
-
-		let data = this.$store.state.data;
-
-		// let f = d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on');// && d['User_ID'] == 3;
-		// data = data.filter(f);
-
-		// Build the logical representation of the model
-		let acm = new ForceModel(data, 10);
-		data = acm.get_as_json();
-		// console.log(data);
-
-		// Build the visualization
-		this.draw(acm.get_as_json());
+		this.draw_graph();
 	},
 	methods: {
+		draw_graph() {
+			let data = this.$store.state.finaldata;
+			// let f = d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on');// && d['User_ID'] == 3;
+			// data = data.filter(f);
+
+			// Build the logical representation of the model
+			let acm = new ForceModel(data, 10);
+			data = acm.get_as_json();
+			// console.log(data);
+
+			// Build the visualization
+			this.draw(acm.get_as_json());
+		},
 		/**
 		 * @param {int} time the value of the node
 		 *

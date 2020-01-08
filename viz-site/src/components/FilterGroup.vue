@@ -80,13 +80,18 @@ export default {
 
 		filter_norange() {
 			let to_rem = this.index_filtered.reduce((a, b) => new Set([...a, ...b]));
-			let fdata = this.$store.state.data.filter((d, i) => !to_rem.includes(i));
+			let fdata = this.$store.state.data.filter((d, i) => !to_rem.has(i));
 			this.$store.commit('setFilteredDataset', fdata);
+			this.$store.commit('setFinalDataset', fdata);
+
+			this.$root.$emit('redrawForceGraph');
 		},
 
 		filter_range() {
 			let fdata = this.$store.state.fdata.filter((d, i) => !this.range_filtered.includes(i));
 			this.$store.commit('setFinalDataset', fdata);
+
+			this.$root.$emit('redrawForceGraph');
 		}
 	}
 };
