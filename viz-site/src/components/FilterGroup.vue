@@ -21,7 +21,7 @@
 			<v-col cols="6">
 				<TimePeriodPicker />
 			</v-col>
-			<MapFilter />
+			<MapFilter @mapChange="mapChange" />
 		</v-row>
 	</v-container>
 </template>
@@ -43,6 +43,11 @@ export default {
 		dataset: {
 			default: null,
 			type: Object
+		}
+	},
+	methods: {
+		mapChange(data) {
+			console.log(data);
 		}
 	}
 };

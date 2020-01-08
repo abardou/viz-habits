@@ -9,7 +9,7 @@
 					:step="0.001"
 					vertical
 					class="latitude-slider"
-					@input="drawHorLines"
+					@input="onVerSlider"
 				/>
 			</div>
 			<div>
@@ -26,7 +26,7 @@
 					:step="0.001"
 					class="large-slider-hor"
 					:style="{width: mapWidth + 'px'}"
-					@input="drawVerLines"
+					@input="onHorSlider"
 				/>
 			</div>
 		</v-container>
@@ -46,6 +46,11 @@ export default {
 		latitudeRange: [0, 1],
 		longitudeRange: [0, 1],
 		map: null,
+		minLat: null,
+		maxLat: null,
+		minLng: null,
+		MaxLng: null,
+		mapBounds: null,
 		latLines: [null, null],
 		lngLines: [null, null],
 		veils: [null, null, null, null],
@@ -93,12 +98,54 @@ export default {
 		this.lngLines[1] = this.makePolyline({lat: minLatMap, lng: maxLngMap}, {lat: maxLatMap, lng: maxLngMap});
 
 		this.map.on('move', () => {
-			this.drawVeils();
+			this.computeNewMinMax();
 			this.drawHorLines();
 			this.drawVerLines();
+			this.drawVeils();
+			this.sendEvent();
 		});
 	},
 	methods: {
+		onHorSlider() {
+			this.computeNewMinMax();
+			this.drawVerLines();
+			this.drawVeils();
+			this.sendEvent();
+		},
+		onVerSlider() {
+			this.computeNewMinMax();
+			this.drawHorLines();
+			this.drawVeils();
+			this.sendEvent();
+		},
+		sendEvent() {
+			const that = this;
+			const dataObject = {
+				minLat: that.minLat,
+				maxLat: that.maxLat,
+				minLng: that.minLng,
+				maxLng: that.maxLng,
+			};
+			
+			this.$emit('mapChange', dataObject);
+		},
+		computeNewMinMax() {
+			this.mapBounds = this.getMapBounds();
+			const [minLatMap, maxLatMap, minLngMap, maxLngMap] = this.mapBounds;
+
+			const minLatSlider = this.latitudeRange[0],
+				maxLatSlider = this.latitudeRange[1];
+
+			this.minLat = this.intervalShift(minLatSlider, 0, 1, minLatMap, maxLatMap);
+			this.maxLat = this.intervalShift(maxLatSlider, 0, 1, minLatMap, maxLatMap);
+
+			const minLngSlider = this.longitudeRange[0],
+				maxLngSlider = this.longitudeRange[1];
+
+			this.minLng = this.intervalShift(minLngSlider, 0, 1, minLngMap, maxLngMap);
+			this.maxLng = this.intervalShift(maxLngSlider, 0, 1, minLngMap, maxLngMap);
+
+		},
 		getMapBounds() {
 			const bounds = this.map.getBounds();
 
@@ -110,40 +157,28 @@ export default {
 			return [minLatMap, maxLatMap, minLngMap, maxLngMap];
 		},
 		drawHorLines() {
-			this.drawVeils();
 			// Clear les anciennes lignes
 			for (const marker of this.latLines) {
 				this.map.removeLayer(marker);
 			}
 
-			const [minLatMap, maxLatMap, minLngMap, maxLngMap] = this.getMapBounds();
-
-			const minLatSlider = this.latitudeRange[0],
-				maxLatSlider = this.latitudeRange[1];
-
-			const newMinLat = this.intervalShift(minLatSlider, 0, 1, minLatMap, maxLatMap),
-				newMaxLat = this.intervalShift(maxLatSlider, 0, 1, minLatMap, maxLatMap);
+			const [minLatMap, maxLatMap, minLngMap, maxLngMap] = this.mapBounds;
+			const that = this;
 			
-			this.latLines[0] = this.makePolyline({lat: newMinLat, lng: minLngMap}, {lat: newMinLat, lng: maxLngMap});
-			this.latLines[1] = this.makePolyline({lat: newMaxLat, lng: minLngMap}, {lat: newMaxLat, lng: maxLngMap});
+			this.latLines[0] = this.makePolyline({lat: that.minLat, lng: minLngMap}, {lat: that.minLat, lng: maxLngMap});
+			this.latLines[1] = this.makePolyline({lat: that.maxLat, lng: minLngMap}, {lat: that.maxLat, lng: maxLngMap});
 		},
 		drawVerLines() {
-			this.drawVeils();
 			// Clear les anciennes lignes
 			for (const marker of this.lngLines) {
 				this.map.removeLayer(marker);
 			}
 
-			const [minLatMap, maxLatMap, minLngMap, maxLngMap] = this.getMapBounds();
+			const [minLatMap, maxLatMap, minLngMap, maxLngMap] = this.mapBounds;
+			const that = this;
 
-			const minLngSlider = this.longitudeRange[0],
-				maxLngSlider = this.longitudeRange[1];
-
-			const newMinLng = this.intervalShift(minLngSlider, 0, 1, minLngMap, maxLngMap),
-				newMaxLng = this.intervalShift(maxLngSlider, 0, 1, minLngMap, maxLngMap);
-
-			this.lngLines[0] = this.makePolyline({lat: minLatMap, lng: newMinLng}, {lat: maxLatMap, lng: newMinLng});
-			this.lngLines[1] = this.makePolyline({lat: minLatMap, lng: newMaxLng}, {lat: maxLatMap, lng: newMaxLng});
+			this.lngLines[0] = this.makePolyline({lat: minLatMap, lng: that.minLng}, {lat: maxLatMap, lng: that.minLng});
+			this.lngLines[1] = this.makePolyline({lat: minLatMap, lng: that.maxLng}, {lat: maxLatMap, lng: that.maxLng});
 		},
 		drawVeils() {
 			// Clear les anciens voiles
@@ -151,16 +186,13 @@ export default {
 				this.map.removeLayer(marker);
 			}
 
-			const [minLatMap, maxLatMap, minLngMap, maxLngMap] = this.getMapBounds();
-			const newMinLng = this.intervalShift(this.longitudeRange[0], 0, 1, minLngMap, maxLngMap),
-				newMaxLng = this.intervalShift(this.longitudeRange[1], 0, 1, minLngMap, maxLngMap),
-				newMinLat = this.intervalShift(this.latitudeRange[0], 0, 1, minLatMap, maxLatMap),
-				newMaxLat = this.intervalShift(this.latitudeRange[1], 0, 1, minLatMap, maxLatMap);
+			const [minLatMap, maxLatMap, minLngMap, maxLngMap] = this.mapBounds;
+			const that = this;
 
-			this.veils[0] = this.makeVeil({lat: minLatMap, lng: minLngMap}, {lat: maxLatMap, lng: newMinLng});
-			this.veils[1] = this.makeVeil({lat: minLatMap, lng: newMinLng}, {lat: newMinLat, lng: newMaxLng});
-			this.veils[2] = this.makeVeil({lat: minLatMap, lng: newMaxLng}, {lat: maxLatMap, lng: maxLngMap});
-			this.veils[3] = this.makeVeil({lat: newMaxLat, lng: newMinLng}, {lat: maxLatMap, lng: newMaxLng});
+			this.veils[0] = this.makeVeil({lat: minLatMap, lng: minLngMap}, {lat: maxLatMap, lng: that.minLng});
+			this.veils[1] = this.makeVeil({lat: minLatMap, lng: that.minLng}, {lat: that.minLat, lng: that.maxLng});
+			this.veils[2] = this.makeVeil({lat: minLatMap, lng: that.maxLng}, {lat: maxLatMap, lng: maxLngMap});
+			this.veils[3] = this.makeVeil({lat: that.maxLat, lng: that.minLng}, {lat: maxLatMap, lng: that.maxLng});
 		},
 		intervalShift(x, a, b, c, d) {
 			return c + ((d - c) / (b - a)) * (x - a);
