@@ -6,7 +6,6 @@ Vue.use(Vuex);
 export default new Vuex.Store({
 	state: {
 		data: null,
-		indices: null,
 		usersSelection: [],
 		draggingState: {
 			dragging: false,
@@ -25,9 +24,6 @@ export default new Vuex.Store({
 		},
 		setFinalDataset(state, value) {
 			state.finaldata = value;
-		},
-		setIndices(state, value) {
-			state.indices = value;
 		}
 	},
 	actions: {

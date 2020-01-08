@@ -44,28 +44,46 @@ export default {
 		links: null
 	}),
 	computed: {
-		app_names: function() {
+		app_names() {
 			let an = new Set();
-			for (let d of this.$store.state.data)
+			for (let d of this.$store.state.data) {
 				an.add(d['App Name']);
+			}
 			return Array.from(an);
 		},
-		pp_data: function() {
+		pp_data() {
 			if (this.subject == 'time') {
-				return this.time_usage();
+				const tu = this.time_usage();
+				const res = [];
+
+				for (const v of Object.values(tu)) {
+					res.push(v);
+				}
+
+				return res;
 			} else if (this.subject == 'switch') {
-				return this.switches().map(d => d.filter(s => s != 0)).reduce((a, b) => a.concat(b));
+				const switches = this.switches();
+				const res = [];
+				for (const deb in switches) {
+					for (const value of Object.values(switches[deb])) {
+						if (value != 0) {
+							res.push(value);
+						}
+					}
+				}
+
+				return res;
 			}
 
 			return null;
 		},
-		min: function() {
+		min() {
 			return this.pp_data.reduce((a, b) => Math.min(a, b));
 		},
-		max: function() {
+		max() {
 			return this.pp_data.reduce((a, b) => Math.max(a, b));
 		},
-		tooltip_style: function() {
+		tooltip_style() {
 			return `
 				color: ${this.selColor};
 				background-color: #fff;
@@ -110,6 +128,7 @@ export default {
 		var histogram = d3.histogram()
 			.domain(x.domain())
 			.thresholds(x.ticks(this.nbbins));
+
 		this.bins = histogram(this.pp_data);
 		this.selected = [this.bins[0].x0, this.bins[this.bins.length-1].x1];
 
@@ -264,32 +283,41 @@ export default {
 		},
 
 		time_usage() {
-			let tu = new Array(this.app_names.length).fill(0);
-
+			const tu = {};
 			const data = JSON.parse(JSON.stringify(this.$store.state.data));
-			const indices = JSON.parse(JSON.stringify(this.$store.state.indices));
 
 			for (const d of data) {
-				tu[indices[d['App Name']]] += d['Duration'];
+				const name = d['App Name'];
+				if (!tu[name]) {
+					tu[name] = 0;
+				}
+				tu[name] += d['Duration'];
 			}
 
 			this.utime = tu;
-
 			return tu;
 		},
 
 		switches() {
-			
 			let users = new Set();
 			const data = JSON.parse(JSON.stringify(this.$store.state.data));
-			const indices = JSON.parse(JSON.stringify(this.$store.state.indices));
 
 			for (let d of data)
 				users.add(d['User_ID']);
 
 			// Fill the matrix with each user sequence
-			let mt = new Array(this.app_names.length).fill(0).map(() => new Array(this.app_names.length).fill(0));
-			for (let uid of users) {
+			// let mt = new Array(this.app_names.length).fill(0).map(() => new Array(this.app_names.length).fill(0));
+
+			const mt = {};
+			for (const app_name of this.app_names) {
+				mt[app_name] = {};
+
+				for (const app_name2 of this.app_names) {
+					mt[app_name][app_name2] = 0;
+				}
+			}
+
+			for (const uid of users) {
 				// Build the user sequence
 				let f_data = data
 					.filter(d => d['User_ID'] == uid)
@@ -297,12 +325,16 @@ export default {
 
 				let mem = undefined;
 				let mem_time = undefined;
+
 				// Loop through the user sequence and compute switches
-				for (let d of f_data) {
-					const app_idx = indices[d['App Name']];
-					if (mem != undefined && mem != app_idx && (d['Time'] - mem_time) < this.delta)
-						mt[mem][app_idx] += 1;
-					mem = app_idx;
+				for (const d of f_data) {
+					const app_name = d['App Name'];
+
+					if (mem != undefined && mem != app_name && (d['Time'] - mem_time) < this.delta) {
+						mt[mem][app_name] += 1;
+					}
+
+					mem = app_name;
 					mem_time = d['Time'];
 				}
 			}
