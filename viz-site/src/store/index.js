@@ -29,6 +29,12 @@ export default new Vuex.Store({
 		},
 		setDataset(state, value) {
 			state.data = value;
+		},
+		setFilteredDataset(state, value) {
+			state.fdata = value;
+		},
+		setFinalDataset(state, value) {
+			state.finaldata = value;
 		}
 	},
 	actions: {

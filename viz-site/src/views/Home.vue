@@ -53,6 +53,8 @@ export default {
 			data = data.filter(d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'));
 			// const str = JSON.stringify(data);
 			this.$store.commit('setDataset', data);
+			this.$store.commit('setFilteredDataset', data);
+			this.$store.commit('setFinalDataset', data);
 			this.fetched = true;
 		});
 	}
