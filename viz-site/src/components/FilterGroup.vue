@@ -18,10 +18,10 @@
 				/>
 			</v-col>
 			<v-col cols="6">
-				<UserFilter :users="['User1', 'User2', 'User3']" />
+				<UserFilter :users="['User1', 'User2', 'User3']" @userChange="userChange" />
 			</v-col>
 			<v-col cols="6">
-				<TimePeriodPicker />
+				<TimePeriodPicker @timePickerChange="timePickerChange" />
 			</v-col>
 			<MapFilter @mapChange="mapChange" />
 		</v-row>
@@ -55,6 +55,12 @@ export default {
 			console.log(data);
 			console.log(name);
 			// do something like : this.filters[name] = data
+		},
+		userChange(data) {
+			console.log(data);
+		},
+		timePickerChange(data) {
+			console.log(data);
 		}
 	}
 };

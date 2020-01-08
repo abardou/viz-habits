@@ -7,6 +7,7 @@
 			label="Users"
 			multiple
 			outlined
+			@change="changed"
 		/>
 	</v-container>
 </template>
@@ -23,17 +24,23 @@ export default {
 	data: () => ({
 		selected: null
 	}),
-	watch: {
-		selected: {
-			handler(value) {
-				this.$store.commit('setUsersSelection', value);
-			},
-			// Deep car on watch on tableau (objet avec profondeur) faire pareil si on watch un objet
-			deep: true
-		}
-	},
+	// watch: {
+	// 	selected: {
+	// 		handler(value) {
+	// 			this.$store.commit('setUsersSelection', value);
+	// 			// console.log(value);
+	// 		},
+	// 		// Deep car on watch on tableau (objet avec profondeur) faire pareil si on watch un objet
+	// 		deep: true
+	// 	}
+	// },
 	mounted() {
 		this.selected = this.users;
 	},
+	methods: {
+		changed(value) {
+			this.$emit('userChange', value);
+		}
+	}
 };
 </script>

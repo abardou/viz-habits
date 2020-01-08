@@ -14,6 +14,7 @@
 			selcol="#374d7c"
 			unselcol="#ddd"
 			:data="daysTooltips"
+			@ringChange="ringChange"
 		/>
 		<Ring
 			v-if="initialized"
@@ -28,6 +29,7 @@
 			selcol="#46edc8"
 			unselcol="#ddd"
 			:data="hoursTooltips"
+			@ringChange="ringChange"
 		/>
 		<Ring
 			v-if="initialized"
@@ -42,6 +44,7 @@
 			selcol="#fdf289"
 			unselcol="#ddd"
 			:data="minutesTooltips"
+			@ringChange="ringChange"
 		/>
 	</v-container>
 </template>
@@ -63,7 +66,8 @@ export default {
 		svg: null,
 		tooltip: null,
 		initialized: false,
-		cx: null
+		cx: null,
+		timePicker: {}
 	}),
 	computed: {
 		// Tooltip for hours
@@ -100,6 +104,12 @@ export default {
 		this.tooltip = d3.select('body').append(() => htmlToElement('<div class="hidden tooltipTimePicker" />'));
 
 		this.initialized = true;
+	},
+	methods: {
+		ringChange(data, name) {
+			this.timePicker[name] = data;
+			this.$emit('timePickerChange', this.timePicker);
+		}
 	}
 };
 </script>
