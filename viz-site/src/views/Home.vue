@@ -4,15 +4,25 @@
 			<v-row dense>
 				<v-col cols="5">
 					<v-card>
-						<FilterGroup />	
+						<FilterGroup @changeVisu="changeVisu" />	
 					</v-card>
 				</v-col>
 				<v-col cols="7">
 					<v-card>
-						<ForceGraph />
+						<ForceGraph v-if="visu" />
+						<RadialTree v-else />
 					</v-card>
 				</v-col>
 			</v-row>
+		</v-container>
+		<v-container v-else style="text-align: center;">
+			<v-progress-circular
+				style="margin-top: 200px;"
+				:size="200"
+				:width="20"
+				color="red"
+				indeterminate
+			/>
 		</v-container>
 	</div>
 </template>
@@ -27,10 +37,13 @@ export default {
 	name: 'Home',
 	components: {
 		FilterGroup,
-		ForceGraph
+		ForceGraph,
+		RadialTree
 	},
 	data: () => ({
-		fetched: false
+		fetched: false,
+		// True: forceGraph False : dendogram
+		visu: true
 	}),
 	mounted() {
 		document.documentElement.addEventListener('mouseup', e => {
@@ -53,6 +66,11 @@ export default {
 			this.$store.commit('setIndices', indices);
 			this.fetched = true;
 		});
+	},
+	methods: {
+		changeVisu(data) {
+			this.visu = data;
+		}
 	}
 };
 </script>

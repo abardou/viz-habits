@@ -20,6 +20,10 @@
 			</v-col>
 			<v-col cols="6">
 				<UserFilter :users="['User1', 'User2', 'User3']" @userChange="userChange" />
+				<v-container pa-5>
+					<v-checkbox v-model="mapFilterActive" :label="`MapFilter ${mapFilterActive ? 'actif' : 'inactif'}`" />
+					<v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Force Graph' : 'Dendogram'}`" @change="changed" />
+				</v-container>
 			</v-col>
 			<v-col cols="6">
 				<TimePeriodPicker @timePickerChange="timePickerChange" />
@@ -45,9 +49,15 @@ export default {
 	data: () => ({
 		index_filtered: [new Set(), new Set(), new Set()],
 		range_filtered: new Array(),
-		edges_filtered: new Array()
+		edges_filtered: new Array(),
+		mapFilterActive: true,
+		// True : forceGraph False : Dendogram
+		visuSwitch: true,
 	}),
 	methods: {
+		changed(data) {
+			this.$emit('changeVisu', data);
+		},
 		mapChange(data) {
 			this.index_filtered[0] = new Set(data);
 			this.filter_norange();
