@@ -108,7 +108,42 @@ export default {
 	methods: {
 		ringChange(data, name) {
 			this.timePicker[name] = data;
-			this.$emit('timePickerChange', this.timePicker);
+			// Construction du graph au tout début
+			if (Object.keys(this.timePicker).length < 3) return;
+
+			const toDel = [];
+
+			for (const [i, d] of this.$store.state.data.entries()) {
+				if (isNaN(d.Time)) {
+					toDel.push(i);
+					continue;
+				}
+
+				// Days : getDay() returns [0 .. 6] [Sunday .. Saturday]
+				const date = new Date(d.Time * 1000);
+				// [Sunday .. Saturday] => [Monday .. Sunday]
+				let day = date.getDay() - 1;
+				if (day == -1) {
+					day = 6;
+				}
+
+				if (!this.timePicker['days'][day]) {
+					toDel.push(i);
+					continue;
+				}
+
+				if (!this.timePicker['hours'][date.getHours()]) {
+					toDel.push(i);
+					continue;
+				}
+
+				const minutesRange = Math.floor(date.getMinutes() / this.granularity_minutes);
+				if (!this.timePicker['minutes'][minutesRange]) {
+					toDel.push(i);
+					continue;
+				}
+			}
+			this.$emit('timePickerChange', toDel);
 		}
 	}
 };

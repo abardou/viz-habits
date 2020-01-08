@@ -60,7 +60,7 @@ export default {
 			// console.log(data);
 		},
 		timePickerChange(data) {
-			// console.log(data);
+			console.log(data);
 		}
 	}
 };
