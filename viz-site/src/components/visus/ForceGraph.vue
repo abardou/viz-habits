@@ -40,6 +40,7 @@ export default {
 	},
 	methods: {
 		draw_graph() {
+			this.svg.selectAll('*').remove();
 			let data = this.$store.state.finaldata;
 			// let f = d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on');// && d['User_ID'] == 3;
 			// data = data.filter(f);
