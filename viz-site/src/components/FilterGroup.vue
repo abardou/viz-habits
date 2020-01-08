@@ -54,13 +54,21 @@ export default {
 		// True : forceGraph False : Dendogram
 		visuSwitch: true,
 	}),
+	watch: {
+		mapFilterActive: function(val) {
+			this.filter_norange();
+		}
+	},
 	methods: {
 		changed(data) {
 			this.$emit('changeVisu', data);
 		},
 		mapChange(data) {
 			this.index_filtered[0] = new Set(data);
-			this.filter_norange();
+
+			if (this.mapFilterActive) {
+				this.filter_norange();
+			}
 		},
 		rangeChange(data, name) {
 			if (this.name == 'time') {
@@ -79,7 +87,14 @@ export default {
 		}, 
 
 		filter_norange() {
-			let to_rem = this.index_filtered.reduce((a, b) => new Set([...a, ...b]));
+			let active_filters;
+			if (this.mapFilterActive) {
+				active_filters = this.index_filtered;
+			} else {
+				active_filters = this.index_filtered.slice(1);
+			}
+
+			let to_rem = active_filters.reduce((a, b) => new Set([...a, ...b]));
 			let fdata = this.$store.state.data.filter((d, i) => !to_rem.has(i));
 			this.$store.commit('setFilteredDataset', fdata);
 			this.$store.commit('setFinalDataset', fdata);
