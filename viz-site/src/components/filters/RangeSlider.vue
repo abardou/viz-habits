@@ -11,11 +11,15 @@ import { htmlToElement } from '@/utils/elementCreation.js';
 export default {
 	name: 'RangeSlider',
 	props: {
-		data: {
+		subject: { // time | switch
 			default: null,
-			type: Array
+			type: String
 		},
-		step: {
+		nbbins: {
+			default: null,
+			type: Number
+		},
+		delta: { // Useful for switch
 			default: null,
 			type: Number
 		},
@@ -35,17 +39,31 @@ export default {
 		selected: [0, 1],
 		heightHist: 100,
 		width: 400,
-		tooltips: null
+		tooltips: null,
+		utime: null,
+		links: null
 	}),
 	computed: {
+		app_names: function() {
+			let an = new Set();
+			for (let d of this.$store.state.data)
+				an.add(d['App Name']);
+			return Array.from(an);
+		},
+		pp_data: function() {
+			if (this.subject == 'time') {
+				return this.time_usage();
+			} else if (this.subject == 'switch') {
+				return this.switches().map(d => d.filter(s => s != 0)).reduce((a, b) => a.concat(b));
+			}
+
+			return null;
+		},
 		min: function() {
-			return this.data.reduce((a, b) => Math.min(a, b));
+			return this.pp_data.reduce((a, b) => Math.min(a, b));
 		},
 		max: function() {
-			return this.data.reduce((a, b) => Math.max(a, b));
-		},
-		range: function() {
-			return [this.min + 0.2*(this.max - this.min), this.min + 0.8*(this.max - this.min)];
+			return this.pp_data.reduce((a, b) => Math.max(a, b));
 		},
 		tooltip_style: function() {
 			return `
@@ -81,8 +99,6 @@ export default {
 			.append('g')
 			.attr('transform', 'translate('+this.margin.left+','+this.margin.top+')');
 
-		let nbBins = (this.max - this.min) / this.step;
-
 		// Draw histogram
 		var x = d3.scaleLinear()
 			.domain([this.min, this.max])
@@ -93,9 +109,9 @@ export default {
 
 		var histogram = d3.histogram()
 			.domain(x.domain())
-			.thresholds(x.ticks(nbBins));
-		this.bins = histogram(this.data);
-		this.selected = [this.bins[parseInt(0.25*this.bins.length)].x0, this.bins[parseInt(0.75*this.bins.length)].x1];
+			.thresholds(x.ticks(this.nbbins));
+		this.bins = histogram(this.pp_data);
+		this.selected = [this.bins[0].x0, this.bins[this.bins.length-1].x1];
 
 		y.domain([0, d3.max(this.bins, function(d) { return d.length; })]);
 
@@ -132,14 +148,27 @@ export default {
 	},
 	methods: {
 		sendEvent() {
-			const that = this;
+			let toDel = [];
 
-			const data = {
-				min: that.selected[0] * that.min,
-				max: that.selected[1] * that.max
-			};
+			// Selection for time
+			if (this.subject == 'time') {
+				let app_to_del = [];
+				for (let i in this.utime) {
+					if (this.utime[i] < this.selected[0] || this.utime[i] > this.selected[1])
+						app_to_del.push(this.app_names[i]);
+				}
 
-			this.$emit('rangeChange', data, this.htmlid);
+				for (let i in this.$store.state.data) {
+					if (app_to_del.indexOf(this.$store.state.data[i]['App Name']) != -1)
+						toDel.push(i);
+				}
+			} else if (this.subject == 'switch') // Selection for switch
+				for (let i in this.links)
+					for (let j in this.links[i])
+						if (this.links[i][j] < this.selected[0] || this.links[i][j] > this.selected[1])
+							toDel.push([this.app_names[i], this.app_names[j]]);
+
+			this.$emit('rangeChange', toDel, this.htmlid);
 		},
 		dragged(idx) {
 			this.show_tooltips();
@@ -232,6 +261,48 @@ export default {
 				.each((d, i) => {
 					this.tooltips[i].classed('hidden', true);
 				});
+		},
+
+		time_usage() {
+			let tu = new Array(this.app_names.length).fill(0);
+			for (let d of this.$store.state.data) {
+				let i = this.app_names.indexOf(d['App Name']);
+				tu[i] += d['Duration'];
+			}
+
+			this.utime = tu;
+
+			return tu;
+		},
+
+		switches() {
+			let users = new Set();
+			for (let d of this.$store.state.data)
+				users.add(d['User_ID']);
+
+			// Fill the matrix with each user sequence
+			let mt = new Array(this.app_names.length).fill(0).map(() => new Array(this.app_names.length).fill(0));
+			for (let uid of users) {
+				// Build the user sequence
+				let f_data = this.$store.state.data
+					.filter(d => d['User_ID'] == uid)
+					.sort(function(a, b) { return a.Time - b.Time; });
+
+				let mem = undefined;
+				let mem_time = undefined;
+				// Loop through the user sequence and compute switches
+				for (let d of f_data) {
+					let app_idx = this.app_names.indexOf(d['App Name']);
+					if (mem != undefined && mem != app_idx && (d['Time'] - mem_time) < this.delta)
+						mt[mem][app_idx] += 1;
+					mem = app_idx;
+					mem_time = d['Time'];
+				}
+			}
+
+			this.links = mt;
+
+			return mt;
 		}
 	}
 };

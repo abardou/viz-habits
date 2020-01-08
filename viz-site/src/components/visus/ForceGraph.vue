@@ -36,8 +36,8 @@ export default {
 
 		let data = this.$store.state.data;
 
-		let f = d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on');// && d['User_ID'] == 3;
-		data = data.filter(f);
+		// let f = d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on');// && d['User_ID'] == 3;
+		// data = data.filter(f);
 
 		// Build the logical representation of the model
 		let acm = new ForceModel(data, 10);

@@ -50,6 +50,7 @@ export default {
 
 		fetch('dataset.json').then(async resp => {
 			let data = await resp.json();
+			data = data.filter(d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'));
 			// const str = JSON.stringify(data);
 			this.$store.commit('setDataset', data);
 			this.fetched = true;
