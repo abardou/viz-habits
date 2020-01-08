@@ -167,25 +167,32 @@ export default {
 	},
 	methods: {
 		sendEvent() {
-			let toDel = [];
+			const toDel = [];
 
 			// Selection for time
 			if (this.subject == 'time') {
-				let app_to_del = [];
-				for (let i in this.utime) {
+				const app_to_del = [];
+
+				for (const i in this.utime) {
 					if (this.utime[i] < this.selected[0] || this.utime[i] > this.selected[1])
-						app_to_del.push(this.app_names[i]);
+						app_to_del.push(i);
 				}
 
-				for (let i in this.$store.state.data) {
-					if (app_to_del.indexOf(this.$store.state.data[i]['App Name']) != -1)
+				for (const i in this.$store.state.data) {
+					if (app_to_del.indexOf(this.$store.state.data[i]['App Name']) != -1) {
 						toDel.push(i);
+					}
 				}
-			} else if (this.subject == 'switch') // Selection for switch
-				for (let i in this.links)
-					for (let j in this.links[i])
-						if (this.links[i][j] < this.selected[0] || this.links[i][j] > this.selected[1])
-							toDel.push([this.app_names[i], this.app_names[j]]);
+			} else if (this.subject == 'switch') {
+				// Selection for switch
+				for (const i in this.links) {
+					for (const j in this.links[i]) {
+						if (this.links[i][j] < this.selected[0] || this.links[i][j] > this.selected[1]) {
+							toDel.push([i, j]);
+						}
+					}
+				}
+			}
 
 			this.$emit('rangeChange', toDel, this.htmlid);
 		},
