@@ -32,13 +32,6 @@ export default {
 	data: () => ({
 		fetched: false
 	}),
-	computed: {
-		timePickerSelection: {
-			get() {
-				return this.$store.state.timePickerSelection;
-			}
-		},
-	},
 	mounted() {
 		document.documentElement.addEventListener('mouseup', e => {
 			this.$store.commit('setDraggingState', {
@@ -48,13 +41,16 @@ export default {
 			});
 		});
 
-		fetch('dataset.json').then(async resp => {
-			let data = await resp.json();
+		Promise.all([fetch('dataset.json'), fetch('indices.json')]).then(async resp => {
+			let data = await resp[0].json();
+			const indices = await resp[1].json();
+
 			data = data.filter(d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'));
 			// const str = JSON.stringify(data);
 			this.$store.commit('setDataset', data);
 			this.$store.commit('setFilteredDataset', data);
 			this.$store.commit('setFinalDataset', data);
+			this.$store.commit('setIndices', indices);
 			this.fetched = true;
 		});
 	}

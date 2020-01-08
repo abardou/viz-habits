@@ -6,11 +6,7 @@ Vue.use(Vuex);
 export default new Vuex.Store({
 	state: {
 		data: null,
-		timePickerSelection: {
-			days: null,
-			hours: null,
-			minutes: null
-		},
+		indices: null,
 		usersSelection: [],
 		draggingState: {
 			dragging: false,
@@ -18,12 +14,6 @@ export default new Vuex.Store({
 		}
 	},
 	mutations: {
-		setTimePickerSelection(state, o) {
-			state.timePickerSelection[o.key] = o.value;
-		},
-		setUsersSelection(state, value) {
-			state.usersSelection = value;
-		},
 		setDraggingState(state, value) {
 			state.draggingState = value;
 		},
@@ -35,6 +25,9 @@ export default new Vuex.Store({
 		},
 		setFinalDataset(state, value) {
 			state.finaldata = value;
+		},
+		setIndices(state, value) {
+			state.indices = value;
 		}
 	},
 	actions: {

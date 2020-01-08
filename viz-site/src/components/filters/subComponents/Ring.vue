@@ -78,7 +78,6 @@ export default {
 		selected: {
 			handler(value) {
 				const key = this.name;
-				this.$store.commit('setTimePickerSelection', {key, value});
 				this.$emit('ringChange', value, key);
 			},
 			deep: true
