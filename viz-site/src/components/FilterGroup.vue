@@ -45,12 +45,14 @@ export default {
 		dataset: {
 			default: null,
 			type: Object
-		}, 
+		}
+	},
+	data: () => ({
 		index_filtered: {
 			default: {'user': [], 'map': [], 'range': [], 'time': []},
 			type: Object
 		}
-	},
+	}),
 	methods: {
 		mapChange(data) {
 			// console.log(data);
@@ -69,8 +71,8 @@ export default {
 			console.log(data);
 		}, 
 		filter_all() {
-			const filter_dset = []
-			const filt = []
+			const filter_dset = [];
+			const filt = [];
 			this.index_filtered.map(x => {
 				if (!filt.includes(x)) {
 					filt.push(x);
