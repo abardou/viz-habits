@@ -12,7 +12,8 @@ export default {
 		svg: null,
 		tooltip: null,
 		width: null,
-		height: null
+		height: null,
+		filteredEdges: {}
 	}),
 	computed: {
 		cx: function() {
@@ -23,9 +24,6 @@ export default {
 		}
 	},
 	mounted() {
-
-		this.$root.$on('redrawForceGraph', () => { this.draw_graph(); });
-
 		const container = document.getElementById('force-container');
 		this.width = container.offsetWidth;
 		this.height = 890;
@@ -37,6 +35,21 @@ export default {
 		this.tooltip = d3.select('#force-container').append('div').attr('class', 'hidden tooltip');
 
 		this.draw_graph();
+
+		this.$root.$on('redrawForceGraph', () => { this.draw_graph(); });
+
+		this.$root.$on('handleEdgesForceGraph', (filteredEdges) => {
+			this.filteredEdges = {};
+
+			for (const edge of filteredEdges) {
+				if (!this.filteredEdges[edge[0]]) {
+					this.filteredEdges[edge[0]] = [];
+				}
+				this.filteredEdges[edge[0]].push(edge[1]);
+			}
+
+			this.draw_graph();
+		});
 	},
 	methods: {
 		draw_graph() {
@@ -138,11 +151,24 @@ export default {
 			// Center of the graph
 				.force('center', d3.forceCenter(this.cx, this.cy));
 
+
+			let links = [];
+
+			if (JSON.stringify(this.filteredEdges) === '{}') {
+				links = graph.links;
+			} else {
+				for (const link of graph.links) {
+					if (!this.filteredEdges[link.source].includes(link.target)) {
+						links.push(link);
+					}
+				}
+			}
+
 			// Link objects
 			const link = this.svg.append('g')
 				.attr('class', 'links')
 				.selectAll('line')
-				.data(graph.links)
+				.data(links)
 				.enter().append('line')
 				.attr('stroke-width', d => Math.sqrt(d.value));
 
@@ -193,7 +219,7 @@ export default {
 
 			// Apply simulation to links
 			simulation.force('link')
-				.links(graph.links);
+				.links(links);
 		},
 		/**
 		 * @param {Object} link the link of the node

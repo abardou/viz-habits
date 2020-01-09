@@ -71,10 +71,11 @@ export default {
 			}
 		},
 		rangeChange(data, name) {
-			if (this.name == 'time') {
+			if (name == 'time') {
 				this.range_filtered = data;
-			} else if (this.name == 'switch') {
+			} else if (name == 'switch') {
 				this.edges_filtered = data;
+				this.$root.$emit('handleEdgesForceGraph', this.edges_filtered);
 			}
 		},
 		userChange(data) {
