@@ -184,7 +184,7 @@ export default {
 				.domain([this.min, this.max])
 				.range([0, this.width]);
 
-			var y = d3.scaleLinear()
+			var y = d3.scaleSqrt()
 				.range([this.heightHist, 0]);
 
 			var histogram = d3.histogram()
