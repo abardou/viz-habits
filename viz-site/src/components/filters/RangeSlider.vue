@@ -1,5 +1,6 @@
 <template>
 	<v-container :id="'container-' + htmlid" style="display: inline">
+		{{ label }}
 		<svg :id="htmlid" />
 	</v-container>
 </template>
@@ -48,6 +49,17 @@ export default {
 		pp_data: null
 	}),
 	computed: {
+		label() {
+			const name = this.htmlid;
+
+			if (name === 'time') {
+				return 'Temps min/max d\'utilisation de l\'appli';
+			} else if (name === 'switch') {
+				return 'Taille min/max des arêtes';
+			}
+
+			return name;
+		},
 		tooltip_style() {
 			return `
 				color: ${this.selColor};
