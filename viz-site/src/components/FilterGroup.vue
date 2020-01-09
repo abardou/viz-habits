@@ -73,6 +73,7 @@ export default {
 		rangeChange(data, name) {
 			if (name == 'time') {
 				this.range_filtered = data;
+				this.filter_range();
 			} else if (name == 'switch') {
 				this.edges_filtered = data;
 				this.$root.$emit('handleEdgesForceGraph', this.edges_filtered);

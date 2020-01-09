@@ -100,7 +100,7 @@ export default {
 
 				for (const i in this.$store.state.fdata) {
 					if (app_to_del.indexOf(this.$store.state.fdata[i]['App Name']) != -1) {
-						toDel.push(i);
+						toDel.push(parseInt(i));
 					}
 				}
 			} else if (this.subject == 'switch') {
@@ -163,8 +163,6 @@ export default {
 		},
 		build_slider() {
 			this.update_computed();
-			console.log(this.$store.state.fdata);
-			console.log(this.max);
 			this.svg.selectAll('*').remove();
 
 			let that = this;
@@ -210,11 +208,8 @@ export default {
 				.on('mouseout', () => that.hide_tooltips())
 				.call(d3.drag()
 					.on('start', () => that.show_tooltips())
-					.on('drag', (d, i) => {
-						this.dragged(i);
-						that.sendEvent();
-					})
-					.on('end', () => that.hide_tooltips())
+					.on('drag', (d, i) => this.dragged(i))
+					.on('end', () => {that.hide_tooltips(); that.sendEvent();})
 				);
 		},
 		dragged(idx) {
