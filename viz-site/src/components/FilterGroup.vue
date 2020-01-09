@@ -99,6 +99,7 @@ export default {
 			this.$store.commit('setFilteredDataset', fdata);
 			this.$store.commit('setFinalDataset', fdata);
 
+			this.$root.$emit('redrawSlider');
 			this.$root.$emit('redrawForceGraph');
 		},
 

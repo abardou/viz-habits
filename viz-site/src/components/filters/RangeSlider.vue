@@ -41,17 +41,89 @@ export default {
 		width: 400,
 		tooltips: null,
 		utime: null,
-		links: null
+		links: null,
+		min: null,
+		max: null,
+		app_names: null,
+		pp_data: null
 	}),
 	computed: {
-		app_names() {
+		tooltip_style() {
+			return `
+				color: ${this.selColor};
+				background-color: #fff;
+				padding: .4em;
+				border-radius: 10px;
+				border: 2px solid ${this.selColor};
+				font-size: 0.8em;
+				font-weight: bold;
+				opacity: 0.9;
+				position: absolute;
+			`;
+		}
+	},
+	mounted() {
+		this.$root.$on('redrawSlider', () => { this.build_slider(); });
+
+		this.width = document.getElementById('container-' + this.htmlid).offsetWidth + 50;
+		this.width = this.width - this.margin.left - this.margin.right;
+
+		this.tooltips = [
+			d3.select('body').append(() => 
+				htmlToElement(`<div id="${this.htmlid}-tt1" style="${this.tooltip_style}" class="hidden tooltipSlider" />`)
+			), 
+			d3.select('body').append(() => 
+				htmlToElement(`<div id="${this.htmlid}-tt2" style="${this.tooltip_style}" class="hidden tooltipSlider" />`)
+			)
+		];
+
+		this.svg = d3.select('#'+this.htmlid)
+			.attr('width', this.width + this.margin.left + this.margin.right)
+			.attr('height', this.heightHist + this.margin.bet + this.thickness + this.margin.top + this.margin.bottom)
+			.append('g')
+			.attr('transform', 'translate('+this.margin.left+','+this.margin.top+')');
+
+		this.build_slider();
+	},
+	methods: {
+		sendEvent() {
+			const toDel = [];
+
+			// Selection for time
+			if (this.subject == 'time') {
+				const app_to_del = [];
+
+				for (const i in this.utime) {
+					if (this.utime[i] < this.selected[0] || this.utime[i] > this.selected[1])
+						app_to_del.push(i);
+				}
+
+				for (const i in this.$store.state.fdata) {
+					if (app_to_del.indexOf(this.$store.state.fdata[i]['App Name']) != -1) {
+						toDel.push(i);
+					}
+				}
+			} else if (this.subject == 'switch') {
+				// Selection for switch
+				for (const i in this.links) {
+					for (const j in this.links[i]) {
+						if (this.links[i][j] < this.selected[0] || this.links[i][j] > this.selected[1]) {
+							toDel.push([i, j]);
+						}
+					}
+				}
+			}
+
+			this.$emit('rangeChange', toDel, this.htmlid);
+		},
+		_app_names() {
 			let an = new Set();
-			for (let d of this.$store.state.data) {
+			for (let d of this.$store.state.fdata) {
 				an.add(d['App Name']);
 			}
 			return Array.from(an);
 		},
-		pp_data() {
+		_pp_data() {
 			if (this.subject == 'time') {
 				const tu = this.time_usage();
 				const res = [];
@@ -77,124 +149,73 @@ export default {
 
 			return null;
 		},
-		min() {
+		_min() {
 			return this.pp_data.reduce((a, b) => Math.min(a, b));
 		},
-		max() {
+		_max() {
 			return this.pp_data.reduce((a, b) => Math.max(a, b));
 		},
-		tooltip_style() {
-			return `
-				color: ${this.selColor};
-				background-color: #fff;
-				padding: .4em;
-				border-radius: 10px;
-				border: 2px solid ${this.selColor};
-				font-size: 0.8em;
-				font-weight: bold;
-				opacity: 0.9;
-				position: absolute;
-			`;
-		}
-	},
-	mounted() {
-		let that = this;
-		this.width = document.getElementById('container-' + this.htmlid).offsetWidth + 50;
-		this.width = this.width - this.margin.left - this.margin.right;
+		update_computed() {
+			this.app_names = this._app_names();
+			this.pp_data = this._pp_data();
+			this.min = this._min();
+			this.max = this._max();
+		},
+		build_slider() {
+			this.update_computed();
+			console.log(this.$store.state.fdata);
+			console.log(this.max);
+			this.svg.selectAll('*').remove();
 
-		this.tooltips = [
-			d3.select('body').append(() => 
-				htmlToElement(`<div id="${this.htmlid}-tt1" style="${this.tooltip_style}" class="hidden tooltipSlider" />`)
-			), 
-			d3.select('body').append(() => 
-				htmlToElement(`<div id="${this.htmlid}-tt2" style="${this.tooltip_style}" class="hidden tooltipSlider" />`)
-			)
-		];
+			let that = this;
 
-		this.svg = d3.select('#'+this.htmlid)
-			.attr('width', this.width + this.margin.left + this.margin.right)
-			.attr('height', this.heightHist + this.margin.bet + this.thickness + this.margin.top + this.margin.bottom)
-			.append('g')
-			.attr('transform', 'translate('+this.margin.left+','+this.margin.top+')');
+			// Draw histogram
+			var x = d3.scaleLinear()
+				.domain([this.min, this.max])
+				.range([0, this.width]);
 
-		// Draw histogram
-		var x = d3.scaleLinear()
-			.domain([this.min, this.max])
-			.range([0, this.width]);
+			var y = d3.scaleLinear()
+				.range([this.heightHist, 0]);
 
-		var y = d3.scaleLinear()
-			.range([this.heightHist, 0]);
+			var histogram = d3.histogram()
+				.domain(x.domain())
+				.thresholds(x.ticks(this.nbbins));
 
-		var histogram = d3.histogram()
-			.domain(x.domain())
-			.thresholds(x.ticks(this.nbbins));
+			this.bins = histogram(this.pp_data);
+			this.selected = [this.bins[0].x0, this.bins[this.bins.length-1].x1];
 
-		this.bins = histogram(this.pp_data);
-		this.selected = [this.bins[0].x0, this.bins[this.bins.length-1].x1];
+			y.domain([0, d3.max(this.bins, function(d) { return d.length; })]);
 
-		y.domain([0, d3.max(this.bins, function(d) { return d.length; })]);
+			var u = this.svg.selectAll('rect')
+				.data(this.bins);
 
-		var u = this.svg.selectAll('rect')
-			.data(this.bins);
+			u.enter()
+				.append('rect') // Add a new rect for each new elements
+				.attr('x', d => x(d.x0))
+				.attr('y', d => y(d.length))
+				.attr('width', function(d) { return x(d.x1) - x(d.x0) - 1; })
+				.attr('height', function(d) { return that.heightHist - y(d.length); })
+				.style('fill', d => d.x0 >= this.selected[0] && d.x1 <= this.selected[1] ? this.selColor : this.unselColor);
 
-		u.enter()
-			.append('rect') // Add a new rect for each new elements
-			.attr('x', d => x(d.x0))
-			.attr('y', d => y(d.length))
-			.attr('width', function(d) { return x(d.x1) - x(d.x0) - 1; })
-			.attr('height', function(d) { return that.heightHist - y(d.length); })
-			.style('fill', d => d.x0 >= this.selected[0] && d.x1 <= this.selected[1] ? this.selColor : this.unselColor);
-
-		this.draw_slider_line(x);
-			
-		this.svg.selectAll('cursors').data(this.selected)
-			.enter()
-			.append('circle')
-			.attr('cx', d => x(d))
-			.attr('cy', this.heightHist + this.margin.bet)
-			.attr('r', this.cursorRad)
-			.style('fill', this.selColor)
-			.on('mouseover', () => that.show_tooltips())
-			.on('mouseout', () => that.hide_tooltips())
-			.call(d3.drag()
-				.on('start', () => that.show_tooltips())
-				.on('drag', (d, i) => {
-					this.dragged(i);
-					that.sendEvent();
-				})
-				.on('end', () => that.hide_tooltips())
-			);
-	},
-	methods: {
-		sendEvent() {
-			const toDel = [];
-
-			// Selection for time
-			if (this.subject == 'time') {
-				const app_to_del = [];
-
-				for (const i in this.utime) {
-					if (this.utime[i] < this.selected[0] || this.utime[i] > this.selected[1])
-						app_to_del.push(i);
-				}
-
-				for (const i in this.$store.state.data) {
-					if (app_to_del.indexOf(this.$store.state.data[i]['App Name']) != -1) {
-						toDel.push(i);
-					}
-				}
-			} else if (this.subject == 'switch') {
-				// Selection for switch
-				for (const i in this.links) {
-					for (const j in this.links[i]) {
-						if (this.links[i][j] < this.selected[0] || this.links[i][j] > this.selected[1]) {
-							toDel.push([i, j]);
-						}
-					}
-				}
-			}
-
-			this.$emit('rangeChange', toDel, this.htmlid);
+			this.draw_slider_line(x);
+				
+			this.svg.selectAll('cursors').data(this.selected)
+				.enter()
+				.append('circle')
+				.attr('cx', d => x(d))
+				.attr('cy', this.heightHist + this.margin.bet)
+				.attr('r', this.cursorRad)
+				.style('fill', this.selColor)
+				.on('mouseover', () => that.show_tooltips())
+				.on('mouseout', () => that.hide_tooltips())
+				.call(d3.drag()
+					.on('start', () => that.show_tooltips())
+					.on('drag', (d, i) => {
+						this.dragged(i);
+						that.sendEvent();
+					})
+					.on('end', () => that.hide_tooltips())
+				);
 		},
 		dragged(idx) {
 			this.show_tooltips();
@@ -291,7 +312,7 @@ export default {
 
 		time_usage() {
 			const tu = {};
-			const data = JSON.parse(JSON.stringify(this.$store.state.data));
+			const data = JSON.parse(JSON.stringify(this.$store.state.fdata));
 
 			for (const d of data) {
 				const name = d['App Name'];
@@ -307,7 +328,7 @@ export default {
 
 		switches() {
 			let users = new Set();
-			const data = JSON.parse(JSON.stringify(this.$store.state.data));
+			const data = JSON.parse(JSON.stringify(this.$store.state.fdata));
 
 			for (let d of data)
 				users.add(d['User_ID']);
