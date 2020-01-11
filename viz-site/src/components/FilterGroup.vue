@@ -21,7 +21,6 @@
 			<v-col cols="6">
 				<v-container pa-5>
 					<UserFilter @userChange="userChange" />
-					<v-checkbox v-model="mapFilterActive" :label="'MapFilter actif'" />
 					<!-- <v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Force Graph' : 'Dendogram'}`" @change="changed" /> -->
 				</v-container>
 			</v-col>
@@ -50,25 +49,16 @@ export default {
 		index_filtered: [new Set(), new Set(), new Set()],
 		range_filtered: new Array(),
 		edges_filtered: new Array(),
-		mapFilterActive: false,
 		// True : forceGraph False : Dendogram
 		visuSwitch: true,
 	}),
-	watch: {
-		mapFilterActive: function(val) {
-			this.filter_norange();
-		}
-	},
 	methods: {
 		changed(data) {
 			this.$emit('changeVisu', data);
 		},
 		mapChange(data) {
 			this.index_filtered[0] = new Set(data);
-
-			if (this.mapFilterActive) {
-				this.filter_norange();
-			}
+			this.filter_norange();
 		},
 		rangeChange(data, name) {
 			if (name == 'time') {
@@ -90,11 +80,7 @@ export default {
 
 		filter_norange() {
 			let active_filters;
-			if (this.mapFilterActive) {
-				active_filters = this.index_filtered;
-			} else {
-				active_filters = this.index_filtered.slice(1);
-			}
+			active_filters = this.index_filtered;
 
 			let to_rem = active_filters.reduce((a, b) => new Set([...a, ...b]));
 			let fdata = this.$store.state.data.filter((d, i) => !to_rem.has(i));

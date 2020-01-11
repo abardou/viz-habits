@@ -13,7 +13,7 @@ export default {
 		tooltip: null,
 		width: null,
 		height: null,
-		filteredEdges: {}
+		toDelEdges: {}
 	}),
 	computed: {
 		cx: function() {
@@ -38,14 +38,14 @@ export default {
 
 		this.$root.$on('redrawForceGraph', () => { this.draw_graph(); });
 
-		this.$root.$on('handleEdgesForceGraph', (filteredEdges) => {
-			this.filteredEdges = {};
+		this.$root.$on('handleEdgesForceGraph', (toDelEdges) => {
+			this.toDelEdges = {};
 
-			for (const edge of filteredEdges) {
-				if (!this.filteredEdges[edge[0]]) {
-					this.filteredEdges[edge[0]] = [];
+			for (const edge of toDelEdges) {
+				if (!this.toDelEdges[edge[0]]) {
+					this.toDelEdges[edge[0]] = [];
 				}
-				this.filteredEdges[edge[0]].push(edge[1]);
+				this.toDelEdges[edge[0]].push(edge[1]);
 			}
 
 			this.draw_graph();
@@ -154,11 +154,11 @@ export default {
 
 			let links = [];
 
-			if (JSON.stringify(this.filteredEdges) === '{}') {
+			if (JSON.stringify(this.toDelEdges) === '{}') {
 				links = graph.links;
 			} else {
 				for (const link of graph.links) {
-					if (!this.filteredEdges[link.source].includes(link.target)) {
+					if (!(this.toDelEdges[link.source] && this.toDelEdges[link.source].includes(link.target))) {
 						links.push(link);
 					}
 				}
