@@ -19,10 +19,10 @@
 				/>
 			</v-col>
 			<v-col cols="6">
-				<UserFilter :users="['User1', 'User2', 'User3']" @userChange="userChange" />
 				<v-container pa-5>
-					<v-checkbox v-model="mapFilterActive" :label="`MapFilter ${mapFilterActive ? 'actif' : 'inactif'}`" />
-					<v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Force Graph' : 'Dendogram'}`" @change="changed" />
+					<UserFilter @userChange="userChange" />
+					<v-checkbox v-model="mapFilterActive" :label="'MapFilter actif'" />
+					<!-- <v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Force Graph' : 'Dendogram'}`" @change="changed" /> -->
 				</v-container>
 			</v-col>
 			<v-col cols="6">
@@ -50,7 +50,7 @@ export default {
 		index_filtered: [new Set(), new Set(), new Set()],
 		range_filtered: new Array(),
 		edges_filtered: new Array(),
-		mapFilterActive: true,
+		mapFilterActive: false,
 		// True : forceGraph False : Dendogram
 		visuSwitch: true,
 	}),

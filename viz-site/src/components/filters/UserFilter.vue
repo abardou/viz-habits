@@ -1,12 +1,22 @@
 <template>
 	<v-container>
-		<v-select
+		<v-checkbox
 			v-model="selected"
-			:items="users"
-			truc
-			label="Users"
-			multiple
-			outlined
+			:label="'John Doe'"
+			value="User1"
+			default="checked"
+			@change="changed"
+		/>
+		<v-checkbox
+			v-model="selected"
+			:label="'Richard Doe'"
+			value="User2"
+			@change="changed"
+		/>
+		<v-checkbox
+			v-model="selected"
+			:label="'Jane Doe'"
+			value="User3"
 			@change="changed"
 		/>
 	</v-container>
@@ -15,24 +25,15 @@
 <script>
 export default {
 	name: 'UserFilter',
-	props: {
-		users: {
-			default: null,
-			type: Array
-		}
-	},
 	data: () => ({
-		selected: null
+		selected: ['User1', 'User2', 'User3']
 	}),
-	mounted() {
-		this.selected = this.users;
-	},
 	methods: {
-		changed(value) {
+		changed() {
 			const toDel = [];
 			const keep = []; 
 
-			value.map( x => {
+			this.selected.forEach( x => {
 				keep.push(parseInt(x.replace('User', '')));
 			});
 
