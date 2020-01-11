@@ -147,7 +147,7 @@ export default {
 			// < 0, linked nodes will attract each other. Default 450
 				.force('link', d3.forceLink().id(d => d.id).distance(d => 480))
 			// Avoid colliding
-				.force('collide', d3.forceCollide().radius(d => that.get_radius(d.value)))
+				.force('collide', d3.forceCollide().radius(d => that.get_radius(d.value)).strength(900))
 			// Center of the graph
 				.force('center', d3.forceCenter(this.cx, this.cy));
 
@@ -190,8 +190,8 @@ export default {
 			// Circles for the nodes
 			const circles = node.append('circle')
 				.attr('r', d => that.get_radius(d.time))
-				.attr('fill', 'white')
-				.attr('stroke', 'black');
+				.attr('fill', '#555')
+				.attr('stroke', 'white');
 
 			// Images within the circles
 			const images = node.append('image')
@@ -205,6 +205,7 @@ export default {
 			const labels = node.append('text')
 				.text(d => d.id)
 				.attr('text-anchor', 'middle')
+				.style('fill', 'white')
 				.attr('x', 0)
 				.attr('y', d => that.get_radius(d.time) + 16);
 
@@ -279,6 +280,6 @@ div.tooltip {
 }
 
 .links line {
-	stroke: #CCC;
+	stroke: #6D6D6D;
 }
 </style>

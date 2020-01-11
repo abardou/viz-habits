@@ -11,8 +11,8 @@
 			:cy="135"
 			:outrad="132"
 			:inrad="112"
-			selcol="#374d7c"
-			unselcol="#ddd"
+			selcol="#3da4ab"
+			unselcol="#666"
 			:data="daysTooltips"
 			@ringChange="ringChange"
 		/>
@@ -26,8 +26,8 @@
 			:cy="135"
 			:outrad="106"
 			:inrad="86"
-			selcol="#46edc8"
-			unselcol="#ddd"
+			selcol="#f6cd61"
+			unselcol="#666"
 			:data="hoursTooltips"
 			@ringChange="ringChange"
 		/>
