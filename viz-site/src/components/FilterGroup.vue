@@ -102,7 +102,7 @@ export default {
 			this.$store.commit('setFinalDataset', fdata);
 
 			this.$root.$emit('redrawSlider');
-			this.$root.$emit('redrawForceGraph');
+			// this.$root.$emit('redrawForceGraph');
 		},
 
 		filter_range() {

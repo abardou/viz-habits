@@ -145,9 +145,9 @@ export default {
 			// Force simulation
 			let simulation = d3.forceSimulation()
 			// < 0, linked nodes will attract each other. Default 450
-				.force('link', d3.forceLink().id(d => d.id).distance(d => -10*Math.sqrt(d.value)))
-			// < 0, node will repell nodes around it. Default -500
-				.force('charge', d3.forceManyBody().strength(d => -100*that.get_radius(d.time)))
+				.force('link', d3.forceLink().id(d => d.id).distance(d => 480))
+			// Avoid colliding
+				.force('collide', d3.forceCollide().radius(d => that.get_radius(d.value)))
 			// Center of the graph
 				.force('center', d3.forceCenter(this.cx, this.cy));
 
