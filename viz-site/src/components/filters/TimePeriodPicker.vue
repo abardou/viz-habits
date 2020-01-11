@@ -31,21 +31,6 @@
 			:data="hoursTooltips"
 			@ringChange="ringChange"
 		/>
-		<Ring
-			v-if="initialized"
-			id="ring_3"
-			name="minutes"
-			:svg="svg"
-			:tooltip="tooltip"
-			:cx="cx"
-			:cy="135"
-			:outrad="80"
-			:inrad="60"
-			selcol="#fdf289"
-			unselcol="#ddd"
-			:data="minutesTooltips"
-			@ringChange="ringChange"
-		/>
 	</v-container>
 </template>
 
@@ -62,7 +47,6 @@ export default {
 	data: () => ({
 		// Tooltip for days
 		daysTooltips: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-		granularity_minutes: 5,
 		svg: null,
 		tooltip: null,
 		initialized: false,
@@ -77,17 +61,6 @@ export default {
 				tt2[i] = (i > 12 ? `${i - 12}pm` : `${i}am`);
 			}
 			return tt2;
-		},
-		// Tooltip for minutes
-		minutesTooltips() {
-			// Granularity for minutes
-			const g_min = this.granularity_minutes;
-
-			const tt3 = [...Array(60/g_min).keys()];			
-			for (let i = 0; i < tt3.length; i++) {
-				tt3[i] = (g_min > 1 ? `${i*g_min}-${(i+1)*g_min}` : i);
-			}
-			return tt3;
 		}
 	},
 	mounted() {
@@ -109,7 +82,7 @@ export default {
 		ringChange(data, name) {
 			this.timePicker[name] = data;
 			// Construction du graph au tout début
-			if (Object.keys(this.timePicker).length < 3) return;
+			if (Object.keys(this.timePicker).length < 2) return;
 
 			const toDel = [];
 
@@ -133,12 +106,6 @@ export default {
 				}
 
 				if (!this.timePicker['hours'][date.getHours()]) {
-					toDel.push(i);
-					continue;
-				}
-
-				const minutesRange = Math.floor(date.getMinutes() / this.granularity_minutes);
-				if (!this.timePicker['minutes'][minutesRange]) {
 					toDel.push(i);
 					continue;
 				}
