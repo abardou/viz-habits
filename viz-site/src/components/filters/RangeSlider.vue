@@ -223,6 +223,8 @@ export default {
 					.on('drag', (d, i) => this.dragged(i))
 					.on('end', () => {that.hide_tooltips(); that.sendEvent();})
 				);
+			
+			this.sendEvent();
 		},
 		dragged(idx) {
 			this.show_tooltips();
