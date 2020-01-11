@@ -1,42 +1,7 @@
 <template>
 	<v-container id="radial-container" />
 </template>
-<style>
-	body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; height: 3000px }
-	.hidden {
-		display: none;
-	}
-	div.tooltip {
-		color: #222;
-		background-color: #fff;
-		padding: .5em;
-		text-shadow: #f5f5f5 0 1px 0;
-		border-radius: 2px;
-		opacity: 0.8;
-		position: absolute;
-		font-size: 8px;
-	}
-	.node circle {
-		fill: #fff;
-		stroke: steelblue;
-		stroke-width: 3px;
-	}
 
-	.node text {
-		font: 12px sans-serif;
-	}
-
-	.link {
-		fill: none;
-		stroke: #ccc;
-		stroke-width: 2px;
-	}
-
-	text {
-		font-family: sans-serif;
-		font-size: 0.5em;
-	}
-</style>
 <script>
 import * as d3 from 'd3';
 import RadialTreeModel from '../../utils/radial_model';
@@ -510,4 +475,40 @@ export default {
 </script>
 
 <style>
+	body { margin:0;position:fixed;top:0;right:0;bottom:0;left:0; height: 3000px }
+	/*
+	.hidden {
+		display: none;
+	}
+	div.tooltip {
+		color: #222;
+		background-color: #fff;
+		padding: .5em;
+		text-shadow: #f5f5f5 0 1px 0;
+		border-radius: 2px;
+		opacity: 0.8;
+		position: absolute;
+		font-size: 8px;
+	}
+	.node circle {
+		fill: #fff;
+		stroke: steelblue;
+		stroke-width: 3px;
+	}
+
+	.node text {
+		font: 12px sans-serif;
+	}
+
+	.link {
+		fill: none;
+		stroke: #ccc;
+		stroke-width: 2px;
+	}
+
+	text {
+		font-family: sans-serif;
+		font-size: 0.5em;
+	}
+	*/
 </style>
