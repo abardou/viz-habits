@@ -206,6 +206,8 @@ export default {
 				.text(d => d.id)
 				.attr('text-anchor', 'middle')
 				.style('fill', 'white')
+				.style('text-shadow', '0 0 1px black, 0 0 1px black, 0 0 1px black, 0 0 1px black')
+				.style('font-size', '11px')
 				.attr('x', 0)
 				.attr('y', d => that.get_radius(d.time) + 16);
 

@@ -11,7 +11,7 @@
 			:cy="135"
 			:outrad="132"
 			:inrad="112"
-			selcol="#3da4ab"
+			selcol="#329EF4"
 			unselcol="#666"
 			:data="daysTooltips"
 			@ringChange="ringChange"

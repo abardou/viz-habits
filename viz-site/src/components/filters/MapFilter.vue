@@ -1,16 +1,29 @@
 <template>
-	<v-container id="mapFilter-container" pb-0>
+	<v-container id="mapFilter-container" pa-0>
 		<v-container class="d-inline-flex pa-0" outlined>
 			<div>
 				<div id="map" :style="{width: mapWidth + 'px'}" />
 			</div>
+			<v-container grid-list-xs pr-0 style="text-align: center">
+				<v-btn color="info" @click="clearLast">
+					Clear last
+				</v-btn>
+				<br>
+				<br>
+				<v-btn color="info" @click="clearAll">
+					Clear all
+				</v-btn>
+			</v-container>
 		</v-container>
 	</v-container>
 </template>
 
 <script>
 import L from 'leaflet';
-import selectAreaFeature from 'leaflet-selectareafeature';
+// import selectAreaFeature from 'leaflet-selectareafeature';
+import selectAreaFeature from '@/utils/Leaflet.SelectAreaFeature';
+L.Map.addInitHook('addHandler', 'selectAreaFeature', L.SelectAreaFeature);
+
 import * as d3Base from 'd3';
 import * as d3Slider from 'd3-simple-slider';
 
@@ -22,19 +35,14 @@ export default {
 		latitudeRange: [0, 1],
 		longitudeRange: [0, 1],
 		map: null,
-		minLat: null,
-		maxLat: null,
-		minLng: null,
-		MaxLng: null,
-		mapBounds: null,
-		latLines: [null, null],
-		lngLines: [null, null],
-		veils: [null, null, null, null],
-		mapWidth: null
+		mapWidth: null,
+		toKeep: [],
+		toDel: [],
+		pointsWithLatLng: []
 	}),
 	async mounted() {
 		const filtersGroupContainerWidth = document.getElementById('mapFilter-container').parentNode.offsetWidth;
-		this.mapWidth = filtersGroupContainerWidth - 50;
+		this.mapWidth = filtersGroupContainerWidth - 150;
 		const posData = await d3.json('dataset.json');
 
 		const lat = 45.782569,
@@ -62,7 +70,15 @@ export default {
 			}
 		}
 
-		const [minLatMap, maxLatMap, minLngMap, maxLngMap] = this.getMapBounds();
+		for (const [line_idx, d] of this.$store.state.data.entries()) {
+			// Par défaut tous les points sont dans toDel
+			this.toDel.push(line_idx);
+
+			// On crée ce tableau pour éviter de boucler sur des points qui seront de toutes manière exclus
+			if (d.Lat != null && d.Long != null) {
+				this.pointsWithLatLng.push({line_idx, d});
+			}
+		}
 
 		this.selectFeature = this.map.selectAreaFeature.enable();
 		this.selectFeature.options.color = '#05ac72';
@@ -70,6 +86,7 @@ export default {
 		this.selectFeature.disable();
 
 		this.buildCustomControl();
+		this.map.on('DrewArea', () => this.sendEvent(true));
 	},
 	methods: {
 		buildCustomControl() {
@@ -102,46 +119,54 @@ export default {
 
 			this.map.addControl(new lassoControl());
 		},
-		sendEvent() {
-			const toDel = [];
-			
-			for (const [i, d] of this.$store.state.data.entries()) {
-				if (d.Lat == null || d.Long == null || d.Lat < this.minLat || d.Lat > this.maxLat || d.Long < this.minLng || d.Long > this.maxLng) {
-					toDel.push(i);
+		clearLast() {
+			const removed = this.selectFeature.removeLastArea();
+			if (removed) {
+				this.toKeep.pop();
+				this.sendEvent(false);
+			}
+		},
+		clearAll() {
+			const removed = this.selectFeature.removeAllArea();
+			if (removed) {
+				this.toKeep = [];
+				this.sendEvent(false);
+			}
+		},
+		sendEvent(newArea) {
+			if (newArea) {
+				const newtoKeep = [];
+				const area = JSON.parse(JSON.stringify(this.selectFeature.getAreaLatLng()));
+				const nvert = area.length;
+
+				for (const {line_idx, d} of this.pointsWithLatLng) {
+					// lat = y, lng = x
+					let i = 0,
+						j = 0,
+						c = false;
+
+					for (i = 0, j = nvert-1; i < nvert; j = i++) {
+						if ( ((area[i].lat > d.Lat) != (area[j].lat>d.Lat))
+								&& (d.Long < (area[j].lng - area[i].lng) * (d.Lat-area[i].lat) / (area[j].lat-area[i].lat) + area[i].lng)
+						) {
+							c = !c;
+						}
+					}
+
+					if (c) newtoKeep.push(line_idx);
 				}
+
+				this.toKeep.push(newtoKeep);
 			}
 
-			this.$emit('mapChange', toDel);
-		},
-		computeNewMinMax() {
-			this.mapBounds = this.getMapBounds();
-			const [minLatMap, maxLatMap, minLngMap, maxLngMap] = this.mapBounds;
-
-			const minLatSlider = this.latitudeRange[0],
-				maxLatSlider = this.latitudeRange[1];
-
-			this.minLat = this.intervalShift(minLatSlider, 0, 1, minLatMap, maxLatMap);
-			this.maxLat = this.intervalShift(maxLatSlider, 0, 1, minLatMap, maxLatMap);
-
-			const minLngSlider = this.longitudeRange[0],
-				maxLngSlider = this.longitudeRange[1];
-
-			this.minLng = this.intervalShift(minLngSlider, 0, 1, minLngMap, maxLngMap);
-			this.maxLng = this.intervalShift(maxLngSlider, 0, 1, minLngMap, maxLngMap);
-
-		},
-		getMapBounds() {
-			const bounds = this.map.getBounds();
-
-			const minLatMap = bounds._southWest.lat,
-				maxLatMap = bounds._northEast.lat,
-				minLngMap = bounds._southWest.lng,
-				maxLngMap = bounds._northEast.lng;
+			let diff = [];
+			if (this.toKeep.length > 0) {
+				const toDel = JSON.parse(JSON.stringify(this.toDel));
+				const allToKeep = Array.from(new Set(this.toKeep.flat()));
+				diff = toDel.filter(x => !allToKeep.includes(x));
+			}
 			
-			return [minLatMap, maxLatMap, minLngMap, maxLngMap];
-		},
-		intervalShift(x, a, b, c, d) {
-			return c + ((d - c) / (b - a)) * (x - a);
+			this.$emit('mapChange', diff);
 		}
 	}
 };
@@ -149,7 +174,7 @@ export default {
 
 <style>
 #map {
-	height: 358px;
+	height: 360px;
 }
 
 .leaflet-control-lasso {

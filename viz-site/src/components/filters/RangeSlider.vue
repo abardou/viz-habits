@@ -34,7 +34,7 @@ export default {
 		bins: null,
 		thickness: 5,
 		cursorRad: 7,
-		selColor: '#69b3a2',
+		selColor: '#329EF4',
 		unselColor: '#ddd',
 		margin: {top: 10, left: 10, right:10, bottom:10, bet: 15},
 		selected: [0, 1],
