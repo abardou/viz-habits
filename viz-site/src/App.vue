@@ -8,16 +8,11 @@
 					fluid
 					data-anchor="explications"
 				>
-					<v-container
-						id="veil"
-						class="section"
-						fluid
-						data-anchor="veil"
-					>
+					<v-container id="veil" fluid data-anchor="veil">
 						First Section
-						<button class="next" @click="$refs.fullpage.api.moveSectionDown()">
+						<v-btn color="success" @click="$refs.fullpage.api.moveSectionDown()">
 							Next
-						</button>
+						</v-btn>
 					</v-container>
 				</v-container>
 				<v-container class="section" fluid data-anchor="visualisation">
@@ -68,7 +63,7 @@ export default {
 		visu: true,
 		options: {
 			licenseKey: 'vhs@RA^t1',
-			anchors: ['explications', 'visualisation', 'page3'],
+			anchors: ['explications', 'visualisation'],
 			// sectionsColor: ['#41b883', '#ff5f45', '#0798ec'],
 			navigation: true,
 			navigationPosition: 'right',
