@@ -14,7 +14,7 @@
 				<v-btn color="info" @click="clearAll">
 					Clear all
 				</v-btn>
-				<ul>
+				<ul id="mapFilterLegend">
 					<li>
 						<div class="input-color">
 							John Doe
@@ -202,7 +202,7 @@ export default {
 	background-position: left 2px top 2px;
 }
 
-ul {
+ul#mapFilterLegend {
 	position: absolute;
 	bottom: 7px;
 	list-style: none;

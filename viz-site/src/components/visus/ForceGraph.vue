@@ -13,7 +13,8 @@ export default {
 		tooltip: null,
 		width: null,
 		height: null,
-		toDelEdges: {}
+		toDelEdges: {},
+		draggedNode: null
 	}),
 	computed: {
 		cx: function() {
@@ -105,6 +106,9 @@ export default {
 		 * @param {Objects} links the links in the graph
 		 */ 
 		mouse_over(node, nodes, links) {
+			if (this.draggedNode != null) {
+				node = this.draggedNode;
+			}
 			const to_keep = new Set();
 
 			// Set smaller opacity for links not connected to node
@@ -188,7 +192,7 @@ export default {
 			// Hover, out interactions
 				.on('mouseover', d => that.mouse_over(d, node, link))
 				.on('mouseout', d => that.mouse_out(node, link));
-											
+
 			// Circles for the nodes
 			const circles = node.append('circle')
 				.attr('r', d => that.get_radius(d.time))
@@ -257,6 +261,7 @@ export default {
 			if (!d3.event.active) simulation.alphaTarget(0.3).restart();
 			d.fx = d.x;
 			d.fy = d.y;
+			this.draggedNode = d;
 		},
 		/**
 		 * @param {Object} d the node object dragged
@@ -273,6 +278,7 @@ export default {
 			if (!d3.event.active) simulation.alphaTarget(0);
 			d.fx = null;
 			d.fy = null;
+			this.draggedNode = null;
 		}
 	}
 };
