@@ -38,6 +38,16 @@ def build_positions_for_activity(activity, location):
             means = loc_points[['Lat', 'Long']].mean()
             lat[i] = means['Lat']
             long[i] = means['Long']
+        else:
+            # +/- 300 sec : tolérance de 10 min pour trouver la pos la plus proche dans le temps
+            tmin -= 300
+            tmax += 300
+            loc_points = location[location['Time'].between(tmin, tmax, inclusive=True)]
+            
+            if not loc_points.empty:
+                means = loc_points[['Lat', 'Long']].mean()
+                lat[i] = means['Lat']
+                long[i] = means['Long']
     
     return lat, long
 
