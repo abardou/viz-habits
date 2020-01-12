@@ -162,10 +162,10 @@ export default {
 			return null;
 		},
 		_min() {
-			return this.pp_data.reduce((a, b) => Math.min(a, b));
+			return this.pp_data.length == 0 ? 0 : this.pp_data.reduce((a, b) => Math.min(a, b));
 		},
 		_max() {
-			return this.pp_data.reduce((a, b) => Math.max(a, b));
+			return this.pp_data.length == 0 ? 1 : this.pp_data.reduce((a, b) => Math.max(a, b));
 		},
 		update_computed() {
 			this.app_names = this._app_names();
@@ -178,7 +178,7 @@ export default {
 			this.svg.selectAll('*').remove();
 
 			let that = this;
-			this.nbbins = Math.min(this.nbbins, this.max - this.min);
+			let nbins = Math.min(this.nbbins, this.max - this.min);
 
 			// Draw histogram
 			var x = d3.scaleLinear()
@@ -190,7 +190,7 @@ export default {
 
 			var histogram = d3.histogram()
 				.domain(x.domain())
-				.thresholds(x.ticks(this.nbbins));
+				.thresholds(x.ticks(nbins));
 
 			this.bins = histogram(this.pp_data);
 			this.selected = [this.bins[0].x0, this.bins[this.bins.length-1].x1];
