@@ -147,7 +147,9 @@ export default {
 			// < 0, linked nodes will attract each other. Default 450
 				.force('link', d3.forceLink().id(d => d.id).distance(d => 480))
 			// Avoid colliding
-				.force('collide', d3.forceCollide().radius(d => that.get_radius(d.value)).strength(900))
+				.force('collide', d3.forceCollide().radius(d => that.get_radius(d.time) + 25))
+			// Avoid too dense agglomerates
+				//.force('charge', d3.forceManyBody().strength(d => -Math.log10(d.time)))
 			// Center of the graph
 				.force('center', d3.forceCenter(this.cx, this.cy));
 
