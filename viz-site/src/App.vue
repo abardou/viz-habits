@@ -1,5 +1,16 @@
 <template>
 	<v-app>
+		<ul id="menu">
+			<li data-menuanchor="page1" class="active">
+				<a href="#page1">Section 1</a>
+			</li>
+			<li data-menuanchor="page2" class="">
+				<a href="#page2">Section 2</a>
+			</li>
+			<li data-menuanchor="page3" class="">
+				<a href="#page3">Section 3</a>
+			</li>
+		</ul>
 		<v-content>
 			<v-container fluid>
 				<v-row v-if="fetched" dense>
@@ -74,3 +85,39 @@ export default {
 	}
 };
 </script>
+
+<style>
+#menu {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	z-index: 70;
+	-webkit-font-smoothing: antialiased;
+	-moz-font-smoothing: antialiased;
+	letter-spacing: 1px;
+	font-size: 1.1em;
+	box-sizing: border-box;
+}
+
+ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#menu li {
+	display: inline-block;
+	margin: 10px 0;
+	position: relative;
+	padding: 0;
+}
+
+#menu li a {
+	text-decoration: none;
+	color:#fff;
+	padding: 0 1.1em 1.1em 1.1em;
+	font-family: arial,helvetica;
+}
+
+
+</style>
