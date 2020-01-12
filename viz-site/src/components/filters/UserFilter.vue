@@ -3,23 +3,40 @@
 		{{ label }}
 		<v-checkbox
 			v-model="selected"
-			:label="'John Doe'"
 			value="User1"
 			default="checked"
 			@change="changed"
-		/>
+		>
+			<template v-slot:label>
+				<div class="input-color">
+					John Doe <span class="dot" style="background-color: blue;" />
+				</div>
+			</template>
+		</v-checkbox>
+
 		<v-checkbox
 			v-model="selected"
-			:label="'Richard Doe'"
 			value="User2"
 			@change="changed"
-		/>
+		>
+			<template v-slot:label>
+				<div class="input-color">
+					Richard Doe <span class="dot" style="background-color: #880088;" />
+				</div>
+			</template>
+		</v-checkbox>
+
 		<v-checkbox
 			v-model="selected"
-			:label="'Jane Doe'"
 			value="User3"
 			@change="changed"
-		/>
+		>
+			<template v-slot:label>
+				<div class="input-color">
+					Jane Doe <span class="dot" style="background-color: red;" />
+				</div>
+			</template>
+		</v-checkbox>
 	</v-container>
 </template>
 
@@ -50,3 +67,12 @@ export default {
 	}
 };
 </script>
+
+<style>
+.dot {
+  height: 20px;
+  width: 20px;
+  border-radius: 50%;
+  display: inline-block;
+}
+</style>

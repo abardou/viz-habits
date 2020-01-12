@@ -100,12 +100,13 @@ export default {
 		*/
 		mouse_move(d, pathObject) {
 			const mousePosition = d3.mouse(pathObject);
+			mousePosition[1] += document.body.clientHeight;
 
-			const mpp = this.extendVector(mousePosition, 50);
+			// const mpp = this.extendVector(mousePosition, 50);
 
 			this.tooltip.classed('hidden', false)
-				.style('left', (window.pageXOffset + mpp[0] + this.cx) + 'px')
-				.style('top', (window.pageYOffset + mpp[1] + this.cy) + 'px')
+				.style('left', (window.pageXOffset + mousePosition[0] + this.cx) + 'px')
+				.style('top', (window.pageYOffset + mousePosition[1] + this.cy) + 'px')
 				.html(d);
 		},
 
