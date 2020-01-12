@@ -54,8 +54,7 @@ export default {
 		},
 	},
 	data: () => ({
-		selected: null,
-		g: null
+		selected: null
 	}),
 	computed: {
 		l() {

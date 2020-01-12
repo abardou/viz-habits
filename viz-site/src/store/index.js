@@ -6,6 +6,8 @@ Vue.use(Vuex);
 export default new Vuex.Store({
 	state: {
 		data: null,
+		fdata: null,
+		finaldata: null,
 		usersSelection: [],
 		draggingState: {
 			dragging: false,
@@ -17,13 +19,13 @@ export default new Vuex.Store({
 			state.draggingState = value;
 		},
 		setDataset(state, value) {
-			state.data = value;
+			state.data = Object.freeze(value);
 		},
 		setFilteredDataset(state, value) {
-			state.fdata = value;
+			state.fdata = Object.freeze(value);
 		},
 		setFinalDataset(state, value) {
-			state.finaldata = value;
+			state.finaldata = Object.freeze(value);
 		}
 	},
 	actions: {

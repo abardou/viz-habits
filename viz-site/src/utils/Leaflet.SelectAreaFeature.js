@@ -61,7 +61,7 @@
 			this._pre_latlon = '';
 			this._post_latlon = '';
 			this._ARR_latlon_line = [];
-			
+
 			this._area_pologon_layers.push(L.polygon(this._ARR_latlon, {color: this.options.color}).addTo(this._map));
 
 			if ( this._map.hasLayer(this._area_line) ){

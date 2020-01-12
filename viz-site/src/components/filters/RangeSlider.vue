@@ -29,25 +29,6 @@ export default {
 			type: String
 		}
 	},
-	data: () => ({
-		svg: null,
-		bins: null,
-		thickness: 5,
-		cursorRad: 7,
-		selColor: '#69b3a2',
-		unselColor: '#666',
-		margin: {top: 10, left: 10, right:10, bottom:10, bet: 15},
-		selected: [0, 1],
-		heightHist: 100,
-		width: 400,
-		tooltips: null,
-		utime: null,
-		links: null,
-		min: null,
-		max: null,
-		app_names: null,
-		pp_data: null
-	}),
 	computed: {
 		label() {
 			const name = this.htmlid;
@@ -75,6 +56,8 @@ export default {
 		}
 	},
 	mounted() {
+		this.setDefaultDataValues();
+		
 		this.$root.$on('redrawSlider', () => { this.build_slider(); });
 
 		this.width = document.getElementById('container-' + this.htmlid).offsetWidth + 50;
@@ -98,6 +81,25 @@ export default {
 		this.build_slider();
 	},
 	methods: {
+		setDefaultDataValues() {
+			this.svg = null;
+			this.bins = null;
+			this.thickness = 5,
+			this.cursorRad = 7,
+			this.selColor = '#69b3a2',
+			this.unselColor = '#666',
+			this.margin = {top: 10, left: 10, right:10, bottom:10, bet: 15},
+			this.selected = [0, 1],
+			this.heightHist = 100,
+			this.width = 400,
+			this.tooltips = null,
+			this.utime = null,
+			this.links = null,
+			this.min = null,
+			this.max = null,
+			this.app_names = null,
+			this.pp_data = null;
+		},
 		sendEvent() {
 			const toDel = [];
 
