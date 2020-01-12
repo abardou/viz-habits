@@ -2,6 +2,7 @@
 	<v-app>
 		<v-content id="mainContent">
 			<full-page id="fullpage" ref="fullpage" :options="options">
+				<section id="home" />
 				<v-container class="section" fluid data-anchor="explications">
 					First Section
 					<button class="next" @click="$refs.fullpage.api.moveSectionDown()">
@@ -97,4 +98,8 @@ export default {
 #fp-nav ul li a span {
 	background-color: white !important;
 }
+
+/* #home {
+	background: url("../assets/home_bg.jpg") no-repeat bottom center
+} */
 </style>
