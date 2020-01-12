@@ -23,11 +23,7 @@ import L from 'leaflet';
 // import selectAreaFeature from 'leaflet-selectareafeature';
 import selectAreaFeature from '@/utils/Leaflet.SelectAreaFeature';
 L.Map.addInitHook('addHandler', 'selectAreaFeature', L.SelectAreaFeature);
-
-import * as d3Base from 'd3';
-import * as d3Slider from 'd3-simple-slider';
-
-const d3 = Object.assign({}, d3Base, d3Slider);
+import * as d3 from 'd3';
 
 export default {
 	name: 'Map',
