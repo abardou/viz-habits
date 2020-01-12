@@ -29,7 +29,8 @@ module.exports = {
     'no-console': 'off',
     'no-unused-vars': 'off',
     'vue/html-indent': ['error', 'tab'],
-    'vue/max-attributes-per-line': ['error', { 'singleline': 3 }]
+    'vue/max-attributes-per-line': ['error', { 'singleline': 3 }],
+    'vue/no-unused-components': 'warn'
   },
   parserOptions: {
     parser: 'babel-eslint',
