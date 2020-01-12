@@ -204,14 +204,24 @@ export default {
 				.attr('y', d => -that.get_radius(d.time));
 
 			// Labels below the nodes
-			const labels = node.append('text')
-				.text(d => d.id)
-				.attr('text-anchor', 'middle')
-				.style('fill', 'white')
-				.style('text-shadow', '0 0 1px black, 0 0 1px black, 0 0 1px black, 0 0 1px black')
+			const labels = node.append('foreignObject')
+				.attr('width', 140)
+				.attr('height', 16)
+				.attr('x', -70)
+				.attr('y', d => 1.1*that.get_radius(d.time))
+				.append('xhtml:body')
 				.style('font-size', '11px')
-				.attr('x', 0)
-				.attr('y', d => that.get_radius(d.time) + 16);
+				.style('text-align', 'center')
+				.style('text-shadow', '0 0 1px black, 0 0 1px black, 0 0 1px black, 0 0 1px black')
+				.html(d => d.id);
+				// .html(d => '<b>d.id</b>')
+				// 
+				// .style('font-size', '11px')
+
+			// HTML for users
+			// node.nodes().forEach(d => {
+			// 	console.log(d);
+			// });
 
 			// Title for each node (stay over a node to see it)
 			node.append('title')
