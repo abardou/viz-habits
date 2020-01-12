@@ -14,26 +14,6 @@
 				<v-btn color="info" @click="clearAll">
 					Clear all
 				</v-btn>
-				<ul id="mapFilterLegend">
-					<li>
-						<div class="input-color">
-							John Doe
-							<div class="color-box" style="background-color: blue;" />
-						</div>
-					</li>
-					<li>
-						<div class="input-color">
-							Richard Doe
-							<div class="color-box" style="background-color: #880088;" />
-						</div>
-					</li>
-					<li>
-						<div class="input-color">
-							Jane Doe
-							<div class="color-box" style="background-color: red;" />
-						</div>
-					</li>
-				</ul>
 			</v-container>
 		</v-container>
 	</v-container>
@@ -205,33 +185,5 @@ export default {
 	background-size: 28px;
 	background-repeat: no-repeat;
 	background-position: left 2px top 2px;
-}
-
-ul#mapFilterLegend {
-	position: absolute;
-	bottom: 7px;
-	list-style: none;
-}
-
-.input-color {
-    position: relative;
-		margin-top: 10px;
-		text-align: left;
-		padding-left: 7px
-}
-
-.input-color .color-box {
-    width: 12px;
-    height: 12px;
-    display: inline-block;
-    background-color: #ccc;
-    position: absolute;
-		left: -12px;
-    top: 6px;
-}
-
-.color-box {
-	border: #ccc 1px solid;
-	border-radius: 40%;
 }
 </style>
