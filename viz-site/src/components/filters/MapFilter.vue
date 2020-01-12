@@ -51,14 +51,17 @@ export default {
 	data: () => ({
 		latitudeRange: [0, 1],
 		longitudeRange: [0, 1],
-		map: null,
 		mapWidth: null,
-		toKeep: [],
-		toDel: [],
-		pointsWithLatLng: [],
 		label: 'Données géographiques'
 	}),
+	// myProperties: {
+	// 	map	: null,
+	// },
 	async mounted() {
+		this.toKeep = [];
+		this.toDel = [];
+		this.pointsWithLatLng = [];
+		
 		const filtersGroupContainerWidth = document.getElementById('mapFilter-container').parentNode.offsetWidth;
 		this.mapWidth = filtersGroupContainerWidth - 150;
 		const posData = await d3.json('dataset.json');
@@ -94,7 +97,7 @@ export default {
 
 			// On crée ce tableau pour éviter de boucler sur des points qui seront de toutes manière exclus
 			if (d.Lat != null && d.Long != null) {
-				this.pointsWithLatLng.push({line_idx, d});
+				this.pointsWithLatLng.push(line_idx);
 			}
 		}
 
@@ -155,17 +158,19 @@ export default {
 			if (newArea) {
 				const newtoKeep = [];
 				const area = JSON.parse(JSON.stringify(this.selectFeature.getAreaLatLng()));
+				const data = this.$store.state.data;
+				
 				const nvert = area.length;
 
-				for (const {line_idx, d} of this.pointsWithLatLng) {
+				for (const line_idx of this.pointsWithLatLng) {
 					// lat = y, lng = x
 					let i = 0,
 						j = 0,
 						c = false;
 
 					for (i = 0, j = nvert-1; i < nvert; j = i++) {
-						if ( ((area[i].lat > d.Lat) != (area[j].lat>d.Lat))
-								&& (d.Long < (area[j].lng - area[i].lng) * (d.Lat-area[i].lat) / (area[j].lat-area[i].lat) + area[i].lng)
+						if ( ((area[i].lat > data[line_idx].Lat) != (area[j].lat>data[line_idx].Lat))
+								&& (data[line_idx].Long < (area[j].lng - area[i].lng) * (data[line_idx].Lat-area[i].lat) / (area[j].lat-area[i].lat) + area[i].lng)
 						) {
 							c = !c;
 						}
@@ -176,7 +181,6 @@ export default {
 
 				this.toKeep.push(newtoKeep);
 			}
-
 			let diff = [];
 			if (this.toKeep.length > 0) {
 				const toDel = JSON.parse(JSON.stringify(this.toDel));

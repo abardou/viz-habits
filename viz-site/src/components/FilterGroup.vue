@@ -46,12 +46,14 @@ export default {
 		TimePeriodPicker
 	},
 	data: () => ({
-		index_filtered: [new Set(), new Set(), new Set()],
-		range_filtered: new Array(),
-		edges_filtered: new Array(),
 		// True : forceGraph False : Dendogram
-		visuSwitch: true,
+		visuSwitch: true
 	}),
+	mounted() {
+		this.index_filtered = [new Set(), new Set(), new Set()];
+		this.range_filtered = new Array();
+		this.edges_filtered = new Array();
+	},
 	methods: {
 		changed(data) {
 			this.$emit('changeVisu', data);
