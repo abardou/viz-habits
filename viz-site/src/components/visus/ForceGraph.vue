@@ -13,8 +13,7 @@ export default {
 		tooltip: null,
 		width: null,
 		height: null,
-		toDelEdges: {},
-		draggedNode: null
+		toDelEdges: {}
 	}),
 	computed: {
 		cx: function() {
@@ -81,7 +80,7 @@ export default {
 		 * @returns {float} the radius of the node
 		 */
 		get_radius(time) {
-			return Math.sqrt(this.get_correct_time(time) / Math.PI);
+			return Math.sqrt(this.get_correct_time(time) / Math.PI) + 5;
 		},
 		/**
 		 * @param {int} sec the number of seconds to convert
@@ -106,9 +105,6 @@ export default {
 		 * @param {Objects} links the links in the graph
 		 */ 
 		mouse_over(node, nodes, links) {
-			if (this.draggedNode != null) {
-				node = this.draggedNode;
-			}
 			const to_keep = new Set();
 
 			// Set smaller opacity for links not connected to node
@@ -151,7 +147,7 @@ export default {
 			// < 0, linked nodes will attract each other. Default 450
 				.force('link', d3.forceLink().id(d => d.id).distance(d => 480))
 			// Avoid colliding
-				.force('collide', d3.forceCollide().radius(d => that.get_radius(d.time) + 25))
+				.force('collide', d3.forceCollide().radius(d => that.get_radius(d.time) + 20))
 			// Avoid too dense agglomerates
 				//.force('charge', d3.forceManyBody().strength(d => -Math.log10(d.time)))
 			// Center of the graph
@@ -192,7 +188,7 @@ export default {
 			// Hover, out interactions
 				.on('mouseover', d => that.mouse_over(d, node, link))
 				.on('mouseout', d => that.mouse_out(node, link));
-
+											
 			// Circles for the nodes
 			const circles = node.append('circle')
 				.attr('r', d => that.get_radius(d.time))
@@ -207,15 +203,24 @@ export default {
 				.attr('x', d => -that.get_radius(d.time))
 				.attr('y', d => -that.get_radius(d.time));
 
-			// Labels below the nodes
-			const labels = node.append('text')
-				.text(d => d.id)
-				.attr('text-anchor', 'middle')
-				.style('fill', 'white')
-				.style('text-shadow', '0 0 1px black, 0 0 1px black, 0 0 1px black, 0 0 1px black')
+			const labels = node.append('foreignObject')
+				.attr('width', 160)
+				.attr('height', 50)
+				.attr('x', -80)
+				.attr('y', d => 1.05*that.get_radius(d.time))
+				.append('xhtml:body')
 				.style('font-size', '11px')
-				.attr('x', 0)
-				.attr('y', d => that.get_radius(d.time) + 16);
+				.style('text-align', 'center')
+				.style('text-shadow', '0 0 1px black, 0 0 1px black, 0 0 1px black, 0 0 1px black')
+				.html(d => `
+					<div>${d.id}</div>
+					${d.only_one_user ? '' : `
+					<div style="margin-top: -5px">
+						${d.users.has(1) ? '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 40%; box-shadow: 0px 0px 2px black; background-color: blue; border: #888 1px solid; "></span>' : ''}
+						${d.users.has(2) ? '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 40%; box-shadow: 0px 0px 2px black; background-color: #880088; border: #888 1px solid; "></span>' : ''}
+						${d.users.has(3) ? '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 40%; box-shadow: 0px 0px 2px black; background-color: red; border: #888 1px solid; "></span>' : ''}
+					</div>`}
+				`);
 
 			// Title for each node (stay over a node to see it)
 			node.append('title')
@@ -251,7 +256,6 @@ export default {
 			if (!d3.event.active) simulation.alphaTarget(0.3).restart();
 			d.fx = d.x;
 			d.fy = d.y;
-			this.draggedNode = d;
 		},
 		/**
 		 * @param {Object} d the node object dragged
@@ -268,7 +272,6 @@ export default {
 			if (!d3.event.active) simulation.alphaTarget(0);
 			d.fx = null;
 			d.fy = null;
-			this.draggedNode = null;
 		}
 	}
 };

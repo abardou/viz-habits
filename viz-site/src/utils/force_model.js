@@ -14,14 +14,6 @@ export default class AppChordModel {
 		this.build_assets();
 		// Will build the attributes relative to adjacency matrix
 		this.build_adjacency_mat(data);
-
-		// The filtered attributes are those to return to the user
-		// Other attributes must NEVER change outside the constructor
-		setTimeout(10000);
-		this.filtered_apps = this.apps.slice();
-		this.filtered_apps_time = this.apps_time.slice();
-		this.filtered_adj_mat = this.adj_mat.slice();
-		this.filtered_images = this.images.slice();
 	}
 
 	/**
@@ -36,12 +28,20 @@ export default class AppChordModel {
 			this.apps.add(d['App Name']);
 		this.apps = Array.from(this.apps);
 
+		// Attribute apps_users : collection of set of users for each app
+		this.apps_users = new Array(this.apps.length).fill(undefined);
+		this.users = new Set();
 		// Attribute apps_time : collection of proportion of time consumption for each app
 		this.apps_time = new Array(this.apps.length).fill(0);
 		// Attribute cumul_time : sum(apps_time)
 		for (let d of data) {
 			let app_idx = this.get_app_index(d['App Name']);
 			this.apps_time[app_idx] += d['Duration'];
+
+			if (this.apps_users[app_idx] == undefined)
+				this.apps_users[app_idx] = new Set();
+			this.apps_users[app_idx].add(d['User_ID']);
+			this.users.add(d['User_ID']);
 		}
 	}
 
@@ -134,22 +134,22 @@ export default class AppChordModel {
 	get_as_json() {
 		let json_obj = {'nodes': [], 'links': []};
 		// Nodes
-		for (let i in this.filtered_apps)
-			json_obj.nodes.push({'id': this.filtered_apps[i], 'time': this.filtered_apps_time[i], 'image': this.filtered_images[i]});
+		for (let i in this.apps)
+			json_obj.nodes.push({'id': this.apps[i], 'time': this.apps_time[i], 'image': this.images[i], 'users': this.apps_users[i], 'only_one_user': this.users.size == 1});
 
-		for (let i in this.filtered_adj_mat) {
-			let aii = this.get_app_index(this.filtered_apps[i]);
+		for (let i in this.adj_mat) {
+			let aii = this.get_app_index(this.apps[i]);
 			let s_switches = this.adj_mat[aii].reduce(function(a, b) { return a+b; });
 			for (let j = 0; j < i; j++) {
-				let aij = this.get_app_index(this.filtered_apps[j]);
+				let aij = this.get_app_index(this.apps[j]);
 				let t_switches = this.adj_mat[aij].reduce(function(a, b) { return a+b; });
-				let v = this.filtered_adj_mat[i][j] + this.filtered_adj_mat[j][i];
+				let v = this.adj_mat[i][j] + this.adj_mat[j][i];
 				if (v != 0)
 					json_obj.links.push({
-						'source': this.filtered_apps[i],
-						'target': this.filtered_apps[j],
-						'value': v, 'st': this.filtered_adj_mat[i][j],
-						'ts': this.filtered_adj_mat[j][i],
+						'source': this.apps[i],
+						'target': this.apps[j],
+						'value': v, 'st': this.adj_mat[i][j],
+						'ts': this.adj_mat[j][i],
 						'fst': this.adj_mat[aii][aij] / s_switches,
 						'fts': this.adj_mat[aij][aii] / t_switches
 					});
