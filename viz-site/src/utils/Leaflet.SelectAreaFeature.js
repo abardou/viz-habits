@@ -28,7 +28,6 @@
 			this._post_latlon = '';
 			this._ARR_latlon_line = [];
 			this._ARR_latlon = [];
-			this._all_areas = [];
 		
 			this._area_pologon_layers = [];
 		
@@ -39,7 +38,6 @@
 		},
 	
 		addHooks: function() {
-		
 			this._map.on('mousedown', this._doMouseDown, this );
 			this._map.on('mouseup', this._doMouseUp, this );
 		
@@ -62,23 +60,24 @@
 			this._post_latlon = '';
 			this._ARR_latlon_line = [];
 
-			this._area_pologon_layers.push(L.polygon(this._ARR_latlon, {color: this.options.color}).addTo(this._map));
-
 			if ( this._map.hasLayer(this._area_line) ){
 				this._map.removeLayer(this._area_line);	
 			}
 			if ( this._map.hasLayer(this._area_line_new) ){
 				this._map.removeLayer(this._area_line_new);	
 			}
-
-			this._all_areas.push(JSON.parse(JSON.stringify(this._ARR_latlon)));
-
+			
 			this._map.off('mousemove');
+
+			if (ev.originalEvent.target.className.includes('control-lasso')) {
+				return;
+			}
+
+			this._area_pologon_layers.push(L.polygon(this._ARR_latlon, {color: this.options.color}).addTo(this._map));
 			this._map.fire('DrewArea');
 		},
 
 		_doMouseDown: function(ev) {
-
 			this._ARR_latlon = [];
 			this._area_pologon = '';
 			this._area_line_new = '';
@@ -144,12 +143,7 @@
 			return this._ARR_latlon;
 		},
 
-		getAllAreas: function() {
-			return this._all_areas;
-		},
-
 		removeAllArea: function() {
-			this._all_areas = [];
 			var _i = 0;
 			let removed = false;
 			while ( _i < this._area_pologon_layers.length	) {
@@ -166,7 +160,6 @@
 			if (index < 0) return false;
 			this._map.removeLayer(this._area_pologon_layers[index]);
 			this._area_pologon_layers.splice(index, 1);
-			this._all_areas.splice(index, 1);
 			return true;
 		},
 	

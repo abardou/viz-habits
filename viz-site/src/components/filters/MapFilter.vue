@@ -118,23 +118,24 @@ export default {
 				},
  
 				onAdd(map) {
-					that.container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom leaflet-control-lasso');
+					const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom leaflet-control-lasso');
+					L.DomEvent.disableClickPropagation(container);
+
+					container.style.backgroundColor = 'white';
+					container.style.width = '35px';
+					container.style.height = '35px';
+					container.style.cursor = 'pointer';
  
-					that.container.style.backgroundColor = 'white';
-					that.container.style.width = '35px';
-					that.container.style.height = '35px';
-					that.container.style.cursor = 'pointer';
- 
-					that.container.onclick = function() {
+					container.onclick = function() {
 						if (that.selectFeature._enabled) {
 							that.selectFeature.disable();
-							that.container.style.backgroundColor = 'white';
+							container.style.backgroundColor = 'white';
 						} else {
 							that.selectFeature.enable();
-							that.container.style.backgroundColor = '#D2E190';
+							container.style.backgroundColor = '#D2E190';
 						}
 					};
-					return that.container;
+					return container;
 				}
 			});
 
