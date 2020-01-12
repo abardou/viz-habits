@@ -100,7 +100,7 @@ export default {
 		*/
 		mouse_move(d, pathObject) {
 			const mousePosition = d3.mouse(pathObject);
-			mousePosition[1] += 640;
+			mousePosition[1] += document.body.clientHeight;
 
 			// const mpp = this.extendVector(mousePosition, 50);
 
