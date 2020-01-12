@@ -8,10 +8,17 @@
 					fluid
 					data-anchor="explications"
 				>
-					First Section
-					<button class="next" @click="$refs.fullpage.api.moveSectionDown()">
-						Next
-					</button>
+					<v-container
+						id="veil"
+						class="section"
+						fluid
+						data-anchor="veil"
+					>
+						First Section
+						<button class="next" @click="$refs.fullpage.api.moveSectionDown()">
+							Next
+						</button>
+					</v-container>
 				</v-container>
 				<v-container class="section" fluid data-anchor="visualisation">
 					<v-row v-if="fetched" dense>
@@ -104,6 +111,17 @@ export default {
 }
 
 #explications {
-	background: url("~@/assets/home_bg.jpg") no-repeat bottom center
+	padding: 0;
+	/* The image used */
+  background-image: url("~@/assets/home_bg.jpg");
+
+  /* Center and scale the image nicely */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+#veil {
+	background-color: #11111177
 }
 </style>
