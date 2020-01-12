@@ -1,5 +1,6 @@
 <template>
 	<v-container id="mapFilter-container" pa-0>
+		{{ label }}
 		<v-container class="d-inline-flex pa-0" outlined>
 			<div>
 				<div id="map" :style="{width: mapWidth + 'px'}" />
@@ -38,7 +39,8 @@ export default {
 		mapWidth: null,
 		toKeep: [],
 		toDel: [],
-		pointsWithLatLng: []
+		pointsWithLatLng: [],
+		label: 'Données géographiques'
 	}),
 	async mounted() {
 		const filtersGroupContainerWidth = document.getElementById('mapFilter-container').parentNode.offsetWidth;

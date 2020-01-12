@@ -1,5 +1,6 @@
 <template>
 	<v-container id="picker-component">
+		{{ label }}
 		<v-container id="picker-container" />
 		<Ring
 			v-if="initialized"
@@ -51,7 +52,8 @@ export default {
 		tooltip: null,
 		initialized: false,
 		cx: null,
-		timePicker: {}
+		timePicker: {},
+		label: 'Période temporelle (jours, heures)'
 	}),
 	computed: {
 		// Tooltip for hours

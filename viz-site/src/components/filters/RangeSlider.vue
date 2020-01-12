@@ -53,9 +53,9 @@ export default {
 			const name = this.htmlid;
 
 			if (name === 'time') {
-				return 'Temps min/max d\'utilisation de l\'appli';
+				return 'Temps d\'utilisation des applications (s)';
 			} else if (name === 'switch') {
-				return 'Taille min/max des arêtes';
+				return 'Nombre de switchs entre applications';
 			}
 
 			return name;
@@ -178,6 +178,7 @@ export default {
 			this.svg.selectAll('*').remove();
 
 			let that = this;
+			this.nbbins = Math.min(this.nbbins, this.max - this.min);
 
 			// Draw histogram
 			var x = d3.scaleLinear()

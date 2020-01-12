@@ -4,7 +4,7 @@
 			<v-col cols="6">
 				<RangeSlider
 					:subject="'time'"
-					:nbbins="50"
+					:nbbins="70"
 					:htmlid="'time'"
 					@rangeChange="rangeChange"
 				/>
@@ -12,7 +12,7 @@
 			<v-col cols="6">
 				<RangeSlider
 					:subject="'switch'"
-					:nbbins="50"
+					:nbbins="70"
 					:delta="10"
 					:htmlid="'switch'"
 					@rangeChange="rangeChange"

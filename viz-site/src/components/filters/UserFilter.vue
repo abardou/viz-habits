@@ -1,5 +1,6 @@
 <template>
 	<v-container>
+		{{ label }}
 		<v-checkbox
 			v-model="selected"
 			:label="'John Doe'"
@@ -26,7 +27,8 @@
 export default {
 	name: 'UserFilter',
 	data: () => ({
-		selected: ['User1', 'User2', 'User3']
+		selected: ['User1', 'User2', 'User3'],
+		label: 'Utilisateurs'
 	}),
 	methods: {
 		changed() {
