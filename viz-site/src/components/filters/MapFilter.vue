@@ -56,15 +56,13 @@ export default {
 			maxZoom: 20
 		}).addTo(this.map);
 
-		let colorScale = d3.scaleSequential().domain([1, 3]).interpolator(d3.interpolate('blue', 'red'));
+		let colorScale = ['#CC2A36', '#4F372D', '#00A0B0'];
 		for (const i in posData) {
 			const pd = posData[i];
 			if (pd.Lat != undefined && pd.Long != undefined) {
 				posData[i].latlng = new L.LatLng(pd.Lat, pd.Long);
 				L.circle(pd.latlng, {
-					color: colorScale(pd.User_ID),
-					fillColor: colorScale(pd.User_ID),
-					fillOpacity: 0.5,
+					color: colorScale[pd.User_ID-1],
 					radius: 3
 				})
 					.addTo(this.map);

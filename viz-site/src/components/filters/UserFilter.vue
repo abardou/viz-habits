@@ -9,7 +9,7 @@
 		>
 			<template v-slot:label>
 				<div class="input-color">
-					John Doe <span class="dot" style="background-color: blue;" />
+					John Doe <span class="dot" style="background-color: #CC2A36; border: 1px solid #bbb" />
 				</div>
 			</template>
 		</v-checkbox>
@@ -21,7 +21,7 @@
 		>
 			<template v-slot:label>
 				<div class="input-color">
-					Richard Doe <span class="dot" style="background-color: #880088;" />
+					Richard Doe <span class="dot" style="background-color: #4F372D; border: 1px solid #bbb" />
 				</div>
 			</template>
 		</v-checkbox>
@@ -33,7 +33,7 @@
 		>
 			<template v-slot:label>
 				<div class="input-color">
-					Jane Doe <span class="dot" style="background-color: red;" />
+					Jane Doe <span class="dot" style="background-color: #00A0B0; border: 1px solid #bbb" />
 				</div>
 			</template>
 		</v-checkbox>
@@ -70,9 +70,12 @@ export default {
 
 <style>
 .dot {
-  height: 20px;
-  width: 20px;
-  border-radius: 50%;
+  height: 15px;
+  width: 15px;
+  border-radius: 40%;
+	position: relative;
+	top: 2px;
+	left: 2px;
   display: inline-block;
 }
 </style>

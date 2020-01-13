@@ -209,21 +209,22 @@ export default {
 				.attr('y', d => -that.get_radius(d.time));
 
 			const labels = node.append('foreignObject')
-				.attr('width', 160)
-				.attr('height', 50)
-				.attr('x', -80)
+				.attr('width', 140)
+				.attr('height', 30)
+				.attr('x', -70)
 				.attr('y', d => 1.05*that.get_radius(d.time))
 				.append('xhtml:body')
-				.style('font-size', '11px')
+				.style('font-size', '10px')
 				.style('text-align', 'center')
 				.style('text-shadow', '0 0 1px black, 0 0 1px black, 0 0 1px black, 0 0 1px black')
+				// '#CC2A36', '#4F372D', '#00A0B0'
 				.html(d => `
 					<div>${d.id}</div>
 					${d.only_one_user ? '' : `
 					<div style="margin-top: -5px">
-						${d.users.has(1) ? '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 40%; box-shadow: 0px 0px 2px black; background-color: blue; border: #888 1px solid; "></span>' : ''}
-						${d.users.has(2) ? '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 40%; box-shadow: 0px 0px 2px black; background-color: #880088; border: #888 1px solid; "></span>' : ''}
-						${d.users.has(3) ? '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 40%; box-shadow: 0px 0px 2px black; background-color: red; border: #888 1px solid; "></span>' : ''}
+						${d.users.has(1) ? '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 40%; background-color: #CC2A36; border: #BBB 1px solid; "></span>' : ''}
+						${d.users.has(2) ? '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 40%; background-color: #4F372D; border: #BBB 1px solid; "></span>' : ''}
+						${d.users.has(3) ? '<span style="display: inline-block; width: 8px; height: 8px; border-radius: 40%; background-color: #00A0B0; border: #BBB 1px solid; "></span>' : ''}
 					</div>`}
 				`);
 
