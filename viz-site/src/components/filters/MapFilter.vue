@@ -6,12 +6,12 @@
 				<div id="map" :style="{width: mapWidth + 'px'}" />
 			</div>
 			<v-container grid-list-xs pr-0 style="text-align: center">
-				<v-btn color="info" @click="clearLast">
+				<v-btn style="color: #252835;" color="#f5f9f9" @click="clearLast">
 					Clear last
 				</v-btn>
 				<br>
 				<br>
-				<v-btn color="info" @click="clearAll">
+				<v-btn style="color: #252835;" color="#f5f9f9" @click="clearAll">
 					Clear all
 				</v-btn>
 			</v-container>
@@ -45,7 +45,7 @@ export default {
 		
 		const filtersGroupContainerWidth = document.getElementById('mapFilter-container').parentNode.offsetWidth;
 		this.mapWidth = filtersGroupContainerWidth - 150;
-		
+
 		this.posData = JSON.parse(JSON.stringify(this.$store.state.data));
 
 		const lat = 45.782569,

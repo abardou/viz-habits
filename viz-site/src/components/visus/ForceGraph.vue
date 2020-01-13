@@ -1,5 +1,5 @@
 <template>
-	<v-container id="force-container" />
+	<v-container id="force-container" style="box-shadow: 3px 3px 8px #000" />
 </template>
 
 <script>

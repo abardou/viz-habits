@@ -18,7 +18,8 @@
 						style="text-align: center; position: absolute; bottom: 7%; width: 100%"
 					>
 						<v-btn
-							color="success"
+							color="#f5f9f9"
+							style="color: #252835;"
 							@click="$refs.fullpage.api.moveSectionDown()"
 						>
 							Next
@@ -56,7 +57,8 @@
 						style="text-align: center; position: absolute; bottom: 7%; width: 100%"
 					>
 						<v-btn
-							color="success"
+							color="#f5f9f9"
+							style="color: #252835;"
 							@click="$refs.fullpage.api.moveSectionDown()"
 						>
 							Voir la visualisation
@@ -66,15 +68,15 @@
 				<v-container class="section" fluid data-anchor="visualisation">
 					<v-row v-if="fetched" dense>
 						<v-col cols="5">
-							<v-card>
-								<FilterGroup @changeVisu="changeVisu" />	
-							</v-card>
+							<!-- <v-card style="background-color: #2B2B3B"> -->
+							<FilterGroup @changeVisu="changeVisu" />	
+							<!-- </v-card> -->
 						</v-col>
 						<v-col cols="7">
-							<v-card>
-								<ForceGraph v-if="visu" />
-								<RadialTree v-else />
-							</v-card>
+							<!-- <v-card> -->
+							<ForceGraph v-if="visu" />
+							<RadialTree v-else />
+							<!-- </v-card> -->
 						</v-col>
 					</v-row>
 					<v-container v-else style="text-align: center;">
@@ -112,7 +114,7 @@ export default {
 		options: {
 			licenseKey: 'vhs@RA^t1',
 			anchors: ['firstPageAnchor', 'explications', 'visualisation'],
-			// sectionsColor: ['#41b883', '#ff5f45', '#0798ec'],
+			sectionsColor: ['#252835', '#252835', '#252835'],
 			navigation: true,
 			navigationPosition: 'right',
 			navigationTooltips: ['Première Page', 'Explications', 'Visualisation']
@@ -180,7 +182,7 @@ h2:after
 	display:block;
 	width: 200px;
 	margin: auto;
-	border: 1px solid #4caf50;
+	border: 1px solid #4CAF50;
 }
 
 p {

@@ -1,5 +1,5 @@
 <template>
-	<v-container fluid pb-0>
+	<v-container fluid pb-0 style="box-shadow: 3px 3px 8px #000">
 		<v-row no-gutters>
 			<v-col cols="6">
 				<RangeSlider

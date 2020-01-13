@@ -3,6 +3,7 @@
 		{{ label }}
 		<v-checkbox
 			v-model="selected"
+			color="#f5f9f9"
 			value="User1"
 			default="checked"
 			@change="changed"
@@ -16,6 +17,7 @@
 
 		<v-checkbox
 			v-model="selected"
+			color="#f5f9f9"
 			value="User2"
 			@change="changed"
 		>
@@ -28,6 +30,7 @@
 
 		<v-checkbox
 			v-model="selected"
+			color="#f5f9f9"
 			value="User3"
 			@change="changed"
 		>

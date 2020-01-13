@@ -86,7 +86,7 @@ export default {
 			this.bins = null;
 			this.thickness = 5,
 			this.cursorRad = 7,
-			this.selColor = '#69b3a2',
+			this.selColor = '#f5f9f9',
 			this.unselColor = '#666',
 			this.margin = {top: 10, left: 10, right:10, bottom:10, bet: 15},
 			this.selected = [0, 1],
