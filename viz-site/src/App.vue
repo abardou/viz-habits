@@ -222,9 +222,4 @@ p {
   height: 1.5em;
   width: 1.5em;
 }
-
-.justify-text {
-	text-align: justify;
-  text-justify: inter-word;
-}
 </style>

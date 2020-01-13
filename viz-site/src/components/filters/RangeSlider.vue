@@ -1,11 +1,13 @@
 <template>
 	<v-container :id="'container-' + htmlid" style="display: inline">
 		{{ label }}
-		<v-tooltip right max-width="200px">
+		<v-tooltip color="success" right max-width="200px">
 			<template v-slot:activator="{ on }">
 				<help-icon class="icon-bigger" title="" v-on="on" />
 			</template>
-			<span>{{ filterExplanation }}</span>
+			<div>
+				{{ filterExplanation }}
+			</div>
 		</v-tooltip> 
 		<svg :id="htmlid" />
 	</v-container>
