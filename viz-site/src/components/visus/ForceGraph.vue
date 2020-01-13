@@ -14,7 +14,7 @@
 				/>
 			</template>
 			<div>
-				Les ronds de couleurs sous les titres d'applications dénotent quel utilisateur a utilisé cette application
+				Les noeuds correspondent aux applications, les arêtes aux basculements entre applications. Les points en dessous de chaque nom correspondent aux couleurs des utilisateurs ayant utilisé ces applications.
 			</div>
 		</v-tooltip> 
 	</v-container>
