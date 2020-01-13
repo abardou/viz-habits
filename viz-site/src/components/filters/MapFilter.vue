@@ -1,6 +1,12 @@
 <template>
 	<v-container id="mapFilter-container" pa-0>
 		{{ label }}
+		<v-tooltip right max-width="200px">
+			<template v-slot:activator="{ on }">
+				<help-icon class="icon-bigger" title="" v-on="on" />
+			</template>
+			<span>Permet via l'utilisation de l'outil lasso de dessiner des zones restreignant la position où les applications ont été utilisées</span>
+		</v-tooltip> 
 		<v-container class="d-inline-flex pa-0" outlined>
 			<div>
 				<div id="map" :style="{width: mapWidth + 'px'}" />

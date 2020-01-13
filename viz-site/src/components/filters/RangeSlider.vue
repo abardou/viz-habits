@@ -1,6 +1,12 @@
 <template>
 	<v-container :id="'container-' + htmlid" style="display: inline">
 		{{ label }}
+		<v-tooltip right max-width="200px">
+			<template v-slot:activator="{ on }">
+				<help-icon class="icon-bigger" title="" v-on="on" />
+			</template>
+			<span>{{ filterExplanation }}</span>
+		</v-tooltip> 
 		<svg :id="htmlid" />
 	</v-container>
 </template>
@@ -37,6 +43,17 @@ export default {
 				return 'Temps d\'utilisation des applications (s)';
 			} else if (name === 'switch') {
 				return 'Nombre de switchs entre applications';
+			}
+
+			return name;
+		},
+		filterExplanation() {
+			const name = this.htmlid;
+
+			if (name === 'time') {
+				return 'Filtre de la visualisation les applications ayant été utilisées en dehors des limites fixées par ce slider';
+			} else if (name === 'switch') {
+				return 'Filtre de la visualisation les arêtes dont le nombre d\'occurrences est en dehors des limites fixées par ce slider';
 			}
 
 			return name;
@@ -86,7 +103,7 @@ export default {
 			this.bins = null;
 			this.thickness = 5,
 			this.cursorRad = 7,
-			this.selColor = '#f5f9f9',
+			this.selColor = '#69b3a2',
 			this.unselColor = '#666',
 			this.margin = {top: 10, left: 10, right:10, bottom:10, bet: 15},
 			this.selected = [0, 1],

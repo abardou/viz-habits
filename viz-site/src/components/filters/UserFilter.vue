@@ -1,6 +1,12 @@
 <template>
 	<v-container>
 		{{ label }}
+		<v-tooltip right max-width="200px">
+			<template v-slot:activator="{ on }">
+				<help-icon class="icon-bigger" title="" v-on="on" />
+			</template>
+			<span class="justify-text">Filtre les applications provenant des utilisateurs décochés</span>
+		</v-tooltip> 
 		<v-checkbox
 			v-model="selected"
 			color="#f5f9f9"

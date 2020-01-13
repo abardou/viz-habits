@@ -208,4 +208,23 @@ p {
   background-repeat: no-repeat;
   background-size: cover;
 }
+
+.help-circle-outline-icon {
+	cursor: pointer;
+}
+
+.material-design-icon.icon-bigger {
+  height: 1.5em;
+  width: 1.5em;
+}
+ 
+.material-design-icon.icon-bigger > .material-design-icon__svg {
+  height: 1.5em;
+  width: 1.5em;
+}
+
+.justify-text {
+	text-align: justify;
+  text-justify: inter-word;
+}
 </style>

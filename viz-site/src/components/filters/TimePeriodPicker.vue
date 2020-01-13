@@ -1,6 +1,12 @@
 <template>
 	<v-container id="picker-component">
 		{{ label }}
+		<v-tooltip right max-width="200px">
+			<template v-slot:activator="{ on }">
+				<help-icon class="icon-bigger" title="" v-on="on" />
+			</template>
+			<span>Filtre les occurences d'application en dehors des plages journalières/horaires définies</span>
+		</v-tooltip> 
 		<v-container id="picker-container" />
 		<Ring
 			v-if="initialized"
@@ -27,7 +33,7 @@
 			:cy="135"
 			:outrad="106"
 			:inrad="86"
-			selcol="#f5f9f9"
+			selcol="#69b3a2"
 			unselcol="#666"
 			:data="hoursTooltips"
 			@ringChange="ringChange"
