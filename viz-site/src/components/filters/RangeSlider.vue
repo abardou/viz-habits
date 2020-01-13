@@ -53,7 +53,7 @@ export default {
 			const name = this.htmlid;
 
 			if (name === 'time') {
-				return 'Filtre de la visualisation les applications ayant été utilisées en dehors des limites fixées par ce slider';
+				return 'Filtre de la visualisation les applications dont le temps d\'utilisation est en dehors des limites fixées par ce slider';
 			} else if (name === 'switch') {
 				return 'Filtre de la visualisation les arêtes dont le nombre d\'occurrences est en dehors des limites fixées par ce slider';
 			}
