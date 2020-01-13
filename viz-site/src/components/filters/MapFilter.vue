@@ -211,7 +211,7 @@ export default {
 
 <style>
 #map {
-	height: 360px;
+	height: 339px;
 }
 
 .leaflet-control-lasso {
