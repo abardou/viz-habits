@@ -8,12 +8,25 @@
 					fluid
 					data-anchor="explications"
 				>
-					<v-container id="veil" fluid data-anchor="veil">
+					<h1>
+						Visualisation des habitudes de consommation des smartphones
+					</h1>
+					<div
+						style="text-align: center; position: absolute; bottom: 7%; width: 100%"
+					>
+						<v-btn
+							color="success"
+							@click="$refs.fullpage.api.moveSectionDown()"
+						>
+							Next
+						</v-btn>
+					</div>
+					<!-- <v-container id="veil" fluid data-anchor="veil">
 						First Section
 						<v-btn color="success" @click="$refs.fullpage.api.moveSectionDown()">
 							Next
 						</v-btn>
-					</v-container>
+					</v-container> -->
 				</v-container>
 				<v-container class="section" fluid data-anchor="visualisation">
 					<v-row v-if="fetched" dense>
@@ -101,6 +114,23 @@ export default {
 </script>
 
 <style>
+@font-face {
+	font-family: 'Biko Regular';
+	src: url('~@/assets/Biko_Regular.otf');
+	font-weight: normal;
+	font-style: normal;
+}
+
+h1 {
+	font-size: 5em;
+	margin-left: 15%;
+	margin-right: 15%;
+	text-align: center;
+	font-weight: normal;
+
+	font-family: 'Biko Regular'
+}
+
 #fp-nav ul li a span {
 	background-color: white !important;
 }
@@ -108,15 +138,11 @@ export default {
 #explications {
 	padding: 0;
 	/* The image used */
-  background-image: url("~@/assets/home_bg.jpg");
+  background-image: url("~@/assets/home_bg.svg");
 
   /* Center and scale the image nicely */
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
-}
-
-#veil {
-	background-color: #11111177
 }
 </style>
