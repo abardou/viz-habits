@@ -59,7 +59,7 @@ export default {
 		const lat = 45.782569,
 			lng = 4.86673;
 
-		this.map = new L.Map('map', {preferCanvas: true}).setView([lat, lng], 7);
+		this.map = new L.Map('map', {preferCanvas: true}).setView([lat, lng], 8);
 		const tileLayer = new L.TileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 			attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
 			minZoom: 1,
@@ -101,6 +101,9 @@ export default {
 		this.buildCustomControl();
 		this.map.on('DrewArea', () => this.sendEvent(true));
 		this.$root.$on('userChangeGlobal', (users) => this.redrawUserPoints(users));
+		setTimeout(() => {
+			this.map.invalidateSize();
+		}, 1000);
 	},
 	methods: {
 		redrawUserPoints(users) {

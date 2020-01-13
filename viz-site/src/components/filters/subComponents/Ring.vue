@@ -99,10 +99,12 @@ export default {
 		* d: data value, included in the tooltip
 		*/
 		mouse_move(d, pathObject) {
+			const chromeAgent = navigator.userAgent.indexOf('Chrome') > -1; 
 			const mousePosition = d3.mouse(pathObject);
-			mousePosition[1] += 2 * document.body.clientHeight;
 
-			// const mpp = this.extendVector(mousePosition, 50);
+			if (!chromeAgent) {
+				mousePosition[1] += 2 * document.body.clientHeight;
+			}
 
 			this.tooltip.classed('hidden', false)
 				.style('left', (window.pageXOffset + mousePosition[0] + this.cx) + 'px')
