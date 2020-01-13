@@ -6,8 +6,11 @@
 					id="firstPage"
 					class="section"
 					fluid
-					data-anchor="firstPageAnchor"
+					data-anchor="vitrine"
 				>
+					<v-alert v-if="notChromeOrFirefox" type="warning">
+						Développement effecuté sous Firefox, vérifié sur Chrome. Préférez utiliser un de ces deux navigateurs.
+					</v-alert>
 					<h1>
 						Visualisation des habitudes de consommation des smartphones
 					</h1>
@@ -116,9 +119,10 @@ export default {
 		fetched: false,
 		// True: forceGraph False : dendogram
 		visu: true,
+		notChromeOrFirefox: false,
 		options: {
 			licenseKey: 'vhs@RA^t1',
-			anchors: ['firstPageAnchor', 'explications', 'visualisation'],
+			anchors: ['vitrine', 'explications', 'visualisation'],
 			sectionsColor: ['#252835', '#252835', '#252835'],
 			navigation: true,
 			navigationPosition: 'right',
@@ -135,6 +139,12 @@ export default {
 				firstObject: null
 			});
 		});
+
+		const uA = navigator.userAgent;
+
+		if (uA.indexOf('Firefox') == -1 && uA.indexOf('Chrome') == -1) {
+			this.notChromeOrFirefox = true;
+		}
 
 		fetch('dataset.json').then(async resp => {
 			let data = await resp.json();
