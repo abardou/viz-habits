@@ -1,5 +1,23 @@
 <template>
-	<v-container id="force-container" style="box-shadow: 3px 3px 8px #000" />
+	<v-container id="force-container" style="box-shadow: 3px 3px 8px #000; position: relative;">
+		<v-tooltip
+			color="success"
+			right
+			max-width="200px"
+		>
+			<template v-slot:activator="{ on }">
+				<help-icon
+					id="graph-help"
+					class="icon-bigger"
+					title=""
+					v-on="on"
+				/>
+			</template>
+			<div>
+				Les ronds de couleurs sous les titres d'applications dénotent quel utilisateur a utilisé cette application
+			</div>
+		</v-tooltip> 
+	</v-container>
 </template>
 
 <script>
@@ -302,5 +320,11 @@ div.tooltip {
 
 .links line {
 	stroke: #6D6D6D;
+}
+
+#graph-help {
+	position: absolute;
+	top: 5px;
+	left: 5px;
 }
 </style>
