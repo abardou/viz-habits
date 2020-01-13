@@ -63,6 +63,7 @@ export default {
 			}
 
 			this.$emit('userChange', toDel);
+			this.$root.$emit('userChangeGlobal', keep);
 		}
 	}
 };

@@ -6,7 +6,7 @@
 					id="firstPage"
 					class="section"
 					fluid
-					data-anchor="firstPage"
+					data-anchor="firstPageAnchor"
 				>
 					<h1>
 						Visualisation des habitudes de consommation des smartphones
@@ -111,7 +111,7 @@ export default {
 		visu: true,
 		options: {
 			licenseKey: 'vhs@RA^t1',
-			anchors: ['firstPage', 'explications', 'visualisation'],
+			anchors: ['firstPageAnchor', 'explications', 'visualisation'],
 			// sectionsColor: ['#41b883', '#ff5f45', '#0798ec'],
 			navigation: true,
 			navigationPosition: 'right',

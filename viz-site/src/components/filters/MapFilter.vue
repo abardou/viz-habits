@@ -41,10 +41,12 @@ export default {
 		this.toKeep = [];
 		this.toDel = [];
 		this.pointsWithLatLng = [];
+		this.circles = [];
 		
 		const filtersGroupContainerWidth = document.getElementById('mapFilter-container').parentNode.offsetWidth;
 		this.mapWidth = filtersGroupContainerWidth - 150;
-		const posData = await d3.json('dataset.json');
+		
+		this.posData = JSON.parse(JSON.stringify(this.$store.state.data));
 
 		const lat = 45.782569,
 			lng = 4.86673;
@@ -56,16 +58,20 @@ export default {
 			maxZoom: 20
 		}).addTo(this.map);
 
-		let colorScale = ['#CC2A36', '#4F372D', '#00A0B0'];
-		for (const i in posData) {
-			const pd = posData[i];
+		this.colorScale = ['#CC2A36', '#4F372D', '#00A0B0'];
+		
+		for (const [i, pd] of this.posData.entries()) {
 			if (pd.Lat != undefined && pd.Long != undefined) {
-				posData[i].latlng = new L.LatLng(pd.Lat, pd.Long);
-				L.circle(pd.latlng, {
-					color: colorScale[pd.User_ID-1],
-					radius: 3
-				})
-					.addTo(this.map);
+				this.posData[i].latlng = new L.LatLng(pd.Lat, pd.Long);
+				const cs = this.colorScale;
+				
+				this.circles.push(
+					L.circle(pd.latlng, {
+						color: cs[pd.User_ID-1],
+						radius: 3
+					})
+						.addTo(this.map)
+				);
 			}
 		}
 
@@ -86,8 +92,30 @@ export default {
 
 		this.buildCustomControl();
 		this.map.on('DrewArea', () => this.sendEvent(true));
+		this.$root.$on('userChangeGlobal', (users) => this.redrawUserPoints(users));
 	},
 	methods: {
+		redrawUserPoints(users) {
+			for (const circle of this.circles) {
+				this.map.removeLayer(circle);
+			}
+			this.circles = [];
+
+			for (const [i, pd] of this.posData.entries()) {
+				if (pd.Lat != undefined && pd.Long != undefined && users.includes(pd.User_ID)) {
+					const cs = this.colorScale;
+
+					this.circles.push(
+						L.circle(pd.latlng, {
+							color: cs[pd.User_ID-1],
+							radius: 3
+						})
+							.addTo(this.map)
+					);
+				}
+			}
+
+		},
 		buildCustomControl() {
 			const that = this;
 			const lassoControl = L.Control.extend({
