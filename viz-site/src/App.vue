@@ -65,7 +65,12 @@
 						</v-btn>
 					</div>
 				</v-container>
-				<v-container class="section" fluid data-anchor="visualisation">
+				<v-container
+					class="section"
+					fluid
+					data-anchor="visualisation"
+					pt-1
+				>
 					<v-row v-if="fetched" dense>
 						<v-col cols="5">
 							<!-- <v-card style="background-color: #2B2B3B"> -->
