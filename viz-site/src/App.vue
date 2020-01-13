@@ -3,14 +3,17 @@
 		<v-content id="mainContent">
 			<full-page id="fullpage" ref="fullpage" :options="options">
 				<v-container
-					id="explications"
+					id="firstPage"
 					class="section"
 					fluid
-					data-anchor="explications"
+					data-anchor="firstPage"
 				>
 					<h1>
 						Visualisation des habitudes de consommation des smartphones
 					</h1>
+					<div style="text-align: center; margin-top: 7%; font-size: 1.3em">
+						Anthony Bardou, Hugo Polloli, Tristan Syrzisko et Théo Rabut
+					</div>
 					<div
 						style="text-align: center; position: absolute; bottom: 7%; width: 100%"
 					>
@@ -21,12 +24,44 @@
 							Next
 						</v-btn>
 					</div>
-					<!-- <v-container id="veil" fluid data-anchor="veil">
-						First Section
-						<v-btn color="success" @click="$refs.fullpage.api.moveSectionDown()">
-							Next
+				</v-container>
+				<v-container
+					class="section"
+					fluid
+					data-anchor="explications"
+				>
+					<v-row>
+						<v-col cols="7" style="text-align: center; margin: auto; padding: 0 3%; margin-bottom: 3%;">
+							<h2 style="text-transform: uppercase">
+								Contexte
+							</h2>
+							<p>Le smartphone est une technologie qui s'est ancrée profondément dans nos sociétés développées. Outil permettant de naviguer parmi un grand ensemble d'applications, nous l'utilisons plusieurs fois par jour, chacun à notre manière. Dans ce projet, nous avons voulu représenter les profils, les façons dont les différents utilisateurs naviguent dans leur téléphone. Cette visualisation, qui s'inscrit dans le contexte de l'explosion des flux de données et du <em>Quantified Self</em>, permet à un utilisateur curieux comme à un expert cherchant à visualiser des comportements d'explorer différents profils de consommation selon différents critères comme la période temporelle, la localisation ou encore le temps d'utilisation de chaque application.</p>
+						</v-col>
+					</v-row>
+					<v-row>
+						<v-col cols="6" style="text-align: center; padding: 0 3%">
+							<h2 style="text-transform: uppercase">
+								Collection des données
+							</h2>
+							<p>Les données que nous utilisons ont été collectées par nos soins, sur nous-mêmes, grâce à l'application App Usage. Elle permet un export de l'activité de l'utilisateur du téléphone sur lequel elle est installée. En croisant ces données avec nos historiques des positions (collectés et fournis par Google), nous pouvons alors constituer un dataset en JSON liant temps d'utilisation des applications, positions géographiques et temporelles.</p>
+						</v-col>
+						<v-col cols="6" style="text-align: center; padding: 0 3%">
+							<h2 style="text-transform: uppercase">
+								Visualisation
+							</h2>
+							<p>Les données sont représentées par un graphe, dans lequel les noeuds incarnent les applications (dont la taille varie en fonction de leur temps d'utilisation). Deux noeuds sont liés si l'utilisateur est passé d'une application à l'autre (la largeur des arêtes représentant le nombre de fois que l'utilisateur a effectué ce basculement). En jouant avec les filtres liés à la visualisation, on peut se rendre compte de plusieurs types de consommation différentes, en fonction du lieu et de l'heure de la journée.</p>
+						</v-col>
+					</v-row>
+					<div
+						style="text-align: center; position: absolute; bottom: 7%; width: 100%"
+					>
+						<v-btn
+							color="success"
+							@click="$refs.fullpage.api.moveSectionDown()"
+						>
+							Voir la visualisation
 						</v-btn>
-					</v-container> -->
+					</div>
 				</v-container>
 				<v-container class="section" fluid data-anchor="visualisation">
 					<v-row v-if="fetched" dense>
@@ -76,11 +111,11 @@ export default {
 		visu: true,
 		options: {
 			licenseKey: 'vhs@RA^t1',
-			anchors: ['explications', 'visualisation'],
+			anchors: ['firstPage', 'explications', 'visualisation'],
 			// sectionsColor: ['#41b883', '#ff5f45', '#0798ec'],
 			navigation: true,
 			navigationPosition: 'right',
-			navigationTooltips: ['Explications', 'Visualisation']
+			navigationTooltips: ['Première Page', 'Explications', 'Visualisation']
 			// loopTop: true,
 			// loopBottom: true
 		}
@@ -121,21 +156,42 @@ export default {
 	font-style: normal;
 }
 
+.section {
+	font-family: 'Biko Regular'
+}
+
 h1 {
 	font-size: 5em;
 	margin-left: 15%;
 	margin-right: 15%;
 	text-align: center;
 	font-weight: normal;
+}
 
-	font-family: 'Biko Regular'
+h2 {
+	font-size: 2em;
+	margin-bottom: 15px;
+	font-weight: normal;
+}
+
+h2:after
+{
+	content:' ';
+	display:block;
+	width: 200px;
+	margin: auto;
+	border: 1px solid #4caf50;
+}
+
+p {
+	font-size: 1.1em;
 }
 
 #fp-nav ul li a span {
 	background-color: white !important;
 }
 
-#explications {
+#firstPage {
 	padding: 0;
 	/* The image used */
   background-image: url("~@/assets/home_bg.svg");
