@@ -82,7 +82,7 @@
 						</v-col>
 						<v-col cols="7">
 							<!-- <v-card> -->
-							<ForceGraph v-if="visu" />
+							<ForceGraph v-if="!visu" />
 							<RadialTree v-else />
 							<!-- </v-card> -->
 						</v-col>
@@ -149,7 +149,12 @@ export default {
 		fetch('dataset.json').then(async resp => {
 			let data = await resp.json();
 
+			this.$store.commit('setDatasetRadial', data);
+			this.$store.commit('setFilteredDatasetRadial', data);
+			this.$store.commit('setFinalDatasetRadial', data);
+
 			data = data.filter(d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'));
+
 			// const str = JSON.stringify(data);
 			this.$store.commit('setDataset', data);
 			this.$store.commit('setFilteredDataset', data);

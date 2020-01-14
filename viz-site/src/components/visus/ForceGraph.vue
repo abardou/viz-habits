@@ -80,7 +80,6 @@ export default {
 			// Build the logical representation of the model
 			let acm = new ForceModel(data, 10);
 			data = acm.get_as_json();
-			// console.log(data);
 
 			// Build the visualization
 			this.draw(acm.get_as_json());

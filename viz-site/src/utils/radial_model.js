@@ -5,21 +5,19 @@
  * calculation on the whole dataset
  */
 export default class RadialTreeModel {
-	constructor(data, delta, start = 'Screen on (unlocked)') {
+	constructor(data, delta, start = 'Screen on (unlocked)', end = 'Screen off') {
 		this.delta = delta;
 		this.start = start;
-		this.data = data;
+		this.end = end;
+
 		// Will build the attributes linked to app info
-		this.build_apps_info(this.data);
+		this.build_apps_info(data);
+
 		// Apps info need to be constructed before
 		// Will build the attributes relative to assets (colors, images)
 		this.build_assets();
 
-		this.build_tree(this.data);
-
-		// The filtered attributes are those to return to the user
-		// Other attributes must NEVER change outside the constructor
-		setTimeout(10000);
+		this.build_tree(data);
 	}
 
 	/**
@@ -30,15 +28,16 @@ export default class RadialTreeModel {
 	build_apps_info(data) {
 		// Attribute apps : collection of apps names and their indexes
 		this.apps = new Set();
-		for (let d of data)
+		for (const d of data) {
 			this.apps.add(d['App Name']);
+		}
 		this.apps = Array.from(this.apps);
 
 		// Attribute apps_time : collection of proportion of time consumption for each app
 		this.apps_time = new Array(this.apps.length).fill(0);
 		// Attribute cumul_time : sum(apps_time)
-		for (let d of data) {
-			let app_idx = this.get_app_index(d['App Name']);
+		for (const d of data) {
+			const app_idx = this.apps.indexOf(d['App Name']); 
 			this.apps_time[app_idx] += d['Duration'];
 		}
 	}
@@ -49,7 +48,7 @@ export default class RadialTreeModel {
 	}
 
 	build_assets() {
-		var that = this;
+		const that = this;
 		this.images = {};
 		this.colors = {};
 		let assets_dir = this.get_assets_location();
@@ -61,68 +60,122 @@ export default class RadialTreeModel {
 
 			let filepath = assets_dir + appname + '/best_color.txt';
 
-
-			let xobj = new XMLHttpRequest();
-			xobj.overrideMimeType('application/json');
-			xobj.open('GET', filepath, true);
-			xobj.onreadystatechange = function () {
-				if (xobj.readyState == 4 && xobj.status == '200') {
-					let data = xobj.responseText.split(' ').map(d => parseInt(d));
-					that.colors[that.apps[i]] = {'r' : data[0], 'g' : data[1], 'b' : data[2]};
-				}
-			};
-			xobj.send(null);
+			fetch(filepath).then(async resp => {
+				let data = await resp.text();
+				data = data.split(' ').map(d => parseInt(d));
+				that.colors[that.apps[i]] = {'r' : data[0], 'g' : data[1], 'b' : data[2]};
+			});
 		}
-
-		//console.log(this.images)
-		//console.log(this.colors)
 	}
 
-
 	build_tree(data) {
-
 		this.users = new Set();
-		for (let d of data)
+		for (const d of data) {
 			this.users.add(d['User_ID']);
+		}
 
+		this.user_trees = {};
 
-		this.user_sequences = {};
+		for (const uid of this.users) {
+			const f_data = data.filter(d => d['User_ID'] == uid)
+				.sort((a, b) => { return a.Time - b.Time; });
 
-		for (let uid of this.users) {
-
-			let f_data = data.filter(d => d['User_ID'] == uid)
-				.sort(function(a, b) { return a.Time - b.Time; });
-
-			let sequences = [];
+			const sequences = [];
 			let in_seq = false;
 			let seq = [];
-			for (let i of f_data) {
-				if (i['App Name'] == this.start && !in_seq) {
+			let mem_time = undefined;				
+			for (const d of f_data) {
+				if (d['App Name'] == this.start && !in_seq) {
 					seq = [this.start];
 					in_seq = true;
 				}
 				else {
-					if (i['App Name'] == 'Screen off' && in_seq) {
-						//seq.push("Screen off")
-						sequences.push({'path' : seq});
+					if (d['App Name'] == this.end && in_seq) {
+						sequences.push(seq);
 						in_seq = false;
+					} else if (in_seq) {
+						seq.push(d['App Name']);
+					}
+				}
+				mem_time = d['Time'];
+			}
+			
+			let nbAlt = 0;
+			for (const seqBase of sequences) {
+				const sequence = seqBase.slice(1);
+				// Alternate = longueur 5 mini
+				if (sequence.length < 5) continue;
+
+				let altArray = [],
+					alt = false;
+				
+				for (const app of sequence) {
+					const len = altArray.length;
+
+					// On commence le tableau
+					if (len < 2) {
+						altArray.push(app);
 					} else {
-						if (in_seq) {
-							seq.push(i['App Name']);
+						altArray.push(app);
+						// Cassage d'alternance
+						if (app !== altArray[len - 2]) {
+							if (alt) {
+								// console.log(altArray);
+								nbAlt++;
+								alt = false;
+							}
+							
+							altArray = altArray.slice(-2);
+						} else if (altArray.length >= 5) {
+							alt = true;
 						}
 					}
 				}
 			}
-
+			console.log(nbAlt);
 			
+			const goal = {
+				name: 'Screen on (unlocked)',
+				nb_use: 0,
+				children: []
+			};
+			for (const seq of sequences) {
+				let currentNode = goal;
+				currentNode.nb_use++;
 
-			var goal = sequences.reduce(function(carry, pathEntry){
+				for (const app of seq.slice(1)) {
+					let found = false,
+						child = null;
+					for (const c of currentNode.children) {
+						if (c.name === app) {
+							found = true;
+							child = c;
+							break;
+						}
+					}
+
+					if (found) {
+						currentNode = child;
+						currentNode.nb_use++;
+					} else {
+						currentNode.children.push({
+							name: app,
+							nb_use: 1,
+							children: []
+						});
+					}
+				}
+			}
+
+			console.log(goal);
+			console.log();
+
+			/*
+			const goal = sequences.reduce((carry, pathEntry) => {
 				// On every path entry, resolve using the base object
-				pathEntry.path.reduce(function(pathObject, pathName){
-				// For each path name we come across, use the existing or create a subpath
-
+				pathEntry.path.reduce((pathObject, pathName) => {
+					// For each path name we come across, use the existing or create a subpath
 					pathObject[pathName] = pathObject[pathName] || {'nb_use': 0};
-
 				
 					// Then return that subpath for the next operation
 					pathObject[pathName]['nb_use'] += 1;
@@ -133,162 +186,22 @@ export default class RadialTreeModel {
 				return carry;
 			// Create our base object
 			}, {});
+			*/
 
-			this.user_sequences[uid] = goal;
+			// let fixed = {name: 'Screen on (unlocked)', children: []};
+			// for (const key in goal['Screen on (unlocked)']) {
+			// 	if (key === 'nb_use') {
+			// 		fixed[key] = goal['Screen on (unlocked)'][key];
+			// 	} else {
+			// 		continue;
+			// 	}
+			// }
+
+			// this.user_trees[uid] = goal;
 		}
 	}
 
-	/**
-	 * Find the index of the an app name by searching into the apps attribute
-	 * 
-	 * @param {string} app_name the name of the app
-	 * 
-	 * @returns {int} the index of the app_name if it exists, -1 otherwise
-	 */
-	get_app_index(app_name) {
-		return this.apps.indexOf(app_name);
+	get_user_tree(user) {
+		return this.user_trees[user];
 	}
-
-	get_users() {
-		return this.users;
-	}
-
-	get_maximum_length() {
-		return this.maximum;
-	}
-
-	get_tree() {
-		return this.json_as_tree;
-	}
-
-	build_tree_from_json() {
-		let app_name = Object.keys(this.user_sequences[this.user_id])[0];
-		
-		this.json_as_tree = this.get_app_tree(app_name, this.user_sequences[this.user_id][app_name]);
-
-		//json_as_tree = this.filter_screen_off_leaf(json_as_tree)
-		
-		return this.json_as_tree;
-	}
-
-	get_app_tree(app_name, values) {
-		let children = [];
-		if (Object.keys(values).length > 0) {
-			for (let b of Object.keys(values)) {
-				if (b != 'nb_use') {
-					let v = values[b];
-					children.push(this.get_app_tree(b, values[b]));
-				}
-			}
-		}
-
-		if (children.length > 0) {
-			return {'name' : app_name, 'image' : this.images[app_name], 'nb_use' : values['nb_use'], 'children' : children};
-		} else {
-			return {'name' : app_name, 'image' : this.images[app_name], 'nb_use' : values['nb_use']};
-		}
-	}
-
-	get_tree_uses() {
-		let res = this.get_node_uses(this.json_as_tree).sort();
-		let r = [];
-		for (let val of res) {
-			if (!r.includes(val)) {
-				r.push(val);
-			}
-		}
-		
-		return r.sort(function (a, b) {  return a - b;  });
-	}
-
-	get_node_uses(sequences) {
-		let res = [];
-
-		res.push(sequences.nb_use);
-
-		if (sequences.children != undefined && sequences.children.length > 0) {
-			for (let child of sequences.children) {
-				let ret = this.get_node_uses(child);
-				res = res.concat(ret);
-			}
-		}
-
-		return res;
-	}
-
-	filter_tree(id='1', minimum=1, begin_with='Screen on (unlocked)', contains=undefined, end_with='Screen off') {
-		this.user_id = id;
-		this.start = begin_with;
-		this.build_tree(this.data);
-		this.build_tree_from_json();
-		this.json_as_tree = this.filter_minimum(this.json_as_tree, minimum);
-
-	}
-
-	filter_minimum(sequences, minimum) {
-		
-		if (sequences.nb_use >= minimum) {
-
-			let children = [];
-
-			if (sequences.children != undefined && sequences.children.length > 0) {
-				for (let child of sequences.children) {
-					let ret = this.filter_minimum(child, minimum);
-					if (ret != undefined) {
-						children.push(ret);
-					}
-				}
-			} else {
-				return sequences;
-			}
-
-			delete sequences.children;
-
-			if (children.length > 0) {
-				sequences.children = children;
-			}
-
-			return sequences;
-
-		} else {
-			return undefined;
-		}
-	}
-
-
-	filter_screen_off_leaf(sequences) {
-		//console.log(res)
-		let children = [];
-
-		if (sequences.children != undefined && sequences.children.length == 1 && sequences.children[0].name == 'Screen off') {
-			delete sequences.children;
-			sequences.children = children;
-		}
-
-		if (sequences.children != undefined && sequences.children.length > 0) {
-			
-			for (let child of sequences.children) {
-				let ret = this.filter_screen_off_leaf(child);
-				children.push(ret);
-			}
-			
-		}
-
-		delete sequences.children;
-
-		sequences.children = children;
-
-		if (sequences.children.length > 0) {
-			let sum = 0;
-
-			for (let c of sequences.children) {
-				sum += c.nb_use;
-			}
-
-			sequences.nb_use = sum;
-		}
-
-		return sequences;
-	}
-
 }

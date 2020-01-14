@@ -4,7 +4,7 @@
  * The object also contains several attributes that avoid to repeat heavy
  * calculation on the whole dataset
  */
-export default class AppChordModel {
+export default class ForceModel {
 	constructor(data, delta) {
 		this.delta = delta;
 		// Will build the attributes linked to app info
@@ -134,8 +134,11 @@ export default class AppChordModel {
 	get_as_json() {
 		let json_obj = {'nodes': [], 'links': []};
 		// Nodes
-		for (let i in this.apps)
-			json_obj.nodes.push({'id': this.apps[i], 'time': this.apps_time[i], 'image': this.images[i], 'users': this.apps_users[i], 'only_one_user': this.users.size == 1});
+		for (let i in this.apps) {
+			json_obj.nodes.push({
+				'id': this.apps[i], 'time': this.apps_time[i], 'image': this.images[i], 'users': this.apps_users[i], 'only_one_user': this.users.size == 1
+			});
+		}
 
 		for (let i in this.adj_mat) {
 			let aii = this.get_app_index(this.apps[i]);
