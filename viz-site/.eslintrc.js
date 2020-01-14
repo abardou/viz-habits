@@ -30,7 +30,8 @@ module.exports = {
     'no-unused-vars': 'off',
     'vue/html-indent': ['error', 'tab'],
     'vue/max-attributes-per-line': ['error', { 'singleline': 3 }],
-    'vue/no-unused-components': 'warn'
+    'vue/no-unused-components': 'warn',
+    'no-unreachable': 'warn',
   },
   parserOptions: {
     parser: 'babel-eslint',
