@@ -83,7 +83,6 @@ export default class RadialTreeModel {
 			const sequences = [];
 			let in_seq = false;
 			let seq = [];
-			let mem_time = undefined;				
 			for (const d of f_data) {
 				if (d['App Name'] == this.start && !in_seq) {
 					seq = [this.start];
@@ -94,34 +93,50 @@ export default class RadialTreeModel {
 						sequences.push(seq);
 						in_seq = false;
 					} else if (in_seq) {
+						if (seq.length > 2 && d['App Name'] == seq[seq.length - 1]) {
+							console.log(d['App Name']);
+							console.log(seq[seq.length - 1]);
+							continue;
+						}
 						seq.push(d['App Name']);
 					}
 				}
-				mem_time = d['Time'];
 			}
 			
-			let nbAlt = 0;
-			for (const seqBase of sequences) {
+			let max = 0;
+			for (const m of sequences) {
+				if (m.length > max) {
+					max = m.length;
+				}
+			}
+
+			console.log(max);
+			
+			for (const [i, seqBase] of sequences.entries()) {
 				const sequence = seqBase.slice(1);
 				// Alternate = longueur 5 mini
 				if (sequence.length < 5) continue;
 
 				let altArray = [],
 					alt = false;
+
+				const alts = [];
 				
-				for (const app of sequence) {
+				for (const [i, app] of sequence.entries()) {
+					altArray.push(app);
 					const len = altArray.length;
 
-					// On commence le tableau
-					if (len < 2) {
-						altArray.push(app);
-					} else {
-						altArray.push(app);
+					if (len >= 3) {
 						// Cassage d'alternance
-						if (app !== altArray[len - 2]) {
+						if (app !== altArray[len - 3]) {
 							if (alt) {
-								// console.log(altArray);
-								nbAlt++;
+								alts.push({
+									idxDeb: i - len + 1,
+									idxFin: i - 1,
+									app1: altArray[0],
+									app2: altArray[1],
+									nbSwitches: altArray.length - 1
+								});
 								alt = false;
 							}
 							
@@ -131,9 +146,40 @@ export default class RadialTreeModel {
 						}
 					}
 				}
+
+				if (alts.length > 0) {
+					let lastIdx = 0,
+						res = [];
+
+					for (const [i, alt] of alts.entries()) {
+						res = res.concat(seqBase.slice(lastIdx, alt.idxDeb + 1));
+						res.push({app1: alt.app1, app2: alt.app2, nbSwitches: alt.nbSwitches});
+					
+						lastIdx = alt.idxFin + 2;
+
+						if (i === alts.length - 1) {
+							res = res.concat(seqBase.slice(lastIdx));
+						}
+					}
+
+					sequences[i] = res;
+				}
 			}
-			console.log(nbAlt);
-			
+
+			console.log(sequences);
+			max = 0;
+			let maxseq = null;
+			for (const m of sequences) {
+				if (m.length > max) {
+					max = m.length;
+					maxseq = m;
+				}
+			}
+
+			console.log(max);
+			console.log(maxseq);
+
+			break;
 			const goal = {
 				name: 'Screen on (unlocked)',
 				nb_use: 0,
@@ -168,7 +214,6 @@ export default class RadialTreeModel {
 			}
 
 			console.log(goal);
-			console.log();
 
 			/*
 			const goal = sequences.reduce((carry, pathEntry) => {
