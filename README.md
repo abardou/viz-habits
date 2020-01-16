@@ -1,4 +1,7 @@
-# VizThat
+# VizHabits
+
+![Alt text](doc/images/thumbnail.jpg?raw=true "Habits")
+
 
 ## Authors
 * Hugo Polloli
