@@ -249,8 +249,8 @@ export default {
 					// on affiche le toolip
 					that.tooltip.classed('hidden', false)
 					// on positionne le tooltip
-						.attr('style', 'left:' + (mouse_position[0] + 10) +
-										'px; top:' + (mouse_position[1] - 15) + 'px')
+						.attr('style', 'left:' + (mouse_position[0] - width *4/5) +
+										'px; top:' + (mouse_position[1] - 40) + 'px')
 					// on recupere le nom de l'etat 
 						.html(str);
 				})
@@ -276,8 +276,8 @@ export default {
 					// on affiche le toolip
 					that.tooltip.classed('hidden', false)
 					// on positionne le tooltip
-						.attr('style', 'left:' + (mouse_position[0] + 10) +
-										'px; top:' + (mouse_position[1] - 15) + 'px')
+						.attr('style', 'left:' + (mouse_position[0] - width *4/5) +
+										'px; top:' + (mouse_position[1] - 40) + 'px')
 					// on recupere le nom de l'etat 
 						.html(d.data.name);
 				})
