@@ -1,49 +1,50 @@
 # VizThat
 
-## Participants 
+## Authors
 * Hugo Polloli
-* Tristan Syrzisko
 * Anthony Bardou
+* Tristan Syrzisko
 * Théo Rabut
 
 ## Description
 
-This projet has for purpose to complete existing visualisations of users habits on their smartphones. The idea behind this project is based on a fact : we didn't find any visualisations of what we usually do after looking this application or this one.  
-We propose two visualisations for differents purpose :
-* The Force Graph, it represents what the user usually do after using a specific application.
-* The Dendogram, it represents all sequences encountered between center of graph (Screen ON), and leaves (Screen OFF).
+This projet aims to complete existing visualisations of users smartphones habits. The idea behind this project is based on a fact : we didn't find any visualization able to show us usage profiles based on application switches and sequences of applications.  
+We propose two visualisations for two differents purpose :
+* A Force Graph, representing which app the user usually go to after using a specific application.
+* A Radial Tree (Tidy), representing all sequences started by unlocking the phone (Screen ON) and terminated by locking the phone (Screen OFF).
 
-We use a lot our smartphone so we decided to work on how we can effectively filter our visualisations to be more user friendly.
+As our visualizations can be a bit messy when the amount of data to display grows, we decided to work on how we can effectively filter our visualisations to be more user friendly. These filters can also be a great tool to explore different usage profiles by navigating through several dimensions, including time and space.
 
-Thoose visualisations are designed to be used by curious individuals or expert who needs a visual representation of a group (aggregated data).
-
+Those visualizations are designed to be used by curious individuals or experts who need a visual representation of a group (aggregated data).
 
 ## Requirements
 
-### Preprocessing 
-* `python 3`
-* `pymongo`
-* `pythondns`
-
+### Preprocessing
+* `pandas`
+* `numpy`
 
 ### Website
 * `node.js`
 * `vuetify.js`
 * `D3.js`
 
+## How can I run this on my machine ?
+You can deploy our service on your machine with a few simple steps. Start by typing the following commands :
+```
+git clone https://github.com/abardou/viz-habits.git
+cd viz-habits/viz-site
+npm install
+npm run serve
+```
+
+Then go to http://localhost:8080/ and you should be able to use our service.
 
 ## Sources 
 ### Data
-* AppUsage (PlayStore). Phone application based on tracking users activities (data can be exported in csv).
-* Google Localisation. Can be activated or not (data can be exported).
+We built our own dataset, using two different tracking services :
+* AppUsage (PlayStore) : tracking application able to export in CSV user  activity on her smartphone.
+* Google Position History : automatically collected once the GPS is active on an Android smartphone. Data can be exported by Google Takeout.
 
 ### Inspiration
 * AppUsage offers visualisations based on the same data we used. 
-
-## How can I run this on my machine ? 
-* git clone repository at https://github.com/abardou/viz-habits.git
-* cd viz-site
-* npm install
-* npm run serve
-
-
+* The Radial Tree we built is based on a design that can be found here : https://blockbuilder.org/mbostock/4063550
