@@ -33,16 +33,15 @@ export default {
 		}
 	},
 	mounted () {
-
 		const container = document.getElementById('radial-container');
-		this.width = container.offsetWidth;
+		this.width = container.offsetWidth - 50;
 		this.height = 890;
 
 		this.svg = d3.select('#radial-container').append('svg')
 			.attr('width', this.width)
 			.attr('height', this.height);
 
-		this.tooltip = d3.select('#radial-container').append('div').attr('class', 'hidden tooltip');
+		this.tooltip = d3.select('#radial-container').append('div').attr('class', 'hidden tooltipRadial');
 
 		this.draw_graph();
 
@@ -216,8 +215,10 @@ export default {
 			let tree =  d3.tree()
 				.size([2 * Math.PI, radius])
 				.separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth);
+
 			const root = tree(d3.hierarchy(data)
 				.sort((a, b) => d3.ascending(a.data.name, b.data.name)));
+
 			/*
 			const svg = d3.select('body').append('svg')
 				.attr('id', 'tree')
@@ -294,9 +295,11 @@ export default {
 					that.draw_graph(d.data.name);
 					that.tooltip.classed('hidden', true);
 				});
+
 			node.append('circle')
 				.attr('fill', d => d.children ? '#555' : '#999')
 				.attr('r', 2.5);
+
 			const images = node.append('image')
 				.attr('xlink:href', d => d.data.image)
 				.attr('width', 20)
@@ -401,7 +404,8 @@ export default {
 	.hidden {
 		display: none;
 	}
-	div.tooltip {
+
+	div.tooltipRadial {
 		color: #222;
 		background-color: #fff;
 		padding: .5em;
@@ -409,8 +413,9 @@ export default {
 		border-radius: 2px;
 		opacity: 0.8;
 		position: absolute;
-		font-size: 8px;
+		font-size: 1em;
 	}
+
 	.node circle {
 		fill: #fff;
 		stroke: steelblue;

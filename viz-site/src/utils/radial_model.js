@@ -82,11 +82,7 @@ export default class RadialTreeModel {
 
 		this.user_sequences = {};
 
-		console.log(this.start);
-
-
 		for (let uid of this.users) {
-
 			let f_data = data.filter(d => d['User_ID'] == uid)
 				.sort(function(a, b) { return a.Time - b.Time; });
 
@@ -105,6 +101,9 @@ export default class RadialTreeModel {
 						in_seq = false;
 					} else {
 						if (in_seq) {
+							if (seq.length > 1 && i['App Name'] == seq[seq.length - 1]) {
+								continue;
+							}
 							seq.push(i['App Name']);
 						}
 					}
@@ -132,8 +131,6 @@ export default class RadialTreeModel {
 			}, {});
 
 			this.user_sequences[uid] = goal;
-
-			//console.log(goal);
 		}
 		//console.log(this.user_sequences[parseInt(Object.keys(this.user_sequences)[0])]);
 	}
@@ -152,7 +149,7 @@ export default class RadialTreeModel {
 	get_tree() {
 		this.build_tree(this.data);
 		this.build_tree_from_json();
-		this.json_as_tree = this.filter_minimum(this.json_as_tree, 3);
+		this.json_as_tree = this.filter_minimum(this.json_as_tree, 4);
 		//console.log(this.json_as_tree);
 		return this.json_as_tree;
 	}
