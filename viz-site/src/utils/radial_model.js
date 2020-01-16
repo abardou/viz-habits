@@ -90,7 +90,7 @@ export default class RadialTreeModel {
 			let in_seq = false;
 			let seq = [];
 			for (let i of f_data) {
-				if (i['App Name'] == this.start && !in_seq) {
+				if ((i['App Name'] === this.start && !in_seq) || (i['App Name'] === this.start && seq.length === 1)) {
 					seq = [this.start];
 					in_seq = true;
 				}
@@ -149,7 +149,7 @@ export default class RadialTreeModel {
 	get_tree() {
 		this.build_tree(this.data);
 		this.build_tree_from_json();
-		this.json_as_tree = this.filter_minimum(this.json_as_tree, 4);
+		this.json_as_tree = this.filter_minimum(this.json_as_tree, 5);
 		//console.log(this.json_as_tree);
 		return this.json_as_tree;
 	}
