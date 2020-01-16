@@ -38,7 +38,7 @@ Thoose visualisations are designed to be used by curious individuals or expert w
 * Google Localisation. Can be activated or not (data can be exported).
 
 ### Inspiration
-* AppUsage offers visualisations of the same data we used. 
+* AppUsage offers visualisations based on the same data we used. 
 
 ## How can I run this on my machine ? 
 * git clone repository at https://github.com/abardou/viz-habits.git
