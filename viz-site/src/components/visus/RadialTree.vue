@@ -77,7 +77,7 @@ export default {
 	methods: {
 		draw_graph() {
 			this.svg.selectAll('*').remove();
-			let data = this.$store.state.finaldataRadial;
+			let data = this.$store.state.finaldata;
 
 
 			//console.log(data);

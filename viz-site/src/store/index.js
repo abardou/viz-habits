@@ -5,12 +5,10 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
 	state: {
+		brutData: null,
 		data: null,
 		fdata: null,
 		finaldata: null,
-		dataRadial: null,
-		fdataRadial: null,
-		finaldataRadial: null,
 		usersSelection: [],
 		draggingState: {
 			dragging: false,
@@ -20,6 +18,9 @@ export default new Vuex.Store({
 	mutations: {
 		setDraggingState(state, value) {
 			state.draggingState = value;
+		},
+		setBrutDataset(state, value) {
+			state.brutData = Object.freeze(value);
 		},
 		setDataset(state, value) {
 			state.data = Object.freeze(value);

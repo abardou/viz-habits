@@ -63,7 +63,7 @@ export default {
 
 			keep.push(parseInt(this.selected.replace('User', '')));
 
-			for (const [i, d] of this.$store.state.dataRadial.entries()) {
+			for (const [i, d] of this.$store.state.data.entries()) {
 				if (!keep.includes(d.User_ID)) {
 					toDel.push(i);
 				}

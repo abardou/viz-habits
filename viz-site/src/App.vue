@@ -153,9 +153,7 @@ export default {
 		fetch('dataset.json').then(async resp => {
 			let data = await resp.json();
 
-			this.$store.commit('setDatasetRadial', data);
-			this.$store.commit('setFilteredDatasetRadial', data);
-			this.$store.commit('setFinalDatasetRadial', data);
+			this.$store.commit('setBrutDataset', data);
 
 			if (this.visu) {
 				data = data.filter(d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'));
@@ -163,14 +161,33 @@ export default {
 				this.$store.commit('setFilteredDataset', data);
 				this.$store.commit('setFinalDataset', data);
 				// const str = JSON.stringify(data);
+			} else {
+				this.$store.commit('setDataset', data);
+				this.$store.commit('setFilteredDataset', data);
+				this.$store.commit('setFinalDataset', data);
+
 			}
 
 			this.fetched = true;
 		});
 	},
 	methods: {
-		changeVisu(data) {
-			this.visu = data;
+		changeVisu(val) {
+			this.visu = val;
+
+			let data = this.$store.state.brutData;
+
+			if (val) {
+				data = data.filter(d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'));
+				this.$store.commit('setDataset', data);
+				this.$store.commit('setFilteredDataset', data);
+				this.$store.commit('setFinalDataset', data);
+			} else {
+				this.$store.commit('setDataset', data);
+				this.$store.commit('setFilteredDataset', data);
+				this.$store.commit('setFinalDataset', data);
+			}
+			console.log(data);
 		}
 	}
 };

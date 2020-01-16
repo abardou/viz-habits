@@ -29,7 +29,7 @@ export default {
 	},
 	data: () => ({
 		// True : forceGraph False : Dendogram
-		visuSwitch: true
+		visuSwitch: false
 	}),
 	mounted() {
 		this.index_filtered = [new Set(), new Set(), new Set()];
@@ -70,11 +70,11 @@ export default {
 			let to_rem = active_filters.reduce((a, b) => new Set([...a, ...b]));
 
 			console.log(to_rem);
-			console.log(this.$store.state.dataRadial);
+			console.log(this.$store.state.data);
 
-			let fdataRadial = this.$store.state.dataRadial.filter((d, i) => !to_rem.has(i));
-			this.$store.commit('setFilteredDatasetRadial', fdataRadial);
-			this.$store.commit('setFinalDatasetRadial', fdataRadial);
+			let fdataRadial = this.$store.state.data.filter((d, i) => !to_rem.has(i));
+			this.$store.commit('setFilteredDataset', fdataRadial);
+			this.$store.commit('setFinalDataset', fdataRadial);
 			console.log(fdataRadial);
 
 			this.$root.$emit('redrawSlider');
