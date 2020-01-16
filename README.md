@@ -27,9 +27,10 @@ Those visualizations are designed to be used by curious individuals or experts w
 * `numpy`
 
 ### Website
-* `node.js`
+* `node.js` (dev)
 * `vuetify.js`
 * `D3.js`
+* `FullPage.js`
 
 ## How can I run this on my machine ?
 You can deploy our service on your machine with a few simple steps. Start by typing the following commands :
