@@ -56,6 +56,9 @@ export default {
 		selected: 'User1',
 		label: 'Utilisateurs'
 	}),
+	mounted() {
+		this.$root.$emit('userChangeGlobal', ['User1']);
+	},
 	methods: {
 		changed() {
 			const toDel = [];
@@ -69,7 +72,7 @@ export default {
 				}
 			}
 
-			console.log(keep);
+			//console.log(keep);
 
 			this.$emit('userChange', toDel);
 			this.$root.$emit('userChangeGlobal', keep);

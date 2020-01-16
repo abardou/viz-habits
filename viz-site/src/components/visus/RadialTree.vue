@@ -83,7 +83,7 @@ export default {
 			//console.log(data);
 			this.rtm = new RadialTreeModel(data, 10);
 
-			this.draw(this.rtm.get_tree());
+			this.draw_tidy(this.rtm.get_tree());
 		},
 
 		get_correct_time(time){
@@ -202,6 +202,104 @@ export default {
 
 			this.svg.attr('viewBox', autoBox);
 
+			function autoBox() {
+				const {x, y, width, height} = this.getBBox();
+				return [x, y, width, height];
+			}
+		},
+		draw_tidy(data) {
+			let that = this;
+			let width = 975;
+			let radius = width / 2;
+			let tree =  d3.tree()
+				.size([2 * Math.PI, radius])
+				.separation((a, b) => (a.parent == b.parent ? 1 : 2) / a.depth);
+			const root = tree(d3.hierarchy(data)
+				.sort((a, b) => d3.ascending(a.data.name, b.data.name)));
+			/*
+			const svg = d3.select('body').append('svg')
+				.attr('id', 'tree')
+				.style('max-width', '100%')
+				.style('height', 'auto')
+				.style('font', '10px sans-serif')
+				.style('margin', '5px');
+			*/
+			const link = this.svg.append('g')
+				.attr('fill', 'none')
+				.attr('stroke', '#555')
+				.attr('stroke-opacity', 0.4)
+				.attr('stroke-width', 1.5)
+				.selectAll('path')
+				.data(root.links())
+				.join('path')
+				.attr('d', d3.linkRadial()
+					.angle(d => d.x)
+					.radius(d => d.y)
+				)
+				.on('mouseover', function(d) {
+					that.enable_focus_path(d, that);
+				})
+				.on('mousemove', function(d) {
+					let mouse_position = d3.mouse(d3.select('body').node());
+					let nb_use = d.target.data.nb_use;
+					let str = nb_use + ' sequences';
+					if (nb_use == 1) {
+						str = nb_use + ' sequence';
+					}
+					// on affiche le toolip
+					that.tooltip.classed('hidden', false)
+					// on positionne le tooltip
+						.attr('style', 'left:' + (mouse_position[0] + 10) +
+										'px; top:' + (mouse_position[1] - 15) + 'px')
+					// on recupere le nom de l'etat 
+						.html(str);
+				})
+				.on('mouseout', function() {
+					that.tooltip.classed('hidden', true);
+					// on cache le toolip
+					that.disable_focus();
+				});
+			const node = this.svg.append('g')
+				.attr('stroke-linejoin', 'round')
+				.attr('stroke-width', 3)
+				.selectAll('g')
+				.data(root.descendants().reverse())
+				.join('g')
+				.attr('transform', d => `
+					rotate(${d.x * 180 / Math.PI - 90})
+					translate(${d.y},0)`)
+				.on('mouseover', function(d) {
+					that.enable_focus_application(d, that);
+				})
+				.on('mousemove', function(d) {
+					let mouse_position = d3.mouse(d3.select('body').node());
+					// on affiche le toolip
+					that.tooltip.classed('hidden', false)
+					// on positionne le tooltip
+						.attr('style', 'left:' + (mouse_position[0] + 10) +
+										'px; top:' + (mouse_position[1] - 15) + 'px')
+					// on recupere le nom de l'etat 
+						.html(d.data.name);
+				})
+				.on('mouseout', function() {
+					that.tooltip.classed('hidden', true);
+					// on cache le toolip
+					that.disable_focus();
+				})
+				.on('click', function(d) {
+					that.tools_ref.send_filters(d.data.name);
+					that.tooltip.classed('hidden', true);
+				});
+			node.append('circle')
+				.attr('fill', d => d.children ? '#555' : '#999')
+				.attr('r', 2.5);
+			const images = node.append('image')
+				.attr('xlink:href', d => d.data.image)
+				.attr('width', 20)
+				.attr('height', 20)
+				.attr('x', -10)
+				.attr('y', -10);
+			this.svg.attr('viewBox', autoBox);
 			function autoBox() {
 				const {x, y, width, height} = this.getBBox();
 				return [x, y, width, height];

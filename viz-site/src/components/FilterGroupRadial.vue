@@ -23,9 +23,9 @@ import TimePeriodPicker from '@/components/filters/TimePeriodPicker.vue';
 export default {
 	name: 'FilterGroupRadial',
 	components: {
-		RadialTreeUserFilter,
 		MapFilter,
-		TimePeriodPicker
+		TimePeriodPicker,
+		RadialTreeUserFilter
 	},
 	data: () => ({
 		// True : forceGraph False : Dendogram
@@ -69,13 +69,9 @@ export default {
 
 			let to_rem = active_filters.reduce((a, b) => new Set([...a, ...b]));
 
-			console.log(to_rem);
-			console.log(this.$store.state.data);
-
 			let fdataRadial = this.$store.state.data.filter((d, i) => !to_rem.has(i));
 			this.$store.commit('setFilteredDataset', fdataRadial);
 			this.$store.commit('setFinalDataset', fdataRadial);
-			console.log(fdataRadial);
 
 			this.$root.$emit('redrawSlider');
 			this.$root.$emit('redrawRadialTree');

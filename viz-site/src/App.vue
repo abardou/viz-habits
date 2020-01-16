@@ -187,7 +187,6 @@ export default {
 				this.$store.commit('setFilteredDataset', data);
 				this.$store.commit('setFinalDataset', data);
 			}
-			console.log(data);
 		}
 	}
 };
