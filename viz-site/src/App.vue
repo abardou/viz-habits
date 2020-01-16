@@ -77,7 +77,8 @@
 					<v-row v-if="fetched" dense>
 						<v-col cols="5">
 							<!-- <v-card style="background-color: #2B2B3B"> -->
-							<FilterGroup @changeVisu="changeVisu" />	
+							<FilterGroup v-if="visu" @changeVisu="changeVisu" />
+							<FilterGroupRadial v-else @changeVisu="changeVisu" />
 							<!-- </v-card> -->
 						</v-col>
 						<v-col cols="7">
@@ -104,14 +105,17 @@
 
 <script>
 // Filters
+import FilterGroupRadial from '@/components/FilterGroupRadial.vue';
 import FilterGroup from '@/components/FilterGroup.vue';
 import ForceGraph from '@/components/visus/ForceGraph.vue';
 import RadialTree from '@/components/visus/RadialTree.vue';
+
 
 export default {
 	name: 'Home',
 	components: {
 		FilterGroup,
+		FilterGroupRadial,
 		ForceGraph,
 		RadialTree
 	},
@@ -149,11 +153,18 @@ export default {
 		fetch('dataset.json').then(async resp => {
 			let data = await resp.json();
 
-			data = data.filter(d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'));
-			// const str = JSON.stringify(data);
-			this.$store.commit('setDataset', data);
-			this.$store.commit('setFilteredDataset', data);
-			this.$store.commit('setFinalDataset', data);
+			this.$store.commit('setDatasetRadial', data);
+			this.$store.commit('setFilteredDatasetRadial', data);
+			this.$store.commit('setFinalDatasetRadial', data);
+
+			if (this.visu) {
+				data = data.filter(d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'));
+				this.$store.commit('setDataset', data);
+				this.$store.commit('setFilteredDataset', data);
+				this.$store.commit('setFinalDataset', data);
+				// const str = JSON.stringify(data);
+			}
+
 			this.fetched = true;
 		});
 	},

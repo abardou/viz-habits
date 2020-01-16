@@ -8,6 +8,9 @@ export default new Vuex.Store({
 		data: null,
 		fdata: null,
 		finaldata: null,
+		dataRadial: null,
+		fdataRadial: null,
+		finaldataRadial: null,
 		usersSelection: [],
 		draggingState: {
 			dragging: false,
@@ -26,6 +29,15 @@ export default new Vuex.Store({
 		},
 		setFinalDataset(state, value) {
 			state.finaldata = Object.freeze(value);
+		},
+		setDatasetRadial(state, value) {
+			state.dataRadial = Object.freeze(value);
+		},
+		setFilteredDatasetRadial(state, value) {
+			state.fdataRadial = Object.freeze(value);
+		},
+		setFinalDatasetRadial(state, value) {
+			state.finaldataRadial = Object.freeze(value);
 		}
 	},
 	actions: {

@@ -20,7 +20,7 @@ import { htmlToElement } from '@/utils/elementCreation.js';
 export default {
 	name: 'RangeSlider',
 	props: {
-		subject: { // time | switch
+		subject: { // time | switch | nb_seq
 			default: null,
 			type: String
 		},

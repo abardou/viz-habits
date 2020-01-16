@@ -15,8 +15,6 @@ export default class RadialTreeModel {
 		// Will build the attributes relative to assets (colors, images)
 		this.build_assets();
 
-		this.build_tree(this.data);
-
 		// The filtered attributes are those to return to the user
 		// Other attributes must NEVER change outside the constructor
 		setTimeout(10000);
@@ -73,9 +71,6 @@ export default class RadialTreeModel {
 			};
 			xobj.send(null);
 		}
-
-		//console.log(this.images)
-		//console.log(this.colors)
 	}
 
 
@@ -85,8 +80,8 @@ export default class RadialTreeModel {
 		for (let d of data)
 			this.users.add(d['User_ID']);
 
-
 		this.user_sequences = {};
+
 
 		for (let uid of this.users) {
 
@@ -114,7 +109,7 @@ export default class RadialTreeModel {
 				}
 			}
 
-			
+			console.log(sequences);
 
 			var goal = sequences.reduce(function(carry, pathEntry){
 				// On every path entry, resolve using the base object
@@ -135,7 +130,10 @@ export default class RadialTreeModel {
 			}, {});
 
 			this.user_sequences[uid] = goal;
+
+			//console.log(goal);
 		}
+		console.log(this.user_sequences[parseInt(Object.keys(this.user_sequences)[0])]);
 	}
 
 	/**
@@ -158,13 +156,18 @@ export default class RadialTreeModel {
 	}
 
 	get_tree() {
+		this.start = 'Screen on (unlocked)';
+		this.build_tree(this.data);
+		this.build_tree_from_json();
+		this.json_as_tree = this.filter_minimum(this.json_as_tree, 3);
+		console.log(this.json_as_tree);
 		return this.json_as_tree;
 	}
 
 	build_tree_from_json() {
-		let app_name = Object.keys(this.user_sequences[this.user_id])[0];
-		
-		this.json_as_tree = this.get_app_tree(app_name, this.user_sequences[this.user_id][app_name]);
+		let app_name = Object.keys(this.user_sequences[Object.keys(this.user_sequences)[0]])[0];
+		console.log(this.user_sequences[Object.keys(this.user_sequences)[0]][app_name]);
+		this.json_as_tree = this.get_app_tree(app_name, this.user_sequences[Object.keys(this.user_sequences)[0]][app_name]);
 
 		//json_as_tree = this.filter_screen_off_leaf(json_as_tree)
 		
@@ -173,10 +176,10 @@ export default class RadialTreeModel {
 
 	get_app_tree(app_name, values) {
 		let children = [];
-		if (Object.keys(values).length > 0) {
-			for (let b of Object.keys(values)) {
+		let old = Object.keys(values);
+		if (old.length > 0) {
+			for (let b of old) {
 				if (b != 'nb_use') {
-					let v = values[b];
 					children.push(this.get_app_tree(b, values[b]));
 				}
 			}
@@ -216,15 +219,6 @@ export default class RadialTreeModel {
 		return res;
 	}
 
-	filter_tree(id='1', minimum=1, begin_with='Screen on (unlocked)', contains=undefined, end_with='Screen off') {
-		this.user_id = id;
-		this.start = begin_with;
-		this.build_tree(this.data);
-		this.build_tree_from_json();
-		this.json_as_tree = this.filter_minimum(this.json_as_tree, minimum);
-
-	}
-
 	filter_minimum(sequences, minimum) {
 		
 		if (sequences.nb_use >= minimum) {
@@ -257,7 +251,6 @@ export default class RadialTreeModel {
 
 
 	filter_screen_off_leaf(sequences) {
-		//console.log(res)
 		let children = [];
 
 		if (sequences.children != undefined && sequences.children.length == 1 && sequences.children[0].name == 'Screen off') {
