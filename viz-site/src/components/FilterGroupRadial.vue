@@ -1,5 +1,5 @@
 <template>
-	<v-container fluid pb-0 style="box-shadow: 3px 3px 8px #000">
+	<v-container fluid pb-0>
 		<v-row no-gutters>
 			<v-col cols="6">
 				<v-container pa-5>
@@ -17,7 +17,7 @@
 			<v-col cols="6">
 				<TimePeriodPicker @timePickerChange="timePickerChange" />
 			</v-col>
-			<MapFilter @mapChange="mapChange" />
+			<MapFilter :default-users="[1]" @mapChange="mapChange" />
 		</v-row>
 	</v-container>
 </template>

@@ -56,9 +56,6 @@ export default {
 		selected: 'User1',
 		label: 'Utilisateurs'
 	}),
-	mounted() {
-		this.$root.$emit('userChangeGlobal', ['User1']);
-	},
 	methods: {
 		changed() {
 			const toDel = [];

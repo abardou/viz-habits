@@ -1,5 +1,5 @@
 <template>
-	<v-container fluid pb-0 style="box-shadow: 3px 3px 8px #000">
+	<v-container fluid pb-0>
 		<v-row no-gutters>
 			<v-col cols="6">
 				<RangeSlider
@@ -19,7 +19,7 @@
 				/>
 			</v-col>
 			<v-col cols="6">
-				<v-container pa-5>
+				<v-container pa-2>
 					<UserFilter @userChange="userChange" />
 					<v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Force Graph' : 'Dendogram'}`" @change="changed" />
 				</v-container>

@@ -74,8 +74,8 @@
 					data-anchor="visualisation"
 					pt-1
 				>
-					<v-row v-if="fetched" dense>
-						<v-col cols="5">
+					<v-row v-if="fetched">
+						<v-col cols="5" style="border-right: 1px solid black;">
 							<!-- <v-card style="background-color: #2B2B3B"> -->
 							<FilterGroup v-if="visu" @changeVisu="changeVisu" />
 							<FilterGroupRadial v-else @changeVisu="changeVisu" />

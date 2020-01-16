@@ -1,5 +1,5 @@
 <template>
-	<v-container id="force-container" style="box-shadow: 3px 3px 8px #000; position: relative;">
+	<v-container id="force-container" style="position: relative;">
 		<v-tooltip
 			color="success"
 			right

@@ -1,5 +1,5 @@
 <template>
-	<v-container id="radial-container" style="box-shadow: 3px 3px 8px #000; position: relative;">
+	<v-container id="radial-container" style="position: relative;">
 		<v-tooltip
 			color="success"
 			right
@@ -14,7 +14,7 @@
 				/>
 			</template>
 			<div>
-				TOFIX
+				Ce tidy tree représentent les séquences d'applications habituelles dans le dataset et ce à partir de l'écran dévérouillé jusqu'au prochain verrouillage (non affiché puisque celui-ci serait alors présent sur chaque branche)
 			</div>
 		</v-tooltip>
 	</v-container>
@@ -47,10 +47,7 @@ export default {
 
 		this.$root.$on('redrawRadialTree', () => {
 			this.draw_graph(); });
-
 	},
-
-
 
 	// 	//this.renderChart(this.chartData, this.options);
 	// 	//this.$emit('created', this.$data._chart);
