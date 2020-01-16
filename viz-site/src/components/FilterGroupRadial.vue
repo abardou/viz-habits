@@ -4,7 +4,7 @@
 			<v-col cols="6">
 				<v-container pa-5>
 					<RadialTreeUserFilter @userChange="userChange" />
-					<v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Force Graph' : 'Dendogram'}`" @change="changed" />
+					<v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Graphe de switch' : 'Arbre radial'}`" @change="changed" />
 					<v-btn
 						color="#f5f9f9"
 						style="color: #252835;"

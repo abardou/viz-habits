@@ -21,7 +21,7 @@
 			<v-col cols="6">
 				<v-container pa-2>
 					<UserFilter @userChange="userChange" />
-					<v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Force Graph' : 'Dendogram'}`" @change="changed" />
+					<v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Graphe de switch' : 'Arbre radial'}`" @change="changed" />
 				</v-container>
 			</v-col>
 			<v-col cols="6">

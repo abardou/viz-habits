@@ -35,25 +35,31 @@
 					data-anchor="explications"
 				>
 					<v-row>
-						<v-col cols="7" style="text-align: center; margin: auto; padding: 0 3%; margin-bottom: 3%;">
+						<v-col cols="6" style="text-align: center; margin: auto; padding: 0 3%; margin-bottom: 3%;">
 							<h2 style="text-transform: uppercase">
 								Contexte
 							</h2>
 							<p>Le smartphone est une technologie qui s'est ancrée profondément dans nos sociétés développées. Outil permettant de naviguer parmi un grand ensemble d'applications, nous l'utilisons plusieurs fois par jour, chacun à notre manière. Dans ce projet, nous avons voulu représenter les profils, les façons dont les différents utilisateurs naviguent dans leur téléphone. Cette visualisation, qui s'inscrit dans le contexte de l'explosion des flux de données et du <em>Quantified Self</em>, permet à un utilisateur curieux comme à un expert cherchant à visualiser des comportements d'explorer différents profils de consommation selon différents critères comme la période temporelle, la localisation ou encore le temps d'utilisation de chaque application.</p>
 						</v-col>
-					</v-row>
-					<v-row>
 						<v-col cols="6" style="text-align: center; padding: 0 3%">
 							<h2 style="text-transform: uppercase">
 								Collection des données
 							</h2>
 							<p>Les données que nous utilisons ont été collectées par nos soins, sur nous-mêmes, grâce à l'application App Usage. Elle permet un export de l'activité de l'utilisateur du téléphone sur lequel elle est installée. En croisant ces données avec nos historiques des positions (collectés et fournis par Google), nous pouvons alors constituer un dataset en JSON liant temps d'utilisation des applications, positions géographiques et temporelles.</p>
 						</v-col>
+					</v-row>
+					<v-row>
 						<v-col cols="6" style="text-align: center; padding: 0 3%">
 							<h2 style="text-transform: uppercase">
-								Visualisation
+								Graphe de switch
 							</h2>
-							<p>Les données sont représentées par un graphe, dans lequel les noeuds incarnent les applications (dont la taille varie en fonction de leur temps d'utilisation). Deux noeuds sont liés si l'utilisateur est passé d'une application à l'autre (la largeur des arêtes représentant le nombre de fois que l'utilisateur a effectué ce basculement). En jouant avec les filtres liés à la visualisation, on peut se rendre compte de plusieurs types de consommation différentes, en fonction du lieu et de l'heure de la journée.</p>
+							<p>Dans cette première visualisation, les données sont représentées par un graphe, dans lequel les noeuds incarnent les applications (dont la taille varie en fonction de leur temps d'utilisation). Deux noeuds sont liés si l'utilisateur est passé d'une application à l'autre (la largeur des arêtes représentant le nombre de fois que l'utilisateur a effectué ce basculement). En jouant avec les filtres liés à la visualisation, on peut se rendre compte de plusieurs types de consommation différentes, en fonction du lieu et de l'heure de la journée.</p>
+						</v-col>
+						<v-col cols="6" style="text-align: center; padding: 0 3%">
+							<h2 style="text-transform: uppercase">
+								Arbre radial
+							</h2>
+							<p>Pour cette seconde visualisation, les données sont représentées par un arbre radial (Radial Tree) et représente des enchainements d'applications, du moment où le téléphone est déverrouillé jusqu'au moment où il se remet en veille. Chaque noeud du graphe est une application, et chaque arête entre deux noeuds représente un switch entre ces deux applications. Cette visualisation nous permet alors d'explorer les séquences les plus fréquentes d'applications, et nous donne la possibilité de visualiser le profil de consommation d'un utilisateur d'une manière différente.</p>
 						</v-col>
 					</v-row>
 					<div
