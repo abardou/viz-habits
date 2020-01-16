@@ -1,6 +1,6 @@
 # VizHabits
 
-![Alt text](doc/images/thumbnail.jpg?raw=true "Habits")
+![Alt text](doc/images/teaser.jpg?raw=true "Habits")
 
 
 ## Authors
