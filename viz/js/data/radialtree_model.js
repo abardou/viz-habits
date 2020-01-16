@@ -175,11 +175,11 @@ class RadialTreeModel {
     }
 
     get_app_tree(app_name, values) {
-    	let children = []
+    	let children = [];
 		if (Object.keys(values).length > 0) {
 			for (let b of Object.keys(values)) {
                 if (b != "nb_use") {
-                    let v = values[b]
+                    let v = values[b];
     				children.push(this.get_app_tree(b, values[b]))
                 }
 			}
@@ -192,26 +192,14 @@ class RadialTreeModel {
 		}
 	}
 
-    get_tree_uses() {
-        let res = this.get_node_uses(this.json_as_tree).sort()
-        let r = []
-        for (let val of res) {
-            if (!r.includes(val)) {
-                r.push(val)
-            }
-        }
-        
-        return r.sort(function (a, b) {  return a - b;  });
-    }
-
     get_node_uses(sequences) {
-        let res = []
+        let res = [];
 
-        res.push(sequences.nb_use)
+        res.push(sequences.nb_use);
 
         if (sequences.children != undefined && sequences.children.length > 0) {
             for (let child of sequences.children) {
-                let ret = this.get_node_uses(child)
+                let ret = this.get_node_uses(child);
                 res = res.concat(ret)
             }
         }
@@ -219,14 +207,6 @@ class RadialTreeModel {
         return res
     }
 
-    filter_tree(id="1", minimum=1, begin_with="Screen on (unlocked)", contains=undefined, end_with="Screen off") {
-        this.user_id = id
-        this.start = begin_with
-        this.build_tree(this.data)
-        this.build_tree_from_json()
-        this.json_as_tree = this.filter_minimum(this.json_as_tree, minimum)
-
-    }
 
     filter_minimum(sequences, minimum) {
         
@@ -236,7 +216,7 @@ class RadialTreeModel {
 
             if (sequences.children != undefined && sequences.children.length > 0) {
                 for (let child of sequences.children) {
-                    let ret = this.filter_minimum(child, minimum)
+                    let ret = this.filter_minimum(child, minimum);
                     if (ret != undefined) {
                         children.push(ret)
                     }
@@ -245,7 +225,7 @@ class RadialTreeModel {
                 return sequences
             }
 
-            delete sequences.children
+            delete sequences.children;
 
             if (children.length > 0) {
                 sequences.children = children
@@ -257,41 +237,4 @@ class RadialTreeModel {
             return undefined
         }
     }
-
-
-    filter_screen_off_leaf(sequences) {
-        //console.log(res)
-        let children = []
-
-        if (sequences.children != undefined && sequences.children.length == 1 && sequences.children[0].name == "Screen off") {
-            delete sequences.children
-            sequences.children = children
-        }
-
-        if (sequences.children != undefined && sequences.children.length > 0) {
-            
-                for (let child of sequences.children) {
-                    let ret = this.filter_screen_off_leaf(child)
-                    children.push(ret)
-                }
-            
-        }
-
-        delete sequences.children
-
-        sequences.children = children
-
-        if (sequences.children.length > 0) {
-            let sum = 0
-
-            for (let c of sequences.children) {
-                sum += c.nb_use
-            }
-
-            sequences.nb_use = sum
-        }
-
-        return sequences
-    }
-
 }

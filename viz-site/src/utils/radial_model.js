@@ -109,7 +109,7 @@ export default class RadialTreeModel {
 				}
 			}
 
-			console.log(sequences);
+			//console.log(sequences);
 
 			var goal = sequences.reduce(function(carry, pathEntry){
 				// On every path entry, resolve using the base object
@@ -133,7 +133,7 @@ export default class RadialTreeModel {
 
 			//console.log(goal);
 		}
-		console.log(this.user_sequences[parseInt(Object.keys(this.user_sequences)[0])]);
+		//console.log(this.user_sequences[parseInt(Object.keys(this.user_sequences)[0])]);
 	}
 
 	/**
@@ -147,30 +147,19 @@ export default class RadialTreeModel {
 		return this.apps.indexOf(app_name);
 	}
 
-	get_users() {
-		return this.users;
-	}
-
-	get_maximum_length() {
-		return this.maximum;
-	}
-
 	get_tree() {
 		this.start = 'Screen on (unlocked)';
 		this.build_tree(this.data);
 		this.build_tree_from_json();
 		this.json_as_tree = this.filter_minimum(this.json_as_tree, 3);
-		console.log(this.json_as_tree);
+		//console.log(this.json_as_tree);
 		return this.json_as_tree;
 	}
 
 	build_tree_from_json() {
 		let app_name = Object.keys(this.user_sequences[Object.keys(this.user_sequences)[0]])[0];
-		console.log(this.user_sequences[Object.keys(this.user_sequences)[0]][app_name]);
+		//console.log(this.user_sequences[Object.keys(this.user_sequences)[0]][app_name]);
 		this.json_as_tree = this.get_app_tree(app_name, this.user_sequences[Object.keys(this.user_sequences)[0]][app_name]);
-
-		//json_as_tree = this.filter_screen_off_leaf(json_as_tree)
-		
 		return this.json_as_tree;
 	}
 
@@ -190,33 +179,6 @@ export default class RadialTreeModel {
 		} else {
 			return {'name' : app_name, 'image' : this.images[app_name], 'nb_use' : values['nb_use']};
 		}
-	}
-
-	get_tree_uses() {
-		let res = this.get_node_uses(this.json_as_tree).sort();
-		let r = [];
-		for (let val of res) {
-			if (!r.includes(val)) {
-				r.push(val);
-			}
-		}
-		
-		return r.sort(function (a, b) {  return a - b;  });
-	}
-
-	get_node_uses(sequences) {
-		let res = [];
-
-		res.push(sequences.nb_use);
-
-		if (sequences.children != undefined && sequences.children.length > 0) {
-			for (let child of sequences.children) {
-				let ret = this.get_node_uses(child);
-				res = res.concat(ret);
-			}
-		}
-
-		return res;
 	}
 
 	filter_minimum(sequences, minimum) {
@@ -248,40 +210,4 @@ export default class RadialTreeModel {
 			return undefined;
 		}
 	}
-
-
-	filter_screen_off_leaf(sequences) {
-		let children = [];
-
-		if (sequences.children != undefined && sequences.children.length == 1 && sequences.children[0].name == 'Screen off') {
-			delete sequences.children;
-			sequences.children = children;
-		}
-
-		if (sequences.children != undefined && sequences.children.length > 0) {
-			
-			for (let child of sequences.children) {
-				let ret = this.filter_screen_off_leaf(child);
-				children.push(ret);
-			}
-			
-		}
-
-		delete sequences.children;
-
-		sequences.children = children;
-
-		if (sequences.children.length > 0) {
-			let sum = 0;
-
-			for (let c of sequences.children) {
-				sum += c.nb_use;
-			}
-
-			sequences.nb_use = sum;
-		}
-
-		return sequences;
-	}
-
 }

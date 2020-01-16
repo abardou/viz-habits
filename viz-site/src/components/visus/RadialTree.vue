@@ -46,7 +46,7 @@ export default {
 
 		this.draw_graph();
 
-		this.$root.$on('redrawForceGraph', () => {
+		this.$root.$on('redrawRadialTree', () => {
 			this.draw_graph(); });
 
 	},
@@ -80,7 +80,7 @@ export default {
 			let data = this.$store.state.finaldataRadial;
 
 
-			console.log(data);
+			//console.log(data);
 			this.rtm = new RadialTreeModel(data, 10);
 
 			this.draw(this.rtm.get_tree());

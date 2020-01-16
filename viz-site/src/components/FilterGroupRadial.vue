@@ -69,18 +69,22 @@ export default {
 
 			let to_rem = active_filters.reduce((a, b) => new Set([...a, ...b]));
 
+			console.log(to_rem);
+			console.log(this.$store.state.dataRadial);
+
 			let fdataRadial = this.$store.state.dataRadial.filter((d, i) => !to_rem.has(i));
 			this.$store.commit('setFilteredDatasetRadial', fdataRadial);
 			this.$store.commit('setFinalDatasetRadial', fdataRadial);
+			console.log(fdataRadial);
 
 			this.$root.$emit('redrawSlider');
-			this.$root.$emit('redrawForceGraph');
+			this.$root.$emit('redrawRadialTree');
 		},
 
 		filter_range() {
 			//let fdata = this.$store.state.fdata.filter((d, i) => !this.range_filtered.includes(i));
 			//this.$store.commit('setFinalDataset', fdata);
-			this.$root.$emit('redrawForceGraph');
+			this.$root.$emit('redrawRadialTreeGraph');
 		}
 	}
 };
