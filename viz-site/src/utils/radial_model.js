@@ -82,6 +82,8 @@ export default class RadialTreeModel {
 
 		this.user_sequences = {};
 
+		console.log(this.start);
+
 
 		for (let uid of this.users) {
 
@@ -148,7 +150,6 @@ export default class RadialTreeModel {
 	}
 
 	get_tree() {
-		this.start = 'Screen on (unlocked)';
 		this.build_tree(this.data);
 		this.build_tree_from_json();
 		this.json_as_tree = this.filter_minimum(this.json_as_tree, 3);

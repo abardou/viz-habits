@@ -5,6 +5,13 @@
 				<v-container pa-5>
 					<RadialTreeUserFilter @userChange="userChange" />
 					<v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Force Graph' : 'Dendogram'}`" @change="changed" />
+					<v-btn
+						color="#f5f9f9"
+						style="color: #252835;"
+						@click="resetGraph"
+					>
+						Restart Tree
+					</v-btn>
 				</v-container>
 			</v-col>
 			<v-col cols="6">
@@ -40,6 +47,9 @@ export default {
 		changed(data) {
 			this.$emit('changeVisu', data);
 		},
+		resetGraph(data) {
+			this.$root.$emit('redrawRadialTree');
+		},
 		mapChange(data) {
 			this.index_filtered[0] = new Set(data);
 			this.filter_norange();
@@ -54,7 +64,6 @@ export default {
 			}
 		},
 		userChange(data) {
-			console.log('ok');
 			this.index_filtered[1] = new Set(data);
 			this.filter_norange();
 		},

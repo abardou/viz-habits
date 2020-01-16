@@ -75,13 +75,15 @@ export default {
 	//
 	// },
 	methods: {
-		draw_graph() {
+		draw_graph(start_app_name=null) {
 			this.svg.selectAll('*').remove();
 			let data = this.$store.state.finaldata;
 
-
-			//console.log(data);
-			this.rtm = new RadialTreeModel(data, 10);
+			if (start_app_name != null) {
+				this.rtm = new RadialTreeModel(data, 10, start_app_name);
+			} else {
+				this.rtm = new RadialTreeModel(data, 10);
+			}
 
 			this.draw_tidy(this.rtm.get_tree());
 		},
@@ -225,6 +227,7 @@ export default {
 				.style('margin', '5px');
 			*/
 			const link = this.svg.append('g')
+				.attr('id', 'links')
 				.attr('fill', 'none')
 				.attr('stroke', '#555')
 				.attr('stroke-opacity', 0.4)
@@ -260,6 +263,7 @@ export default {
 					that.disable_focus();
 				});
 			const node = this.svg.append('g')
+				.attr('id', 'nodes')
 				.attr('stroke-linejoin', 'round')
 				.attr('stroke-width', 3)
 				.selectAll('g')
@@ -287,7 +291,7 @@ export default {
 					that.disable_focus();
 				})
 				.on('click', function(d) {
-					that.tools_ref.send_filters(d.data.name);
+					that.draw_graph(d.data.name);
 					that.tooltip.classed('hidden', true);
 				});
 			node.append('circle')
