@@ -2,6 +2,14 @@
 	<v-container fluid pb-0>
 		<v-row no-gutters>
 			<v-col cols="6">
+				<RangeSlider
+					:subject="'sequences'"
+					:nbbins="70"
+					:htmlid="'time'"
+					@rangeChange="rangeChange"
+				/>
+			</v-col>
+			<v-col cols="6">
 				<v-container pa-5>
 					<RadialTreeUserFilter @userChange="userChange" />
 					<v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Force Graph' : 'Dendogram'}`" @change="changed" />
@@ -31,6 +39,7 @@ export default {
 	name: 'FilterGroupRadial',
 	components: {
 		MapFilter,
+		RangeSlider,
 		TimePeriodPicker,
 		RadialTreeUserFilter
 	},

@@ -20,7 +20,7 @@ import { htmlToElement } from '@/utils/elementCreation.js';
 export default {
 	name: 'RangeSlider',
 	props: {
-		subject: { // time | switch | nb_seq
+		subject: { // time | switch | sequences
 			default: null,
 			type: String
 		},
@@ -117,7 +117,8 @@ export default {
 			this.min = null,
 			this.max = null,
 			this.app_names = null,
-			this.pp_data = null;
+			this.pp_data = null,
+			this.test = {};
 		},
 		sendEvent() {
 			const toDel = [];
@@ -178,6 +179,8 @@ export default {
 				}
 
 				return res;
+			} else if (this.subject == 'sequences') {
+				const sequences = this.sequences();
 			}
 
 			return null;
@@ -401,6 +404,104 @@ export default {
 			this.links = mt;
 
 			return mt;
+		},
+		sequences() {
+			let users = new Set();
+			const data = JSON.parse(JSON.stringify(this.$store.state.fdata));
+
+
+			let keys = Object.keys(data);
+			for (let i = 0; i < keys.length; i++) {
+				data[keys[i]]['row_id'] = i;
+			}
+
+			for (let d of data)
+				users.add(d['User_ID']);
+
+			let sequences_per_user = [];
+
+			for (let uid of users) {
+				let f_data = data.filter(d => d['User_ID'] == uid)
+					.sort(function (a, b) {
+						return a.Time - b.Time;
+					});
+
+				let sequences = [];
+				let in_seq = false;
+				let seq = [];
+				for (let i of f_data) {
+					if ((i['App Name'] === 'Screen on (unlocked)' && !in_seq) || (i['App Name'] === 'Screen on (unlocked)' && seq.length === 1)) {
+						seq = [['Screen on (unlocked)', i['row_id']]];
+						in_seq = true;
+					} else {
+						if (i['App Name'] == 'Screen off' && in_seq) {
+							//seq.push("Screen off")
+							sequences.push({'path': seq});
+							in_seq = false;
+						} else {
+							if (in_seq) {
+								if (seq.length > 1 && i['App Name'] == seq[seq.length - 1]) {
+									continue;
+								}
+								seq.push([i['App Name'], i['row_id']]);
+							}
+						}
+					}
+				}
+
+
+				var goal = sequences.reduce(function (carry, pathEntry) {
+					// On every path entry, resolve using the base object
+					pathEntry.path.reduce(function (pathObject, pathName) {
+						// For each path name we come across, use the existing or create a subpath
+
+						pathObject[pathName[0]] = pathObject[pathName[0]] || {'nb_use': 0, 'row_id' : []};
+
+
+						// Then return that subpath for the next operation
+						pathObject[pathName[0]]['nb_use'] += 1;
+						pathObject[pathName[0]]['row_id'].push(pathName[1]);
+						return pathObject[pathName[0]];
+						// Use the passed in base object to attach our resolutions
+					}, carry);
+					// Return the base object for suceeding paths, or for our final value
+					return carry;
+					// Create our base object
+				}, {});
+
+				sequences_per_user.push(goal);
+			}
+			let s = sequences_per_user[0];
+
+			let app_name = Object.keys(s)[0];
+			//console.log(this.user_sequences[Object.keys(this.user_sequences)[0]][app_name]);
+			this.set_app_nb_use_by_index(app_name, s[app_name]);
+
+			let result = [];
+			let test_keys = Object.keys(this.test);
+
+			for (let i = 0; i < keys.length; i++) {
+				if (test_keys.includes(i.toString())) {
+					result.push(this.test[i][1]);
+				} else {
+					result.push(0);
+				}
+			}
+			console.log(result);
+
+		},
+		set_app_nb_use_by_index(app_name, values) {
+			let old = Object.keys(values);
+			if (old.length > 0) {
+				for (let b of old) {
+					if (b != 'nb_use' && b != 'row_id') {
+						this.set_app_nb_use_by_index(b, values[b]);
+					}
+				}
+			}
+			for (let i of values['row_id']) {
+				this.test[i] = [app_name, values['nb_use']];
+			}
 		}
 	}
 };
