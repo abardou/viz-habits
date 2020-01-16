@@ -118,7 +118,8 @@ export default {
 			this.max = null,
 			this.app_names = null,
 			this.pp_data = null,
-			this.test = {};
+			this.test = {},
+			this.model = [];
 		},
 		sendEvent() {
 			const toDel = [];
@@ -472,6 +473,7 @@ export default {
 				sequences_per_user.push(goal);
 			}
 			let s = sequences_per_user[0];
+			console.log(s);
 
 			let app_name = Object.keys(s)[0];
 			//console.log(this.user_sequences[Object.keys(this.user_sequences)[0]][app_name]);
@@ -487,7 +489,12 @@ export default {
 					result.push(0);
 				}
 			}
+
+			console.log(this.model);
+
 			console.log(result);
+
+
 
 		},
 		set_app_nb_use_by_index(app_name, values) {
@@ -499,6 +506,7 @@ export default {
 					}
 				}
 			}
+			this.model.push(values['nb_use']);
 			for (let i of values['row_id']) {
 				this.test[i] = [app_name, values['nb_use']];
 			}
