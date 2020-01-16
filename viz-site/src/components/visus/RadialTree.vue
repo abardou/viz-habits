@@ -31,16 +31,14 @@ export default {
 			// Build the logical representation of the model
 			const rtm = new RadialTreeModel(data, 10);
 			data = rtm.get_user_tree(1);
-			console.log(data);
 
 			this.draw_den(data);
 		},
 
 		draw_den(data) {
-			return;
 			const that = this;
 			const radius = this.width / 2;
-			const tree = d3.cluster().size([360, radius - 100]);
+			const tree = d3.cluster().size([360, radius + 1000]);
 			const root = tree(d3.hierarchy(data)
 				.sort((a, b) => d3.ascending(a.data.name, b.data.name)));
 

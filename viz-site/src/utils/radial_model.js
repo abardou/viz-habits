@@ -94,24 +94,13 @@ export default class RadialTreeModel {
 						in_seq = false;
 					} else if (in_seq) {
 						if (seq.length > 2 && d['App Name'] == seq[seq.length - 1]) {
-							console.log(d['App Name']);
-							console.log(seq[seq.length - 1]);
 							continue;
 						}
 						seq.push(d['App Name']);
 					}
 				}
 			}
-			
-			let max = 0;
-			for (const m of sequences) {
-				if (m.length > max) {
-					max = m.length;
-				}
-			}
 
-			console.log(max);
-			
 			for (const [i, seqBase] of sequences.entries()) {
 				const sequence = seqBase.slice(1);
 				// Alternate = longueur 5 mini
@@ -135,7 +124,7 @@ export default class RadialTreeModel {
 									idxFin: i - 1,
 									app1: altArray[0],
 									app2: altArray[1],
-									nbSwitches: altArray.length - 1
+									nbSwitches: altArray.length - 2
 								});
 								alt = false;
 							}
@@ -143,6 +132,17 @@ export default class RadialTreeModel {
 							altArray = altArray.slice(-2);
 						} else if (altArray.length >= 5) {
 							alt = true;
+						}
+
+						if (alt && i === sequence.length - 1) {
+							alts.push({
+								idxDeb: i - len + 1,
+								idxFin: i,
+								app1: altArray[0],
+								app2: altArray[1],
+								nbSwitches: altArray.length - 1
+							});
+							alt = false;
 						}
 					}
 				}
@@ -166,34 +166,37 @@ export default class RadialTreeModel {
 				}
 			}
 
-			console.log(sequences);
-			max = 0;
-			let maxseq = null;
-			for (const m of sequences) {
-				if (m.length > max) {
-					max = m.length;
-					maxseq = m;
-				}
-			}
-
-			console.log(max);
-			console.log(maxseq);
-
-			break;
 			const goal = {
 				name: 'Screen on (unlocked)',
 				nb_use: 0,
 				children: []
 			};
+
 			for (const seq of sequences) {
 				let currentNode = goal;
 				currentNode.nb_use++;
 
 				for (const app of seq.slice(1)) {
+					let appStr,
+						dual = false;
+
+					if (typeof app === 'object') {
+						dual = true;
+						// Ordre alphabétique
+						if (app.app1 > app.app2) {
+							appStr = `${app.app2} / ${app.app1}`;
+						} else {
+							appStr = `${app.app1} / ${app.app2}`;
+						}
+					} else {
+						appStr = app;
+					}
+
 					let found = false,
 						child = null;
+					
 					for (const c of currentNode.children) {
-						if (c.name === app) {
+						if (c.name === appStr) {
 							found = true;
 							child = c;
 							break;
@@ -203,46 +206,27 @@ export default class RadialTreeModel {
 					if (found) {
 						currentNode = child;
 						currentNode.nb_use++;
+						if (dual) {
+							currentNode.nbSwitches += app.nbSwitches;
+						}
 					} else {
-						currentNode.children.push({
-							name: app,
+						const toPush = {
+							name: appStr,
 							nb_use: 1,
 							children: []
-						});
+						};
+
+						if (dual) {
+							toPush.nbSwitches = app.nbSwitches;
+						}
+
+						currentNode.children.push(toPush);
 					}
 				}
 			}
 
 			console.log(goal);
-
-			/*
-			const goal = sequences.reduce((carry, pathEntry) => {
-				// On every path entry, resolve using the base object
-				pathEntry.path.reduce((pathObject, pathName) => {
-					// For each path name we come across, use the existing or create a subpath
-					pathObject[pathName] = pathObject[pathName] || {'nb_use': 0};
-				
-					// Then return that subpath for the next operation
-					pathObject[pathName]['nb_use'] += 1;
-					return pathObject[pathName];
-				// Use the passed in base object to attach our resolutions
-				}, carry);
-				// Return the base object for suceeding paths, or for our final value
-				return carry;
-			// Create our base object
-			}, {});
-			*/
-
-			// let fixed = {name: 'Screen on (unlocked)', children: []};
-			// for (const key in goal['Screen on (unlocked)']) {
-			// 	if (key === 'nb_use') {
-			// 		fixed[key] = goal['Screen on (unlocked)'][key];
-			// 	} else {
-			// 		continue;
-			// 	}
-			// }
-
-			// this.user_trees[uid] = goal;
+			this.user_trees[uid] = goal;
 		}
 	}
 
