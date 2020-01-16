@@ -75,17 +75,20 @@ export default {
 		this.colorScale = ['#CC2A36', '#4F372D', '#00A0B0'];
 		
 		for (const [i, pd] of this.posData.entries()) {
-			if (pd.Lat != undefined && pd.Long != undefined && this.defaultUsers.includes(pd.User_ID)) {
+			if (pd.Lat != undefined && pd.Long != undefined) {
 				this.posData[i].latlng = new L.LatLng(pd.Lat, pd.Long);
-				const cs = this.colorScale;
-				
-				this.circles.push(
-					L.circle(pd.latlng, {
-						color: cs[pd.User_ID-1],
-						radius: 3
-					})
-						.addTo(this.map)
-				);
+
+				if (this.defaultUsers.includes(pd.User_ID)) {
+					const cs = this.colorScale;
+
+					this.circles.push(
+						L.circle(pd.latlng, {
+							color: cs[pd.User_ID-1],
+							radius: 3
+						})
+							.addTo(this.map)
+					);
+				}
 			}
 		}
 
