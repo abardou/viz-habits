@@ -36,6 +36,12 @@ import * as d3 from 'd3';
 
 export default {
 	name: 'Map',
+	props: {
+		defaultUsers: {
+			type: Array,
+			default: () => [1, 2, 3]
+		}
+	},
 	data: () => ({
 		latitudeRange: [0, 1],
 		longitudeRange: [0, 1],
@@ -71,15 +77,18 @@ export default {
 		for (const [i, pd] of this.posData.entries()) {
 			if (pd.Lat != undefined && pd.Long != undefined) {
 				this.posData[i].latlng = new L.LatLng(pd.Lat, pd.Long);
-				const cs = this.colorScale;
-				
-				this.circles.push(
-					L.circle(pd.latlng, {
-						color: cs[pd.User_ID-1],
-						radius: 3
-					})
-						.addTo(this.map)
-				);
+
+				if (this.defaultUsers.includes(pd.User_ID)) {
+					const cs = this.colorScale;
+
+					this.circles.push(
+						L.circle(pd.latlng, {
+							color: cs[pd.User_ID-1],
+							radius: 3
+						})
+							.addTo(this.map)
+					);
+				}
 			}
 		}
 

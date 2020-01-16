@@ -5,6 +5,7 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
 	state: {
+		brutData: null,
 		data: null,
 		fdata: null,
 		finaldata: null,
@@ -18,6 +19,9 @@ export default new Vuex.Store({
 		setDraggingState(state, value) {
 			state.draggingState = value;
 		},
+		setBrutDataset(state, value) {
+			state.brutData = Object.freeze(value);
+		},
 		setDataset(state, value) {
 			state.data = Object.freeze(value);
 		},
@@ -26,6 +30,15 @@ export default new Vuex.Store({
 		},
 		setFinalDataset(state, value) {
 			state.finaldata = Object.freeze(value);
+		},
+		setDatasetRadial(state, value) {
+			state.dataRadial = Object.freeze(value);
+		},
+		setFilteredDatasetRadial(state, value) {
+			state.fdataRadial = Object.freeze(value);
+		},
+		setFinalDatasetRadial(state, value) {
+			state.finaldataRadial = Object.freeze(value);
 		}
 	},
 	actions: {

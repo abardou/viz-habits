@@ -74,10 +74,11 @@
 					data-anchor="visualisation"
 					pt-1
 				>
-					<v-row v-if="fetched" dense>
-						<v-col cols="5">
+					<v-row v-if="fetched">
+						<v-col cols="5" style="border-right: 1px solid black;">
 							<!-- <v-card style="background-color: #2B2B3B"> -->
-							<FilterGroup @changeVisu="changeVisu" />	
+							<FilterGroup v-if="visu" @changeVisu="changeVisu" />
+							<FilterGroupRadial v-else @changeVisu="changeVisu" />
 							<!-- </v-card> -->
 						</v-col>
 						<v-col cols="7">
@@ -104,14 +105,17 @@
 
 <script>
 // Filters
+import FilterGroupRadial from '@/components/FilterGroupRadial.vue';
 import FilterGroup from '@/components/FilterGroup.vue';
 import ForceGraph from '@/components/visus/ForceGraph.vue';
 import RadialTree from '@/components/visus/RadialTree.vue';
+
 
 export default {
 	name: 'Home',
 	components: {
 		FilterGroup,
+		FilterGroupRadial,
 		ForceGraph,
 		RadialTree
 	},
@@ -149,17 +153,40 @@ export default {
 		fetch('dataset.json').then(async resp => {
 			let data = await resp.json();
 
-			data = data.filter(d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'));
-			// const str = JSON.stringify(data);
-			this.$store.commit('setDataset', data);
-			this.$store.commit('setFilteredDataset', data);
-			this.$store.commit('setFinalDataset', data);
+			this.$store.commit('setBrutDataset', data);
+
+			if (this.visu) {
+				data = data.filter(d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'));
+				this.$store.commit('setDataset', data);
+				this.$store.commit('setFilteredDataset', data);
+				this.$store.commit('setFinalDataset', data);
+				// const str = JSON.stringify(data);
+			} else {
+				this.$store.commit('setDataset', data);
+				this.$store.commit('setFilteredDataset', data);
+				this.$store.commit('setFinalDataset', data);
+
+			}
+
 			this.fetched = true;
 		});
 	},
 	methods: {
-		changeVisu(data) {
-			this.visu = data;
+		changeVisu(val) {
+			this.visu = val;
+
+			let data = this.$store.state.brutData;
+
+			if (val) {
+				data = data.filter(d => d['App Name'] != 'Screen off' && !d['App Name'].startsWith('Screen on'));
+				this.$store.commit('setDataset', data);
+				this.$store.commit('setFilteredDataset', data);
+				this.$store.commit('setFinalDataset', data);
+			} else {
+				this.$store.commit('setDataset', data);
+				this.$store.commit('setFilteredDataset', data);
+				this.$store.commit('setFinalDataset', data);
+			}
 		}
 	}
 };
