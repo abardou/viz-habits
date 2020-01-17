@@ -4,13 +4,6 @@
 			<v-col cols="6">
 				<v-container pa-5>
 					<RadialTreeUserFilter @userChange="userChange" />
-					<v-btn
-						color="#f5f9f9"
-						style="color: #252835;"
-						@click="resetGraph"
-					>
-						Restart Tree
-					</v-btn>
 				</v-container>
 			</v-col>
 			<v-col cols="6">
@@ -39,9 +32,6 @@ export default {
 		this.edges_filtered = new Array();
 	},
 	methods: {
-		resetGraph(data) {
-			this.$root.$emit('redrawRadialTree');
-		},
 		mapChange(data) {
 			this.index_filtered[0] = new Set(data);
 			this.filter_norange();

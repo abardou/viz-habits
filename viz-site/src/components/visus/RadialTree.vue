@@ -17,6 +17,14 @@
 				Ce tidy tree représentent les séquences d'applications habituelles dans le dataset et ce à partir de l'écran dévérouillé jusqu'au prochain verrouillage (non affiché puisque celui-ci serait alors présent sur chaque branche)
 			</div>
 		</v-tooltip>
+		<v-btn
+			id="tree-reset-btn"
+			color="#f5f9f9"
+			style="color: #252835;"
+			@click="draw_graph"
+		>
+			Restart Tree
+		</v-btn>
 		<v-switch
 			v-model="visuSwitch"
 			class="graph-switch"
@@ -53,9 +61,6 @@ export default {
 		this.tooltip = d3.select('#radial-container').append('div').attr('class', 'hidden tooltipRadial');
 
 		this.draw_graph();
-
-		this.$root.$on('redrawRadialTree', () => {
-			this.draw_graph(); });
 	},
 
 	methods: {
@@ -389,39 +394,45 @@ export default {
 </script>
 
 <style>
-	.hidden {
-		display: none;
-	}
+.hidden {
+	display: none;
+}
 
-	div.tooltipRadial {
-		color: #222;
-		background-color: #fff;
-		padding: .5em;
-		text-shadow: #f5f5f5 0 1px 0;
-		border-radius: 2px;
-		opacity: 0.8;
-		position: absolute;
-		font-size: 1em;
-	}
+div.tooltipRadial {
+	color: #222;
+	background-color: #fff;
+	padding: .5em;
+	text-shadow: #f5f5f5 0 1px 0;
+	border-radius: 2px;
+	opacity: 0.8;
+	position: absolute;
+	font-size: 1em;
+}
 
-	.node circle {
-		fill: #fff;
-		stroke: steelblue;
-		stroke-width: 3px;
-	}
+.node circle {
+	fill: #fff;
+	stroke: steelblue;
+	stroke-width: 3px;
+}
 
-	.node text {
-		font: 12px sans-serif;
-	}
+.node text {
+	font: 12px sans-serif;
+}
 
-	.link {
-		fill: none;
-		stroke: #ccc;
-		stroke-width: 2px;
-	}
+.link {
+	fill: none;
+	stroke: #ccc;
+	stroke-width: 2px;
+}
 
-	text {
-		font-family: sans-serif;
-		font-size: 0.5em;
-	}
+text {
+	font-family: sans-serif;
+	font-size: 0.5em;
+}
+
+#tree-reset-btn {
+	position: absolute;
+	bottom: 15px;
+	left: 5pfx;
+}
 </style>
