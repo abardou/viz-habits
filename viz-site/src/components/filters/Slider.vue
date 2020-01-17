@@ -34,7 +34,7 @@ export default {
 			return 'Largeur des chemins';
 		},
 		filterExplanation() {
-			return 'Tooltip TODO';
+			return 'Sélection du minimum de la taille des arêtes, afin de rendre l\'arbre plus ou moins dense et de conserver les séquences plus ou moins importantes';
 		},
 		tooltip_style() {
 			return `
@@ -131,7 +131,7 @@ export default {
 				.thresholds(x.ticks(nbins));
 
 			this.bins = histogram(this.pp_data);
-			this.selected = [this.bins[0].x0, this.bins[this.bins.length-1].x1];
+			this.selected = [3, this.bins[this.bins.length-1].x1];
 
 			y.domain([0, d3.max(this.bins, function(d) { return d.length; })]);
 
