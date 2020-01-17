@@ -1,6 +1,13 @@
 <template>
 	<v-container fluid pb-0>
 		<v-row no-gutters>
+			<v-col cols="12">
+				<Slider
+					:nbbins="140"
+					:htmlid="'slider'"
+					@sliderChange="sliderChange"
+				/>
+			</v-col>
 			<v-col cols="6">
 				<v-container pa-5>
 					<RadialTreeUserFilter @userChange="userChange" />
@@ -15,7 +22,7 @@
 </template>
 <script>
 import RadialTreeUserFilter from '@/components/filters/RadialTreeUserFilter.vue';
-import RangeSlider from '@/components/filters/RangeSlider.vue';
+import Slider from '@/components/filters/Slider.vue';
 import MapFilter from '@/components/filters/MapFilter.vue';
 import TimePeriodPicker from '@/components/filters/TimePeriodPicker.vue';
 
@@ -23,6 +30,7 @@ export default {
 	name: 'FilterGroupRadial',
 	components: {
 		MapFilter,
+		Slider,
 		TimePeriodPicker,
 		RadialTreeUserFilter
 	},
@@ -36,14 +44,9 @@ export default {
 			this.index_filtered[0] = new Set(data);
 			this.filter_norange();
 		},
-		rangeChange(data, name) {
-			if (name == 'time') {
-				this.range_filtered = data;
-				this.filter_range();
-			} else if (name == 'switch') {
-				this.edges_filtered = data;
-				this.$root.$emit('handleEdgesForceGraph', this.edges_filtered);
-			}
+		sliderChange(data) {
+			this.$store.commit('setRadialMinimum', data); // Tristan, here you go
+			this.$root.$emit('redrawRadialTree');
 		},
 		userChange(data) {
 			this.index_filtered[1] = new Set(data);
@@ -69,9 +72,9 @@ export default {
 		},
 
 		filter_range() {
-			//let fdata = this.$store.state.fdata.filter((d, i) => !this.range_filtered.includes(i));
-			//this.$store.commit('setFinalDataset', fdata);
-			this.$root.$emit('redrawRadialTreeGraph');
+			let fdata = this.$store.state.fdata.filter((d, i) => !this.range_filtered.includes(i));
+			this.$store.commit('setFinalDataset', fdata);
+			this.$root.$emit('redrawRadialTree');
 		}
 	}
 };

@@ -21,7 +21,7 @@
 			id="tree-reset-btn"
 			color="#f5f9f9"
 			style="color: #252835;"
-			@click="draw_graph"
+			@click="resetRadialTree"
 		>
 			Restart Tree
 		</v-btn>
@@ -50,6 +50,7 @@ export default {
 		visuSwitch: false
 	}),
 	mounted () {
+		this.start_app_name = null;
 		const container = document.getElementById('radial-container');
 		this.width = container.offsetWidth - 50;
 		this.height = 890;
@@ -61,20 +62,28 @@ export default {
 		this.tooltip = d3.select('#radial-container').append('div').attr('class', 'hidden tooltipRadial');
 
 		this.draw_graph();
-	},
 
+		this.$root.$on('redrawRadialTree', () => {
+			this.draw_graph();
+		});
+	},
 	methods: {
+		resetRadialTree() {
+			this.start_app_name = null;
+			this.draw_graph();
+		},
 		changed(data) {
 			this.$emit('changeVisu', data);
 		},
-		draw_graph(start_app_name=null) {
+		draw_graph() {
 			this.svg.selectAll('*').remove();
-			let data = this.$store.state.finaldata;
+			const data = this.$store.state.finaldata;
+			const min = this.$store.state.radialMinimum;
 
-			if (start_app_name != null) {
-				this.rtm = new RadialTreeModel(data, 10, start_app_name);
+			if (this.start_app_name != null) {
+				this.rtm = new RadialTreeModel(data, 10, min, this.start_app_name);
 			} else {
-				this.rtm = new RadialTreeModel(data, 10);
+				this.rtm = new RadialTreeModel(data, 10, min);
 			}
 
 			this.draw_tidy(this.rtm.get_tree());
@@ -82,9 +91,6 @@ export default {
 
 		get_correct_time(time){
 			return time / 10;
-		},
-		get_size(time) {
-			return Math.sqrt(this.get_correct_time(time) / Math.PI);
 		},
 		seconds_to_time(sec) {
 			let h = Math.floor(sec / 3600);
@@ -285,7 +291,8 @@ export default {
 					that.disable_focus();
 				})
 				.on('click', function(d) {
-					that.draw_graph(d.data.name);
+					that.start_app_name = d.data.name;
+					that.draw_graph();
 					that.tooltip.classed('hidden', true);
 				});
 

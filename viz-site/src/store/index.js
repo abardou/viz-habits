@@ -13,7 +13,8 @@ export default new Vuex.Store({
 		draggingState: {
 			dragging: false,
 			dragStartRing: null
-		}
+		},
+		radialMinimum: 1
 	},
 	mutations: {
 		setDraggingState(state, value) {
@@ -39,6 +40,9 @@ export default new Vuex.Store({
 		},
 		setFinalDatasetRadial(state, value) {
 			state.finaldataRadial = Object.freeze(value);
+		},
+		setRadialMinimum(state, value) {
+			state.radialMinimum = Object.freeze(value);
 		}
 	},
 	actions: {

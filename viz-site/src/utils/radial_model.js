@@ -5,10 +5,11 @@
  * calculation on the whole dataset
  */
 export default class RadialTreeModel {
-	constructor(data, delta, start = 'Screen on (unlocked)') {
+	constructor(data, delta, minimum, start = 'Screen on (unlocked)') {
 		this.delta = delta;
 		this.start = start;
 		this.data = data;
+		this.minimum = minimum;
 		// Will build the attributes linked to app info
 		this.build_apps_info(this.data);
 		// Apps info need to be constructed before
@@ -84,7 +85,9 @@ export default class RadialTreeModel {
 
 		for (let uid of this.users) {
 			let f_data = data.filter(d => d['User_ID'] == uid)
-				.sort(function(a, b) { return a.Time - b.Time; });
+				.sort(function (a, b) {
+					return a.Time - b.Time;
+				});
 
 			let sequences = [];
 			let in_seq = false;
@@ -93,11 +96,10 @@ export default class RadialTreeModel {
 				if ((i['App Name'] === this.start && !in_seq) || (i['App Name'] === this.start && seq.length === 1)) {
 					seq = [this.start];
 					in_seq = true;
-				}
-				else {
-					if (i['App Name'] == 'Screen off' && in_seq) {
+				} else {
+					if ((i['App Name'] == 'Screen off' || i['App Name'] == 'Screen on (unlocked)') && in_seq) {
 						//seq.push("Screen off")
-						sequences.push({'path' : seq});
+						sequences.push({'path': seq});
 						in_seq = false;
 					} else {
 						if (in_seq) {
@@ -112,22 +114,22 @@ export default class RadialTreeModel {
 
 			//console.log(sequences);
 
-			var goal = sequences.reduce(function(carry, pathEntry){
+			var goal = sequences.reduce(function (carry, pathEntry) {
 				// On every path entry, resolve using the base object
-				pathEntry.path.reduce(function(pathObject, pathName){
-				// For each path name we come across, use the existing or create a subpath
+				pathEntry.path.reduce(function (pathObject, pathName) {
+					// For each path name we come across, use the existing or create a subpath
 
 					pathObject[pathName] = pathObject[pathName] || {'nb_use': 0};
 
-				
+
 					// Then return that subpath for the next operation
 					pathObject[pathName]['nb_use'] += 1;
 					return pathObject[pathName];
-				// Use the passed in base object to attach our resolutions
+					// Use the passed in base object to attach our resolutions
 				}, carry);
 				// Return the base object for suceeding paths, or for our final value
 				return carry;
-			// Create our base object
+				// Create our base object
 			}, {});
 
 			this.user_sequences[uid] = goal;
@@ -149,7 +151,7 @@ export default class RadialTreeModel {
 	get_tree() {
 		this.build_tree(this.data);
 		this.build_tree_from_json();
-		this.json_as_tree = this.filter_minimum(this.json_as_tree, 5);
+		this.json_as_tree = this.filter_minimum(this.json_as_tree, this.minimum);
 		//console.log(this.json_as_tree);
 		return this.json_as_tree;
 	}

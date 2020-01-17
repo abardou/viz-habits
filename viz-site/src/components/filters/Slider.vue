@@ -18,17 +18,9 @@ import * as d3 from 'd3';
 import { htmlToElement } from '@/utils/elementCreation.js';
 
 export default {
-	name: 'RangeSlider',
+	name: 'Slider',
 	props: {
-		subject: { // time | switch | sequences
-			default: null,
-			type: String
-		},
 		nbbins: {
-			default: null,
-			type: Number
-		},
-		delta: { // Useful for switch
 			default: null,
 			type: Number
 		},
@@ -39,26 +31,10 @@ export default {
 	},
 	computed: {
 		label() {
-			const name = this.htmlid;
-
-			if (name === 'time') {
-				return 'Temps d\'utilisation des applications (s)';
-			} else if (name === 'switch') {
-				return 'Nombre de switchs entre applications';
-			}
-
-			return name;
+			return 'Largeur des chemins';
 		},
 		filterExplanation() {
-			const name = this.htmlid;
-
-			if (name === 'time') {
-				return 'Filtre de la visualisation les applications dont le temps d\'utilisation est en dehors des limites fixées par ce slider';
-			} else if (name === 'switch') {
-				return 'Filtre de la visualisation les arêtes dont le nombre d\'occurrences est en dehors des limites fixées par ce slider';
-			}
-
-			return name;
+			return 'Sélection du minimum de la taille des arêtes, afin de rendre l\'arbre plus ou moins dense et de conserver les séquences plus ou moins importantes';
 		},
 		tooltip_style() {
 			return `
@@ -79,15 +55,12 @@ export default {
 		
 		this.$root.$on('redrawSlider', () => { this.build_slider(); });
 
-		this.width = document.getElementById('container-' + this.htmlid).offsetWidth + 50;
+		this.width = document.getElementById('container-' + this.htmlid).parentNode.offsetWidth;
 		this.width = this.width - this.margin.left - this.margin.right;
 
 		this.tooltips = [
 			d3.select('body').append(() => 
-				htmlToElement(`<div id="${this.htmlid}-tt1" style="${this.tooltip_style}" class="hidden tooltipSlider" />`)
-			), 
-			d3.select('body').append(() => 
-				htmlToElement(`<div id="${this.htmlid}-tt2" style="${this.tooltip_style}" class="hidden tooltipSlider" />`)
+				htmlToElement(`<div id="${this.htmlid}-tt" style="${this.tooltip_style}" class="hidden tooltipSlider" />`)
 			)
 		];
 
@@ -116,75 +89,16 @@ export default {
 			this.links = null,
 			this.min = null,
 			this.max = null,
-			this.app_names = null,
 			this.pp_data = null,
 			this.test = {},
 			this.model = [];
+			this.max_to_exclude = 0;
 		},
 		sendEvent() {
-			const toDel = [];
-
-			// Selection for time
-			if (this.subject == 'time') {
-				const app_to_del = [];
-
-				for (const i in this.utime) {
-					if (this.utime[i] < this.selected[0] || this.utime[i] > this.selected[1])
-						app_to_del.push(i);
-				}
-
-				for (const i in this.$store.state.fdata) {
-					if (app_to_del.indexOf(this.$store.state.fdata[i]['App Name']) != -1) {
-						toDel.push(parseInt(i));
-					}
-				}
-			} else if (this.subject == 'switch') {
-				// Selection for switch
-				for (const i in this.links) {
-					for (const j in this.links[i]) {
-						if (this.links[i][j] < this.selected[0] || this.links[i][j] > this.selected[1]) {
-							toDel.push([i, j]);
-						}
-					}
-				}
-			}
-
-			this.$emit('rangeChange', toDel, this.htmlid);
-		},
-		_app_names() {
-			let an = new Set();
-			for (let d of this.$store.state.fdata) {
-				an.add(d['App Name']);
-			}
-			return Array.from(an);
+			this.$emit('sliderChange', this.selected[0]);
 		},
 		_pp_data() {
-			if (this.subject == 'time') {
-				const tu = this.time_usage();
-				const res = [];
-
-				for (const v of Object.values(tu)) {
-					res.push(v);
-				}
-
-				return res;
-			} else if (this.subject == 'switch') {
-				const switches = this.switches();
-				const res = [];
-				for (const deb in switches) {
-					for (const value of Object.values(switches[deb])) {
-						if (value != 0) {
-							res.push(value);
-						}
-					}
-				}
-
-				return res;
-			} else if (this.subject == 'sequences') {
-				const sequences = this.sequences();
-			}
-
-			return null;
+			return this.sequences();
 		},
 		_min() {
 			return this.pp_data.length == 0 ? 0 : this.pp_data.reduce((a, b) => Math.min(a, b));
@@ -193,7 +107,6 @@ export default {
 			return this.pp_data.length == 0 ? 1 : this.pp_data.reduce((a, b) => Math.max(a, b));
 		},
 		update_computed() {
-			this.app_names = this._app_names();
 			this.pp_data = this._pp_data();
 			this.min = this._min();
 			this.max = this._max();
@@ -206,23 +119,23 @@ export default {
 			let nbins = Math.min(this.nbbins, this.max - this.min);
 
 			// Draw histogram
-			var x = d3.scaleLinear()
+			const x = d3.scaleLinear()
 				.domain([this.min, this.max])
 				.range([0, this.width]);
 
-			var y = d3.scaleSqrt()
+			const y = d3.scaleSqrt()
 				.range([this.heightHist, 0]);
 
-			var histogram = d3.histogram()
+			const histogram = d3.histogram()
 				.domain(x.domain())
 				.thresholds(x.ticks(nbins));
 
 			this.bins = histogram(this.pp_data);
-			this.selected = [this.bins[0].x0, this.bins[this.bins.length-1].x1];
+			this.selected = [3, this.bins[this.bins.length-1].x1];
 
 			y.domain([0, d3.max(this.bins, function(d) { return d.length; })]);
 
-			var u = this.svg.selectAll('rect')
+			const u = this.svg.selectAll('rect')
 				.data(this.bins);
 
 			u.enter()
@@ -235,10 +148,9 @@ export default {
 
 			this.draw_slider_line(x);
 				
-			this.svg.selectAll('cursors').data(this.selected)
-				.enter()
+			this.svg.selectAll('cursors').data([this.selected[0]]).enter()
 				.append('circle')
-				.attr('cx', d => x(d))
+				.attr('cx', x(this.selected[0]))
 				.attr('cy', this.heightHist + this.margin.bet)
 				.attr('r', this.cursorRad)
 				.style('fill', this.selColor)
@@ -246,51 +158,34 @@ export default {
 				.on('mouseout', () => that.hide_tooltips())
 				.call(d3.drag()
 					.on('start', () => that.show_tooltips())
-					.on('drag', (d, i) => this.dragged(i))
+					.on('drag', () => this.dragged())
 					.on('end', () => {that.hide_tooltips(); that.sendEvent();})
 				);
 			
 			this.sendEvent();
 		},
-		dragged(idx) {
+		dragged() {
 			this.show_tooltips();
 
 			let x = d3.scaleLinear()
 				.domain([this.min, this.max])
 				.range([0, this.width]);
-			let bin_idx = this.get_cursor_index(idx, x);
-			let attr = 'x'+idx;
+			let bin_idx = this.get_cursor_index(x);
+			let attr = 'x0';
 
-			this.selected[idx] = this.bins[bin_idx][attr];
+			this.selected[0] = this.bins[bin_idx][attr];
 			this.draw_slider_line(x, false);
 			this.svg.selectAll('circle')
-				.filter((d, i) => i == idx)
 				.attr('cx', x(this.bins[bin_idx][attr]));
 
 			this.svg.selectAll('rect')
 				.style('fill', d => d.x0 >= this.selected[0] && d.x1 <= this.selected[1] ? this.selColor : this.unselColor);
 		},
 
-		get_cursor_index(idx, x) {
+		get_cursor_index(x) {
 			// Get bin index
-			let other_curs = this.svg.selectAll('circle').filter((d, i) => i != idx).attr('cx');
-			let other_idx = this.get_point_index(other_curs, 'x'+(1-idx), this.bins, x);
-
-			let attr = 'x'+idx;
-			let diffs = this.bins.filter((d, i) => idx == 1 && i >= other_idx || idx == 0 && i <= other_idx)
-				.map(d => Math.abs(x(d[attr]) - d3.event.x));
-			let bin_idx = 0;
-			for (let i = 1; i < diffs.length; i++) {
-				if (diffs[i] < diffs[bin_idx])
-					bin_idx = i;
-			}
-			bin_idx += idx == 1 ? other_idx : 0;
-
-			return bin_idx;
-		},
-
-		get_point_index(posx, attr, bins, x) {
-			let diffs = bins.map(d => Math.abs(x(d[attr]) - posx));
+			let attr = 'x0';
+			let diffs = this.bins.map(d => Math.abs(x(d[attr]) - d3.event.x));
 			let bin_idx = 0;
 			for (let i = 1; i < diffs.length; i++) {
 				if (diffs[i] < diffs[bin_idx])
@@ -305,7 +200,7 @@ export default {
 			// Draw slider
 			let l_cor = [
 				{x0: this.min, x1: this.max, c:this.unselColor, d:full},
-				{x0: this.selected[0], x1: this.selected[1], c:this.selColor, d:true}
+				{x0: this.selected[0], x1: this.max, c:this.selColor, d:true}
 			].filter(d => d.d);
 
 			let to_rem = d3.select('#'+this.htmlid).selectAll('line');
@@ -344,72 +239,12 @@ export default {
 					this.tooltips[i].classed('hidden', true);
 				});
 		},
-
-		time_usage() {
-			const tu = {};
-			const data = JSON.parse(JSON.stringify(this.$store.state.fdata));
-
-			for (const d of data) {
-				const name = d['App Name'];
-				if (!tu[name]) {
-					tu[name] = 0;
-				}
-				tu[name] += d['Duration'];
-			}
-
-			this.utime = tu;
-			return tu;
-		},
-
-		switches() {
-			let users = new Set();
-			const data = JSON.parse(JSON.stringify(this.$store.state.fdata));
-
-			for (let d of data)
-				users.add(d['User_ID']);
-
-			// Fill the matrix with each user sequence
-			// let mt = new Array(this.app_names.length).fill(0).map(() => new Array(this.app_names.length).fill(0));
-
-			const mt = {};
-			for (const app_name of this.app_names) {
-				mt[app_name] = {};
-
-				for (const app_name2 of this.app_names) {
-					mt[app_name][app_name2] = 0;
-				}
-			}
-
-			for (const uid of users) {
-				// Build the user sequence
-				let f_data = data
-					.filter(d => d['User_ID'] == uid)
-					.sort(function(a, b) { return a.Time - b.Time; });
-
-				let mem = undefined;
-				let mem_time = undefined;
-
-				// Loop through the user sequence and compute switches
-				for (const d of f_data) {
-					const app_name = d['App Name'];
-
-					if (mem != undefined && mem != app_name && (d['Time'] - mem_time) < this.delta) {
-						mt[mem][app_name] += 1;
-					}
-
-					mem = app_name;
-					mem_time = d['Time'];
-				}
-			}
-
-			this.links = mt;
-
-			return mt;
-		},
 		sequences() {
+			this.model = [];
+			this.max_to_exclude = 0;
+
 			let users = new Set();
 			const data = JSON.parse(JSON.stringify(this.$store.state.fdata));
-
 
 			let keys = Object.keys(data);
 			for (let i = 0; i < keys.length; i++) {
@@ -420,7 +255,6 @@ export default {
 				users.add(d['User_ID']);
 
 			let sequences_per_user = [];
-
 			for (let uid of users) {
 				let f_data = data.filter(d => d['User_ID'] == uid)
 					.sort(function (a, b) {
@@ -450,15 +284,11 @@ export default {
 					}
 				}
 
-
 				var goal = sequences.reduce(function (carry, pathEntry) {
 					// On every path entry, resolve using the base object
 					pathEntry.path.reduce(function (pathObject, pathName) {
 						// For each path name we come across, use the existing or create a subpath
-
 						pathObject[pathName[0]] = pathObject[pathName[0]] || {'nb_use': 0, 'row_id' : []};
-
-
 						// Then return that subpath for the next operation
 						pathObject[pathName[0]]['nb_use'] += 1;
 						pathObject[pathName[0]]['row_id'].push(pathName[1]);
@@ -473,22 +303,13 @@ export default {
 				sequences_per_user.push(goal);
 			}
 			let s = sequences_per_user[0];
-
 			let app_name = Object.keys(s)[0];
 			//console.log(this.user_sequences[Object.keys(this.user_sequences)[0]][app_name]);
 			this.set_app_nb_use_by_index(app_name, s[app_name]);
 
-			let result = [];
-			let test_keys = Object.keys(this.test);
+			let to_ret = this.model.filter(d => d != this.max_to_exclude);
 
-			for (let i = 0; i < keys.length; i++) {
-				if (test_keys.includes(i.toString())) {
-					result.push(this.test[i][1]);
-				} else {
-					result.push(0);
-				}
-			}
-
+			return to_ret;
 		},
 		set_app_nb_use_by_index(app_name, values) {
 			let old = Object.keys(values);
@@ -500,6 +321,8 @@ export default {
 				}
 			}
 			this.model.push(values['nb_use']);
+			if (values['nb_use'] > this.max_to_exclude)
+				this.max_to_exclude = values['nb_use'];
 			for (let i of values['row_id']) {
 				this.test[i] = [app_name, values['nb_use']];
 			}
