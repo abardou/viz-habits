@@ -33,6 +33,7 @@ export default {
 		}
 	},
 	mounted () {
+		this.start_app_name = null;
 		const container = document.getElementById('radial-container');
 		this.width = container.offsetWidth - 50;
 		this.height = 890;
@@ -47,38 +48,21 @@ export default {
 
 		this.$root.$on('redrawRadialTree', () => {
 			this.draw_graph(); });
-	},
 
-	// 	//this.renderChart(this.chartData, this.options);
-	// 	//this.$emit('created', this.$data._chart);
-	// 	fetch('dataset.json').then(async resp => {
-	// 		let data = await resp.json();
-	// 		this.rtm = new RadialTreeModel(data, 10);
-	// 		// Apply last filters
-	// 		// acm.apply_filters(0, 1e10, 0, 1);
-	// 		// Build the visualization
-	// 		this.rtm.filter_tree();
-	// 		this.svg = d3.select('#radial-container').append('svg')
-	// 			.attr('width', 1000)
-	// 			.attr('height', 1000);
-	// 		this.tooltip = d3.select('body').append('div').attr('class', 'hidden tooltip');
-	// 		this.update_filters('Screen on (unlocked)', '1', 10, 'dendogram');
-	// 	});
-	//
-	//
-	//
-	// 	// ? let displays = ['dendogram', 'tidy', 'line'];
-	//
-	// },
+		this.$root.$on('resetRadialTree', () => {
+			this.start_app_name = null;
+			this.draw_graph(); });
+	},
 	methods: {
-		draw_graph(start_app_name=null) {
+		draw_graph() {
 			this.svg.selectAll('*').remove();
 			let data = this.$store.state.finaldata;
+			let min = this.$store.state.radialMinimum;
 
-			if (start_app_name != null) {
-				this.rtm = new RadialTreeModel(data, 10, start_app_name);
+			if (this.start_app_name != null) {
+				this.rtm = new RadialTreeModel(data, 10, min, this.start_app_name);
 			} else {
-				this.rtm = new RadialTreeModel(data, 10);
+				this.rtm = new RadialTreeModel(data, 10, min);
 			}
 
 			this.draw_tidy(this.rtm.get_tree());
@@ -86,9 +70,6 @@ export default {
 
 		get_correct_time(time){
 			return time / 10;
-		},
-		get_size(time) {
-			return Math.sqrt(this.get_correct_time(time) / Math.PI);
 		},
 		seconds_to_time(sec) {
 			let h = Math.floor(sec / 3600);
@@ -289,7 +270,8 @@ export default {
 					that.disable_focus();
 				})
 				.on('click', function(d) {
-					that.draw_graph(d.data.name);
+					that.start_app_name = d.data.name;
+					that.draw_graph();
 					that.tooltip.classed('hidden', true);
 				});
 

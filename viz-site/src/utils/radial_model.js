@@ -5,10 +5,11 @@
  * calculation on the whole dataset
  */
 export default class RadialTreeModel {
-	constructor(data, delta, start = 'Screen on (unlocked)') {
+	constructor(data, delta, minimum, start = 'Screen on (unlocked)') {
 		this.delta = delta;
 		this.start = start;
 		this.data = data;
+		this.minimum = minimum;
 		// Will build the attributes linked to app info
 		this.build_apps_info(this.data);
 		// Apps info need to be constructed before
@@ -149,9 +150,8 @@ export default class RadialTreeModel {
 
 	get_tree() {
 		this.build_tree(this.data);
-		console.log(this.user_sequences);
 		this.build_tree_from_json();
-		this.json_as_tree = this.filter_minimum(this.json_as_tree, 5);
+		this.json_as_tree = this.filter_minimum(this.json_as_tree, this.minimum);
 		//console.log(this.json_as_tree);
 		return this.json_as_tree;
 	}

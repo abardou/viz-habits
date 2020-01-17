@@ -56,14 +56,15 @@ export default {
 			this.$emit('changeVisu', data);
 		},
 		resetGraph(data) {
-			this.$root.$emit('redrawRadialTree');
+			this.$root.$emit('resetRadialTree');
 		},
 		mapChange(data) {
 			this.index_filtered[0] = new Set(data);
 			this.filter_norange();
 		},
 		sliderChange(data) {
-			console.log(data); // Tristan, here you go
+			this.$store.commit('setRadialMinimum', data); // Tristan, here you go
+			this.$root.$emit('redrawRadialTree');
 		},
 		userChange(data) {
 			this.index_filtered[1] = new Set(data);
@@ -89,10 +90,9 @@ export default {
 		},
 
 		filter_range() {
-			console.log(this.range_filtered);
 			let fdata = this.$store.state.fdata.filter((d, i) => !this.range_filtered.includes(i));
 			this.$store.commit('setFinalDataset', fdata);
-			this.$root.$emit('redrawRadialTreeGraph');
+			this.$root.$emit('redrawRadialTree');
 		}
 	}
 };
