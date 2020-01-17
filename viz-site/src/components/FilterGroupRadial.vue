@@ -63,8 +63,7 @@ export default {
 			this.filter_norange();
 		},
 		sliderChange(data) {
-			this.range_filtered = data;
-			this.filter_range();
+			console.log(data); // Tristan, here you go
 		},
 		userChange(data) {
 			this.index_filtered[1] = new Set(data);

@@ -95,13 +95,7 @@ export default {
 			this.max_to_exclude = 0;
 		},
 		sendEvent() {
-			const toDel = [];			
-
-			for (let i in this.model) {
-				if (this.model[i] < this.selected[0])
-					toDel.push(i);
-			}
-			this.$emit('sliderChange', toDel);
+			this.$emit('sliderChange', this.selected[0]);
 		},
 		_pp_data() {
 			return this.sequences();
@@ -313,18 +307,7 @@ export default {
 			//console.log(this.user_sequences[Object.keys(this.user_sequences)[0]][app_name]);
 			this.set_app_nb_use_by_index(app_name, s[app_name]);
 
-			let result = [];
-			let test_keys = Object.keys(this.test);
-			for (let i = 0; i < keys.length; i++) {
-				if (test_keys.includes(i.toString())) {
-					result.push(this.test[i][1]);
-				} else {
-					result.push(0);
-				}
-			}
-
 			let to_ret = this.model.filter(d => d != this.max_to_exclude);
-			this.model = result;
 
 			return to_ret;
 		},
