@@ -55,7 +55,7 @@ export default {
 		
 		this.$root.$on('redrawSlider', () => { this.build_slider(); });
 
-		this.width = document.getElementById('container-' + this.htmlid).offsetWidth + 50;
+		this.width = document.getElementById('container-' + this.htmlid).parentNode.offsetWidth;
 		this.width = this.width - this.margin.left - this.margin.right;
 
 		this.tooltips = [
@@ -119,14 +119,14 @@ export default {
 			let nbins = Math.min(this.nbbins, this.max - this.min);
 
 			// Draw histogram
-			var x = d3.scaleLinear()
+			const x = d3.scaleLinear()
 				.domain([this.min, this.max])
 				.range([0, this.width]);
 
-			var y = d3.scaleSqrt()
+			const y = d3.scaleSqrt()
 				.range([this.heightHist, 0]);
 
-			var histogram = d3.histogram()
+			const histogram = d3.histogram()
 				.domain(x.domain())
 				.thresholds(x.ticks(nbins));
 
@@ -135,7 +135,7 @@ export default {
 
 			y.domain([0, d3.max(this.bins, function(d) { return d.length; })]);
 
-			var u = this.svg.selectAll('rect')
+			const u = this.svg.selectAll('rect')
 				.data(this.bins);
 
 			u.enter()
