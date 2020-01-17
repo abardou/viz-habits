@@ -59,6 +59,8 @@ export default {
 			let data = this.$store.state.finaldata;
 			let min = this.$store.state.radialMinimum;
 
+
+			console.log(min);
 			if (this.start_app_name != null) {
 				this.rtm = new RadialTreeModel(data, 10, min, this.start_app_name);
 			} else {

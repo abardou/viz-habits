@@ -97,7 +97,7 @@ export default class RadialTreeModel {
 					seq = [this.start];
 					in_seq = true;
 				} else {
-					if (i['App Name'] == 'Screen off' && in_seq) {
+					if ((i['App Name'] == 'Screen off' || i['App Name'] == 'Screen on (unlocked)') && in_seq) {
 						//seq.push("Screen off")
 						sequences.push({'path': seq});
 						in_seq = false;
