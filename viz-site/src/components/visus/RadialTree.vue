@@ -17,12 +17,18 @@
 				Ce tidy tree représentent les séquences d'applications habituelles dans le dataset et ce à partir de l'écran dévérouillé jusqu'au prochain verrouillage (non affiché puisque celui-ci serait alors présent sur chaque branche)
 			</div>
 		</v-tooltip>
+		<v-switch
+			v-model="visuSwitch"
+			class="graph-switch"
+			:label="`${visuSwitch ? 'Graphe de switch' : 'Arbre radial'}`"
+			@change="changed"
+		/>
 	</v-container>
 </template>
 
 <script>
 import * as d3 from 'd3';
-import RadialTreeModel from '../../utils/radial_model';
+import RadialTreeModel from '@/utils/radial_model';
 
 export default {
 	name: 'RadialTree',
@@ -32,6 +38,9 @@ export default {
 			default : null
 		}
 	},
+	data: () => ({
+		visuSwitch: false
+	}),
 	mounted () {
 		const container = document.getElementById('radial-container');
 		this.width = container.offsetWidth - 50;
@@ -49,28 +58,10 @@ export default {
 			this.draw_graph(); });
 	},
 
-	// 	//this.renderChart(this.chartData, this.options);
-	// 	//this.$emit('created', this.$data._chart);
-	// 	fetch('dataset.json').then(async resp => {
-	// 		let data = await resp.json();
-	// 		this.rtm = new RadialTreeModel(data, 10);
-	// 		// Apply last filters
-	// 		// acm.apply_filters(0, 1e10, 0, 1);
-	// 		// Build the visualization
-	// 		this.rtm.filter_tree();
-	// 		this.svg = d3.select('#radial-container').append('svg')
-	// 			.attr('width', 1000)
-	// 			.attr('height', 1000);
-	// 		this.tooltip = d3.select('body').append('div').attr('class', 'hidden tooltip');
-	// 		this.update_filters('Screen on (unlocked)', '1', 10, 'dendogram');
-	// 	});
-	//
-	//
-	//
-	// 	// ? let displays = ['dendogram', 'tidy', 'line'];
-	//
-	// },
 	methods: {
+		changed(data) {
+			this.$emit('changeVisu', data);
+		},
 		draw_graph(start_app_name=null) {
 			this.svg.selectAll('*').remove();
 			let data = this.$store.state.finaldata;

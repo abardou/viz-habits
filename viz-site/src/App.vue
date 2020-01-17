@@ -83,14 +83,14 @@
 					<v-row v-if="fetched">
 						<v-col cols="5" style="border-right: 1px solid black;">
 							<!-- <v-card style="background-color: #2B2B3B"> -->
-							<FilterGroup v-if="visu" @changeVisu="changeVisu" />
-							<FilterGroupRadial v-else @changeVisu="changeVisu" />
+							<FilterGroup v-if="visu" />
+							<FilterGroupRadial v-else />
 							<!-- </v-card> -->
 						</v-col>
 						<v-col cols="7">
 							<!-- <v-card> -->
-							<ForceGraph v-if="visu" />
-							<RadialTree v-else />
+							<ForceGraph v-if="visu" @changeVisu="changeVisu" />
+							<RadialTree v-else @changeVisu="changeVisu" />
 							<!-- </v-card> -->
 						</v-col>
 					</v-row>

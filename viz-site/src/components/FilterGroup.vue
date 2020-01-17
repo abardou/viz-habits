@@ -21,7 +21,6 @@
 			<v-col cols="6">
 				<v-container pa-2>
 					<UserFilter @userChange="userChange" />
-					<v-switch v-model="visuSwitch" :label="`${visuSwitch ? 'Graphe de switch' : 'Arbre radial'}`" @change="changed" />
 				</v-container>
 			</v-col>
 			<v-col cols="6">
@@ -45,19 +44,12 @@ export default {
 		MapFilter,
 		TimePeriodPicker
 	},
-	data: () => ({
-		// True : forceGraph False : Dendogram
-		visuSwitch: true
-	}),
 	mounted() {
 		this.index_filtered = [new Set(), new Set(), new Set()];
 		this.range_filtered = new Array();
 		this.edges_filtered = new Array();
 	},
 	methods: {
-		changed(data) {
-			this.$emit('changeVisu', data);
-		},
 		mapChange(data) {
 			this.index_filtered[0] = new Set(data);
 			this.filter_norange();

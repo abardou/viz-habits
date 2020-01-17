@@ -16,7 +16,13 @@
 			<div>
 				Les noeuds correspondent aux applications, les arêtes aux basculements entre applications. Les points en dessous de chaque nom correspondent aux couleurs des utilisateurs ayant utilisé ces applications.
 			</div>
-		</v-tooltip> 
+		</v-tooltip>
+		<v-switch
+			v-model="visuSwitch"
+			class="graph-switch"
+			:label="`${visuSwitch ? 'Graphe de switch' : 'Arbre radial'}`"
+			@change="changed"
+		/>
 	</v-container>
 </template>
 
@@ -32,7 +38,8 @@ export default {
 		width: null,
 		height: null,
 		toDelEdges: {},
-		draggedNode: null
+		draggedNode: null,
+		visuSwitch: true
 	}),
 	computed: {
 		cx: function() {
@@ -71,6 +78,9 @@ export default {
 		});
 	},
 	methods: {
+		changed(data) {
+			this.$emit('changeVisu', data);
+		},
 		draw_graph() {
 			this.svg.selectAll('*').remove();
 			let data = this.$store.state.finaldata;
@@ -326,5 +336,11 @@ div.tooltip {
 	position: absolute;
 	top: 5px;
 	left: 5px;
+}
+
+.graph-switch {
+	position: absolute;
+	bottom: 5px;
+	right: 5px;
 }
 </style>
